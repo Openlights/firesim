@@ -12,9 +12,11 @@ class FireSimGUI(QtCore.QObject):
         self.view = QtDeclarative.QDeclarativeView()
         self.view.setSource(QtCore.QUrl('ui/qml/firesimgui.qml'))
         self.view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
+        self.view.show()
 
-        self.app.exec_()
+        sys.exit(self.app.exec_())
+
 
 if __name__ == "__main__":
-    firesim = FireSimGUI()
+    sim = FireSimGUI()
 
