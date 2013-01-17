@@ -8,19 +8,21 @@ Rectangle {
 
     color: "#282828"
     width: 100
-    height: 48
+    height: 32
+    radius: 5
 
     signal clicked
 
     Rectangle {
         id: shade
+        radius: 5
         anchors.fill: button; color: "white"; opacity: 0
     }
 
     Text {
         id: buttonText
         anchors.centerIn: parent; anchors.verticalCenterOffset: -1
-        font.pixelSize: parent.width > parent.height ? parent.height * .25 : parent.width * .25
+        font.pixelSize: parent.width > parent.height ? parent.height * .4 : parent.width * .4
         style: Text.Sunken; color: "white"; styleColor: "black"; smooth: true
     }
 

@@ -25,22 +25,23 @@ Item {
 
         width: 120
         color: "#121212";
-        anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
+        anchors { left: parent.left; top: parent.top; bottom: parent.bottom; }
 
         Column {
-            anchors.centerIn: parent
+            anchors { horizontalCenter: parent.horizontalCenter }
+
             spacing: 8
 
             Text { color: "#cfcfcf"; text: "FireSim" }
 
             Button {
+                id: btnAddFixture
                 text: "Add Fixture"
-                onClicked: {
-                    var fixCmp = Qt.createComponent("fixture_strand.qml");
-                    if (fixCmp.status == Component.Ready) {
-                        fixCmp.createObject(sim);
-                    }
-                }
+            }
+
+            Button {
+                id: btnClear
+                text: "Clear"
             }
         }
     }
