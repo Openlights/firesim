@@ -2,11 +2,19 @@ import sys
 from PySide import QtCore, QtGui, QtDeclarative
 
 
+class FireSimGUI(QtCore.QObject):
+
+    def __init__(self):
+        QtCore.QObject.__init__(self)
+
+        self.app = QtGui.QApplication(["FireSim"])
+
+        self.view = QtDeclarative.QDeclarativeView()
+        self.view.setSource(QtCore.QUrl('ui/qml/firesimgui.qml'))
+        self.view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
+
+        self.app.exec_()
+
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    view = QtDeclarative.QDeclarativeView()
-    url = QtCore.QUrl('ui/qml/firesimgui.qml')
-    view.setSource(url)
-    view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
-    view.show()
-    sys.exit(app.exec_())
+    firesim = FireSimGUI()
+
