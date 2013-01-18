@@ -1,21 +1,21 @@
 import QtQuick 1.0
+import FireSim 1.0
 import "widgets"
 
 Item {
     id: window
 
-    width: 640;
-    height: 480;
+    width: 640
+    height: 480
 
     MouseArea {
         anchors.fill: parent
         onClicked: window.focus = false;
     }
 
-    Rectangle {
+    SimCanvas {
         id: sim
         anchors {left: toolbox.right; top: parent.top; bottom: parent.bottom; right: parent.right}
-        color: "#000000"
     }
 
     SystemPalette { id: activePalette }
@@ -28,20 +28,20 @@ Item {
         anchors { left: parent.left; top: parent.top; bottom: parent.bottom; }
 
         Column {
-            anchors { horizontalCenter: parent.horizontalCenter }
+            anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: 8; }
 
             spacing: 8
 
-            Text { color: "#cfcfcf"; text: "FireSim" }
-
             Button {
-                id: btnAddFixture
+                id: btn_add_fixture
                 text: "Add Fixture"
+                onClicked: main.on_btn_add_fixture()
             }
 
             Button {
-                id: btnClear
+                id: btn_clear
                 text: "Clear"
+                onClicked: main.on_btn_clear()
             }
         }
     }

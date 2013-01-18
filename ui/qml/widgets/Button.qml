@@ -22,8 +22,9 @@ Rectangle {
     Text {
         id: buttonText
         anchors.centerIn: parent; anchors.verticalCenterOffset: -1
-        font.pixelSize: parent.width > parent.height ? parent.height * .4 : parent.width * .4
-        style: Text.Sunken; color: "white"; styleColor: "black"; smooth: true
+        font.pixelSize: 14
+        color: "white"
+        smooth: true
     }
 
     MouseArea {
