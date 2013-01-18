@@ -44,6 +44,39 @@ Item {
                 text: "Clear"
                 onClicked: main.on_btn_clear()
             }
+
+            Button {
+                id: btn_load
+                text: "Load Scene"
+            }
+
+            Button {
+                id: btn_save
+                text: "Save Scene"
+            }
+
+            Button {
+                id: btn_load_bg
+                text: "Load Backdrop"
+            }
+
+            Rectangle {
+                width: 100
+                height: 150
+
+                radius: 5
+                color: "#232323"
+
+                Column {
+                    spacing: 8
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Text {
+                        color: "#dddddd"
+                        text: "Fixture Info"
+                    }
+                }
+            }
         }
     }
 }

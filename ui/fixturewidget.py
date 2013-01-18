@@ -40,7 +40,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def mouseMoveEvent(self, event):
         if self.dragging:
             npos = (event.scenePos() - self.drag_pos)
-            self.moveBy(npos.x(), npos.y())
+            if self.parent().sceneBoundingRect().contains(event.scenePos()):
+                self.moveBy(npos.x(), npos.y())
             self.drag_pos = event.scenePos()
 
     def mousePressEvent(self, event):
