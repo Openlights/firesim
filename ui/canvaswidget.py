@@ -13,6 +13,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.fixture_list = []
         self.background_image = None
         self.rect = None
+        self.next_new_fixture_pos = (0, 0)
 
     def paint(self, painter, options, widget):
         self.rect = QtCore.QRect(0, 0, self.width(), self.height())
@@ -39,6 +40,11 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
     def set_background_image(self, image):
         assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
         self.background_image = image
+
+    def get_next_new_fixture_pos_and_increment(self):
+        x, y = self.next_new_fixture_pos
+        self.next_new_fixture_pos = (x + 2, y + 2)
+        return (x, y)
 
     def hoverMoveEvent(self, event):
         pass

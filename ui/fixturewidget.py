@@ -16,6 +16,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.hovering = False
         self.drag_pos = None
         self.rect = QtCore.QRect(0, 0, 128, 16)
+        if parent:
+            x, y = parent.get_next_new_fixture_pos_and_increment()
+            self.setPos(x, y)
 
     def paint(self, painter, options, widget):
         if self.hovering:
