@@ -3,6 +3,7 @@ from PySide import QtCore, QtGui, QtDeclarative
 
 from fixture import Fixture
 from ui.simcanvas import SimCanvasDeclarative
+from ui.fixturedeclarative import FixtureDeclarative
 
 
 class FireSimGUI(QtCore.QObject):
@@ -13,6 +14,7 @@ class FireSimGUI(QtCore.QObject):
         self.app = QtGui.QApplication(["FireSim"])
 
         QtDeclarative.qmlRegisterType(SimCanvasDeclarative, "FireSim", 1, 0, "SimCanvas")
+        QtDeclarative.qmlRegisterType(FixtureDeclarative, "FireSim", 1, 0, "Fixture")
 
         self.view = QtDeclarative.QDeclarativeView()
         self.view.setSource(QtCore.QUrl('ui/qml/FireSimGUI.qml'))
@@ -24,14 +26,15 @@ class FireSimGUI(QtCore.QObject):
 
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(SimCanvasDeclarative)
-        self.canvas_mouse = self.root.findChild(QtDeclarative.QDeclarativeItem, "simMouseArea")
-        print self.canvas_mouse
+
+        self.fix0 = FixtureDeclarative(self.canvas)
+        self.fix0.setParentItem(self.canvas)
 
         self.canvas.set_background_image(QtGui.QImage("light_dome.png"))
 
         self.fixture_list = [Fixture(32, (1, 1, 64, 2))]
 
-        self.canvas.update_fixtures(self.fixture_list)
+        #self.canvas.update_fixtures(self.fixture_list)
 
         self.view.show()
         sys.exit(self.app.exec_())
@@ -52,23 +55,6 @@ class FireSimGUI(QtCore.QObject):
     def on_btn_clear(self):
         self.fixture_list = []
         self.update_fixtures()
-
-    @QtCore.Slot()
-    def on_mouse_move(self):
-        pass
-
-    @QtCore.Slot()
-    def on_mouse_press(self):
-        for i, _ in enumerate(self.fixture_list):
-            self.fixture_list[i].set_all((255, 255, 255))
-        self.update_fixtures()
-
-    @QtCore.Slot()
-    def on_mouse_release(self):
-        for i, _ in enumerate(self.fixture_list):
-            self.fixture_list[i].set_all((255, 0, 255))
-        self.update_fixtures()
-
 
 if __name__ == "__main__":
     sim = FireSimGUI()
