@@ -2,10 +2,10 @@ from PySide import QtCore, QtGui, QtDeclarative
 
 from fixture import Fixture
 
-class FixtureDeclarative(QtDeclarative.QDeclarativeItem):
+class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def __init__(self, parent = None):
-        super(FixtureDeclarative, self).__init__(parent)
+        super(FixtureWidget, self).__init__(parent)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
         self.setAcceptsHoverEvents(True)

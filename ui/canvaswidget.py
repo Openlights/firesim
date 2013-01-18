@@ -2,9 +2,9 @@ from PySide import QtCore, QtGui, QtDeclarative
 
 from fixture import Fixture
 
-class SimCanvasDeclarative(QtDeclarative.QDeclarativeItem):
+class CanvasWidget(QtDeclarative.QDeclarativeItem):
     def __init__(self, parent = None):
-        super(SimCanvasDeclarative, self).__init__()
+        super(CanvasWidget, self).__init__()
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setFlag(QtGui.QGraphicsItem.ItemClipsChildrenToShape, True)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
