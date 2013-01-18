@@ -16,6 +16,7 @@ Item {
     SimCanvas {
         id: sim
         anchors {left: toolbox.right; top: parent.top; bottom: parent.bottom; right: parent.right}
+
     }
 
     SystemPalette { id: activePalette }

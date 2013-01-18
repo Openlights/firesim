@@ -6,6 +6,9 @@ class SimCanvasDeclarative(QtDeclarative.QDeclarativeItem):
     def __init__(self, parent = None):
         super(SimCanvasDeclarative, self).__init__()
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
+        self.setFlag(QtGui.QGraphicsItem.ItemClipsChildrenToShape, True)
+        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
+        self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.fixture_list = []
         self.background_image = None
@@ -36,3 +39,12 @@ class SimCanvasDeclarative(QtDeclarative.QDeclarativeItem):
     def set_background_image(self, image):
         assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
         self.background_image = image
+
+    def hoverMoveEvent(self, event):
+        pass
+
+    def mouseMoveEvent(self, event):
+        pass
+
+    def mousePressEvent(self, event):
+        print "click", event.scenePos()
