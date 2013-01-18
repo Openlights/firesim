@@ -8,9 +8,14 @@ class SimCanvasDeclarative(QtDeclarative.QDeclarativeItem):
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.color = QtGui.QColor(100, 100, 100)
         self.fixture_list = []
+        self.background_image = None
+        self.rect = None
 
     def paint(self, painter, options, widget):
-        painter.fillRect(0, 0, self.width(), self.height(), QtGui.QColor(0, 0, 0))
+        self.rect = QtCore.QRect(0, 0, self.width(), self.height())
+        painter.fillRect(self.rect, QtGui.QColor(0, 0, 0))
+        if self.background_image is not None:
+            painter.drawImage(self.rect, self.background_image)
         pen = QtGui.QPen(self.color, 2)
         painter.setPen(pen)
         painter.setRenderHints(QtGui.QPainter.Antialiasing, True)
@@ -27,3 +32,7 @@ class SimCanvasDeclarative(QtDeclarative.QDeclarativeItem):
     def update_fixtures(self, fixture_list):
         self.fixture_list = fixture_list
         self.update()
+
+    def set_background_image(self, image):
+        assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
+        self.background_image = image
