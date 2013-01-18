@@ -26,14 +26,9 @@ class FireSimGUI(QtCore.QObject):
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(CanvasWidget)
 
-        self.fix0 = FixtureWidget(self.canvas)
-        self.fix0.setParentItem(self.canvas)
-
         self.canvas.set_background_image(QtGui.QImage("light_dome.png"))
 
-        self.fixture_list = [Fixture(32, (1, 1, 64, 2))]
-
-        #self.canvas.update_fixtures(self.fixture_list)
+        self.fixture_list = [FixtureWidget(self.canvas)]
 
         self.view.show()
 
@@ -43,16 +38,11 @@ class FireSimGUI(QtCore.QObject):
     def on_close(self, e):
         pass
 
-    def update_fixtures(self):
-        self.canvas.update_fixtures(self.fixture_list)
-
     @QtCore.Slot()
     def on_btn_add_fixture(self):
-        for i, _ in enumerate(self.fixture_list):
-            self.fixture_list[i].set_all((255, 0, 255))
-        self.update_fixtures()
+        self.fixture_list.append(FixtureWidget(self.canvas))
 
     @QtCore.Slot()
     def on_btn_clear(self):
-        self.fixture_list = []
-        self.update_fixtures()
+        for fixture in self.fixture_list:
+            fixture.deleteLater()
