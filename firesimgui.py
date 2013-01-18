@@ -1,8 +1,8 @@
 from PySide import QtCore, QtGui, QtDeclarative
 
 from fixture import Fixture
-from ui.simcanvas import SimCanvasDeclarative
-from ui.fixturedeclarative import FixtureDeclarative
+from ui.canvaswidget import CanvasWidget
+from ui.fixturewidget import FixtureWidget
 
 
 class FireSimGUI(QtCore.QObject):
@@ -12,8 +12,8 @@ class FireSimGUI(QtCore.QObject):
 
         self.app = QtGui.QApplication(["FireSim"])
 
-        QtDeclarative.qmlRegisterType(SimCanvasDeclarative, "FireSim", 1, 0, "SimCanvas")
-        QtDeclarative.qmlRegisterType(FixtureDeclarative, "FireSim", 1, 0, "Fixture")
+        QtDeclarative.qmlRegisterType(CanvasWidget, "FireSim", 1, 0, "SimCanvas")
+        QtDeclarative.qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
 
         self.view = QtDeclarative.QDeclarativeView()
         self.view.setSource(QtCore.QUrl('ui/qml/FireSimGUI.qml'))
@@ -24,9 +24,9 @@ class FireSimGUI(QtCore.QObject):
         self.context.setContextProperty('main', self)
 
         self.root = self.view.rootObject()
-        self.canvas = self.root.findChild(SimCanvasDeclarative)
+        self.canvas = self.root.findChild(CanvasWidget)
 
-        self.fix0 = FixtureDeclarative(self.canvas)
+        self.fix0 = FixtureWidget(self.canvas)
         self.fix0.setParentItem(self.canvas)
 
         self.canvas.set_background_image(QtGui.QImage("light_dome.png"))
