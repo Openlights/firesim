@@ -1,6 +1,7 @@
 import sys
 from PySide import QtCore, QtGui, QtDeclarative
 
+from fixture import Fixture
 from ui.simcanvas import SimCanvasDeclarative
 
 
@@ -23,6 +24,11 @@ class FireSimGUI(QtCore.QObject):
 
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(SimCanvasDeclarative)
+        assert isinstance(self.canvas, SimCanvasDeclarative)
+
+        self.fixture_list = [Fixture(32, (1, 1, 64, 2))]
+
+        self.canvas.update_fixtures(self.fixture_list)
 
         self.view.show()
         sys.exit(self.app.exec_())
@@ -30,15 +36,19 @@ class FireSimGUI(QtCore.QObject):
     def on_close(self, e):
         pass
 
+    def update_fixtures(self):
+        self.canvas.update_fixtures(self.fixture_list)
+
     @QtCore.Slot()
     def on_btn_add_fixture(self):
-        fixc = QtDeclarative.QDeclarativeComponent(self.view.engine(), QtCore.QUrl("ui/qml/Fixture_Strand.qml"))
-        if fixc.isReady():
-            fix = fixc.create(self.context)
+        for i, _ in enumerate(self.fixture_list):
+            self.fixture_list[i].set_all((255, 0, 255))
+        self.update_fixtures()
 
     @QtCore.Slot()
     def on_btn_clear(self):
-        self.canvas.set_color((255, 0, 255))
+        self.fixture_list = []
+        self.update_fixtures()
 
 
 if __name__ == "__main__":

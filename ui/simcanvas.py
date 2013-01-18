@@ -1,20 +1,29 @@
 from PySide import QtCore, QtGui, QtDeclarative
 
+from fixture import Fixture
 
 class SimCanvasDeclarative(QtDeclarative.QDeclarativeItem):
     def __init__(self, parent = None):
         super(SimCanvasDeclarative, self).__init__()
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
-        self.color = QtGui.QColor(255, 255, 0)
+        self.color = QtGui.QColor(100, 100, 100)
+        self.fixture_list = []
 
     def paint(self, painter, options, widget):
         painter.fillRect(0, 0, self.width(), self.height(), QtGui.QColor(0, 0, 0))
         pen = QtGui.QPen(self.color, 2)
         painter.setPen(pen)
         painter.setRenderHints(QtGui.QPainter.Antialiasing, True)
-        painter.drawPie(self.boundingRect(), 90 * 16, 290 * 16)
 
-    def set_color(self, color):
-        r, g, b = color
-        self.color = QtGui.QColor(r, g, b)
+        # TODO: support multi-dimensional fixtures
+        for fixture in self.fixture_list:
+            x, y, w, h = fixture.pos_rect
+            painter.fillRect(x, y, w, h, self.color)
+            for px, color in enumerate(fixture.pixels):
+                r, g, b = color
+                xp = int(x + w * (float(px) / fixture.num_pixels))
+                painter.fillRect(xp, y, (w / fixture.num_pixels), h, QtGui.QColor(r, g, b))
+
+    def update_fixtures(self, fixture_list):
+        self.fixture_list = fixture_list
         self.update()
