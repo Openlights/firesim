@@ -24,7 +24,8 @@ class FireSimGUI(QtCore.QObject):
 
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(SimCanvasDeclarative)
-        assert isinstance(self.canvas, SimCanvasDeclarative)
+
+        self.canvas.set_background_image(QtGui.QImage("light_dome.png"))
 
         self.fixture_list = [Fixture(32, (1, 1, 64, 2))]
 
