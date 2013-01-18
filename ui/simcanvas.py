@@ -47,4 +47,4 @@ class SimCanvasDeclarative(QtDeclarative.QDeclarativeItem):
         pass
 
     def mousePressEvent(self, event):
-        print "click", event.scenePos()
+        pass
