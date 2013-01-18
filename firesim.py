@@ -21,6 +21,9 @@ class FireSimGUI(QtCore.QObject):
         self.context = self.view.rootContext()
         self.context.setContextProperty('main', self)
 
+        self.root = self.view.rootObject()
+        self.canvas = self.root.findChild(SimCanvasDeclarative)
+
         self.view.show()
         sys.exit(self.app.exec_())
 
@@ -35,7 +38,7 @@ class FireSimGUI(QtCore.QObject):
 
     @QtCore.Slot()
     def on_btn_clear(self):
-        print "clear"
+        self.canvas.set_color((255, 0, 255))
 
 
 if __name__ == "__main__":
