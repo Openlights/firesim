@@ -14,7 +14,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.setWidth(128)
         self.dragging = False
         self.hovering = False
-        self.drag_start = None
+        self.drag_pos = None
         self.rect = QtCore.QRect(0, 0, 128, 16)
 
     def paint(self, painter, options, widget):
@@ -24,7 +24,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             hover_rect = QtCore.QRect(2, 4, 124, 8)
             painter.drawRoundRect(hover_rect, 16, 16)
         fixture_bg = QtCore.QRect(4, 6, 120, 4)
-        painter.fillRect(fixture_bg, QtGui.QColor(200, 200, 0))
+        painter.fillRect(fixture_bg, QtGui.QColor(200, 200, 0, 200))
 
     def hoverEnterEvent(self, event):
         self.hovering = True
@@ -36,12 +36,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def mouseMoveEvent(self, event):
         if self.dragging:
-            self.setPos(event.scenePos() - self.drag_start - self.pos())
+            npos = (event.scenePos() - self.drag_pos)
+            self.moveBy(npos.x(), npos.y())
+            self.drag_pos = event.scenePos()
 
     def mousePressEvent(self, event):
         self.dragging = True
-        self.drag_start = event.scenePos()
+        self.drag_pos = event.scenePos()
 
     def mouseReleaseEvent(self, event):
         self.dragging = False
-        self.drag_start = None
+        self.drag_pos = None
