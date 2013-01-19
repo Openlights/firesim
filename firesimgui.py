@@ -16,7 +16,7 @@ class FireSimGUI(QtCore.QObject):
         QtDeclarative.qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
 
         self.view = QtDeclarative.QDeclarativeView()
-        self.view.setSource(QtCore.QUrl('ui/qml/FireSimGUI.qml'))
+        self.view.setSource(QtCore.QUrl('ui/qml/firesimgui.qml'))
         self.view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
         self.view.closeEvent = self.on_close
 
@@ -44,5 +44,6 @@ class FireSimGUI(QtCore.QObject):
 
     @QtCore.Slot()
     def on_btn_clear(self):
-        for fixture in self.fixture_list:
+        while len(self.fixture_list) > 0:
+            fixture = self.fixture_list.pop()
             fixture.deleteLater()
