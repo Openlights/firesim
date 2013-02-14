@@ -1,61 +1,56 @@
 {
     "backdrop_enable": true,
     "backdrop_filename": "light_dome.png",
-    "surfaces" : [{
-        "name" : "Test Surface",
-        "dimensions" : "640,480",
-        "strands" : [
-            {
-                "name" : "Strand1",
-                "type" : "Openlights_Ethernet_Node",
-                "address" : 0,
-                "num_pixels" : 4096,
-                "ip_address" : "192.168.50.2",
-                "port" : 5202,
-                "fixtures" : [
-                    {
-                        "id" : 0,
-                        "offset" : 0,
-                        "type" : "Openlights_32LED_Bar",
-                        "tl" : "195,50",
-                        "scale" : 3.0,
-                        "angle" : "60.0"
-                    },
-                    {
-                        "id" : 1,
-                        "offset" : 32,
-                        "type" : "Openlights_32LED_Bar",
-                        "tl" : "315,50",
-                        "scale" : 3.0,
-                        "angle" : -60.0
-                    },
-                    {
-                        "id" : 2,
-                        "offset" : 64,
-                        "type" : "Openlights_32LED_Bar",
-                        "tl" : "220,210",
-                        "scale" : 3.0,
-                        "angle" : -180.0
-                    },
-                    {
-                        "id" : 3,
-                        "offset" : 128,
-                        "type" : "Openlights_32LED_Bar",
-                        "tl" : "165,265",
-                        "scale" : 3.0,
-                        "angle" : -60.0
-                    },
-                    {
-                        "id" : 4,
-                        "offset" : 96,
-                        "type" : "Openlights_32LED_Bar",
-                        "tl" : "345,265",
-                        "scale" : 3.0,
-                        "angle" : 60.0
-                    }
-
-                ]
-            }
-        ]
-    }]
+    "fixtures": [
+        {
+            "id": 0,
+            "strand": 0,
+            "address": 0,
+            "type": "linear",
+            "pixels": 32,
+            "pos1" : "195,50",
+            "scale" : 3.0,
+            "angle" : "60.0"
+        },
+        {
+            "id" : 1,
+            "strand": 0,
+            "address": 1,
+            "type": "linear",
+            "pixels": 32,
+            "pos1" : "315,50",
+            "scale" : 3.0,
+            "angle" : -60.0
+        },
+        {
+            "id" : 2,
+            "strand": 0,
+            "address": 2,
+            "type": "linear",
+            "pixels": 32,
+            "pos1" : "220,210",
+            "scale" : 3.0,
+            "angle" : -180.0
+        },
+        {
+            "id" : 3,
+            "strand": 0,
+            "address": 3,
+            "type": "linear",
+            "pixels": 32,
+            "pos1" : "165,265",
+            "scale" : 3.0,
+            "angle" : -60.0
+        },
+        {
+            "id" : 4,
+            "strand": 0,
+            "address": 4,
+            "type": "linear",
+            "pixels": 32,
+            "pos1" : "345,265",
+            "scale" : 3.0,
+            "angle" : 60.0
+        }
+    ]
 }
