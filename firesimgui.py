@@ -17,7 +17,10 @@ class FireSimGUI(QtCore.QObject):
 
         self.view = QtDeclarative.QDeclarativeView()
         self.view.setSource(QtCore.QUrl('ui/qml/FireSimGUI.qml'))
+        self.view.setWindowTitle("FireSim")
         self.view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
+        w, h = self.view.size().toTuple()
+        self.view.setFixedSize(w, h)
         self.view.closeEvent = self.on_close
 
         self.context = self.view.rootContext()
