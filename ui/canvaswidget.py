@@ -53,3 +53,6 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def mousePressEvent(self, event):
         pass
+
+    def on_fixture_click(self, fixture):
+        print "Fixture %d clicked" % fixture.id
