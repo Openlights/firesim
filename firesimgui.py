@@ -8,6 +8,7 @@ from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from util.config import Config
 from models.scene import Scene
+from controllers.scenecontroller import SceneController
 
 
 class FireSimGUI(QtCore.QObject):
@@ -38,18 +39,7 @@ class FireSimGUI(QtCore.QObject):
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(CanvasWidget)
 
-        if self.scene.get("backdrop_enable", False):
-            log.info("Loading backdrop from " + self.scene.get("backdrop_filename"))
-            self.canvas.set_background_image(QtGui.QImage(self.scene.get("backdrop_filename")))
-
-        self.fixture_list = []
-        if len(self.scene.fixtures) > 0:
-            for fixture in self.scene.fixtures:
-                fw = FixtureWidget(self.canvas, fixture.id)
-                x, y = fixture.pos1
-                fw.setPos(x, y)
-                fw.setRotation(fixture.angle)
-                self.fixture_list.append(fw)
+        self.scenecontroller = SceneController(canvas=self.canvas, scene=self.scene)
 
         log.info("FireSimGUI Ready.")
         self.view.show()
@@ -62,10 +52,8 @@ class FireSimGUI(QtCore.QObject):
 
     @QtCore.Slot()
     def on_btn_add_fixture(self):
-        self.fixture_list.append(FixtureWidget(self.canvas))
+        self.scenecontroller.add_fixture()
 
     @QtCore.Slot()
     def on_btn_clear(self):
-        while len(self.fixture_list) > 0:
-            fixture = self.fixture_list.pop()
-            fixture.deleteLater()
+        self.scenecontroller.clear_fixtures()

@@ -12,4 +12,3 @@ class Scene(JSONLoader):
         if len(fd) > 0:
             for f in fd:
                 self.fixtures.append(Fixture(f))
-        print self.fixtures
