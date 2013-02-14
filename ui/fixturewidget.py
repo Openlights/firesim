@@ -6,6 +6,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def __init__(self, canvas=None, id=0, model=None, move_callback=None):
         super(FixtureWidget, self).__init__(canvas)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
+        self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
@@ -16,6 +17,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.setWidth(128)
         self.dragging = False
         self.mouse_down = False
+        self.setSelected(False)
         self.hovering = False
         self.drag_pos = None
         self.rect = QtCore.QRect(0, 0, 128, 16)
@@ -25,7 +27,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.setPos(x, y)
 
     def paint(self, painter, options, widget):
-        if self.hovering:
+        if self.isSelected() or self.hovering:
             painter.setPen(QtGui.QColor(50, 100, 255, 255))
             painter.setBrush(QtGui.QColor(50, 100, 255, 255))
             hover_rect = QtCore.QRect(2, 4, 124, 8)
@@ -58,6 +60,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def mouseReleaseEvent(self, event):
         if not self.dragging:
             if event.button() == QtCore.Qt.MouseButton.LeftButton:
+                self.setSelected(not self.isSelected())
+                if not self.isSelected():
+                    self.hovering = False
                 self.canvas.on_fixture_click(self)
         self.dragging = False
         self.mouse_down = False
