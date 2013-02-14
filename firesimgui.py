@@ -42,7 +42,13 @@ class FireSimGUI(QtCore.QObject):
             log.info("Loading backdrop from " + self.scene.get("backdrop_filename"))
             self.canvas.set_background_image(QtGui.QImage(self.scene.get("backdrop_filename")))
 
-        self.fixture_list = [FixtureWidget(self.canvas)]
+        self.fixture_list = []
+        if len(self.scene.fixtures) > 0:
+            for fixture in self.scene.fixtures:
+                fw = FixtureWidget(self.canvas, fixture.id)
+                x, y = fixture.pos1
+                fw.setPos(x, y)
+                self.fixture_list.append(fw)
 
         log.info("FireSimGUI Ready.")
         self.view.show()

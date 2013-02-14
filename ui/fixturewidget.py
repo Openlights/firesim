@@ -4,12 +4,13 @@ from fixture import Fixture
 
 class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None, id=0):
         super(FixtureWidget, self).__init__(parent)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
+        self.id = id
         self.setHeight(16)
         self.setWidth(128)
         self.dragging = False
