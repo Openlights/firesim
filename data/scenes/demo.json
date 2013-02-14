@@ -1,0 +1,61 @@
+{
+    "backdrop_enable": true,
+    "backdrop_filename": "light_dome.png",
+    "surfaces" : [{
+        "name" : "Test Surface",
+        "dimensions" : "640,480",
+        "strands" : [
+            {
+                "name" : "Strand1",
+                "type" : "Openlights_Ethernet_Node",
+                "address" : 0,
+                "num_pixels" : 4096,
+                "ip_address" : "192.168.50.2",
+                "port" : 5202,
+                "fixtures" : [
+                    {
+                        "id" : 0,
+                        "offset" : 0,
+                        "type" : "Openlights_32LED_Bar",
+                        "tl" : "195,50",
+                        "scale" : 3.0,
+                        "angle" : "60.0"
+                    },
+                    {
+                        "id" : 1,
+                        "offset" : 32,
+                        "type" : "Openlights_32LED_Bar",
+                        "tl" : "315,50",
+                        "scale" : 3.0,
+                        "angle" : -60.0
+                    },
+                    {
+                        "id" : 2,
+                        "offset" : 64,
+                        "type" : "Openlights_32LED_Bar",
+                        "tl" : "220,210",
+                        "scale" : 3.0,
+                        "angle" : -180.0
+                    },
+                    {
+                        "id" : 3,
+                        "offset" : 128,
+                        "type" : "Openlights_32LED_Bar",
+                        "tl" : "165,265",
+                        "scale" : 3.0,
+                        "angle" : -60.0
+                    },
+                    {
+                        "id" : 4,
+                        "offset" : 96,
+                        "type" : "Openlights_32LED_Bar",
+                        "tl" : "345,265",
+                        "scale" : 3.0,
+                        "angle" : 60.0
+                    }
+
+                ]
+            }
+        ]
+    }]
+}

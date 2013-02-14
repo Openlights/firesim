@@ -1,4 +1,5 @@
 import logging as log
+import os.path
 
 from PySide import QtCore, QtGui, QtDeclarative
 
@@ -6,16 +7,19 @@ from fixture import Fixture
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from util.config import Config
+from models.scene import Scene
 
 
 class FireSimGUI(QtCore.QObject):
 
-    def __init__(self):
+    def __init__(self, args=None):
         QtCore.QObject.__init__(self)
 
         self.app = QtGui.QApplication(["FireSim"])
+        self.args = args
+        self.config = Config("data/config.json")
 
-        self.config = Config("config.json")
+        self.scene = Scene(os.path.join(self.config.get("scene_root"), self.args.scene) + ".json")
 
         QtDeclarative.qmlRegisterType(CanvasWidget, "FireSim", 1, 0, "SimCanvas")
         QtDeclarative.qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
@@ -34,8 +38,9 @@ class FireSimGUI(QtCore.QObject):
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(CanvasWidget)
 
-        if self.config.get("background_enable", False):
-            self.canvas.set_background_image(QtGui.QImage(self.config.get("background_filename")))
+        if self.scene.get("backdrop_enable", False):
+            log.info("Loading backdrop from " + self.scene.get("backdrop_filename"))
+            self.canvas.set_background_image(QtGui.QImage(self.scene.get("backdrop_filename")))
 
         self.fixture_list = [FixtureWidget(self.canvas)]
 
