@@ -54,7 +54,3 @@ class SceneController:
         for f in self.fixtures:
             if f.id == id:
                 return f
-
-    def fixture_move_callback(self, id, pos):
-        f = self.get_fixture(id)
-        f.pos1 = map(int, pos.toTuple())

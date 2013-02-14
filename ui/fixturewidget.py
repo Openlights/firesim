@@ -68,7 +68,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.mouse_down = False
         self.drag_pos = None
         if self.move_callback:
-            self.move_callback(self.id, self.pos())
+            self.move_callback(self.pos())
         #super(FixtureWidget, self).mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event):
