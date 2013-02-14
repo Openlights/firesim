@@ -53,6 +53,7 @@ Item {
             Button {
                 id: btn_save
                 text: "Save Scene"
+                onClicked: main.on_btn_save()
             }
 
             Button {

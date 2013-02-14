@@ -1,56 +1,91 @@
 {
-    "backdrop_enable": true,
-    "backdrop_filename": "light_dome.png",
-    "fixtures": [
-        {
-            "id": 0,
-            "strand": 0,
-            "address": 0,
-            "type": "linear",
-            "pixels": 32,
-            "pos1" : "195,50",
-            "scale" : 3.0,
-            "angle" : -60.0
-        },
-        {
-            "id" : 1,
-            "strand": 0,
-            "address": 1,
-            "type": "linear",
-            "pixels": 32,
-            "pos1" : "315,50",
-            "scale" : 3.0,
-            "angle" : 60.0
-        },
-        {
-            "id" : 2,
-            "strand": 0,
-            "address": 2,
-            "type": "linear",
-            "pixels": 32,
-            "pos1" : "220,210",
-            "scale" : 3.0,
-            "angle" : 180.0
-        },
-        {
-            "id" : 3,
-            "strand": 0,
-            "address": 3,
-            "type": "linear",
-            "pixels": 32,
-            "pos1" : "165,265",
-            "scale" : 3.0,
-            "angle" : 60.0
-        },
-        {
-            "id" : 4,
-            "strand": 0,
-            "address": 4,
-            "type": "linear",
-            "pixels": 32,
-            "pos1" : "345,265",
-            "scale" : 3.0,
-            "angle" : -60.0
-        }
-    ]
+  "backdrop_enable": true, 
+  "backdrop_filename": "light_dome.png", 
+  "fixtures": [
+    {
+      "address": 0, 
+      "angle": -60.0, 
+      "id": 0, 
+      "pixels": 32, 
+      "pos1": [
+        162, 
+        169
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 1, 
+      "angle": 60.0, 
+      "id": 1, 
+      "pixels": 32, 
+      "pos1": [
+        163, 
+        289
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 2, 
+      "angle": 180.0, 
+      "id": 2, 
+      "pixels": 32, 
+      "pos1": [
+        199, 
+        231
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 3, 
+      "angle": 60.0, 
+      "id": 3, 
+      "pixels": 32, 
+      "pos1": [
+        231, 
+        169
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 4, 
+      "angle": -60.0, 
+      "id": 4, 
+      "pixels": 32, 
+      "pos1": [
+        229, 
+        290
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }
+  ]
 }

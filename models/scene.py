@@ -12,3 +12,10 @@ class Scene(JSONLoader):
         if len(fd) > 0:
             for f in fd:
                 self.fixtures.append(Fixture(f))
+
+    def save(self):
+        fd = []
+        for fixture in self.fixtures:
+            fd.append(fixture.pack())
+        self.data["fixtures"] = fd
+        JSONLoader.save(self)

@@ -20,12 +20,24 @@ class Fixture:
         return "Fixture %d [%d:%d]" % (self.id, self.strand, self.address)
 
     def unpack(self, data):
-        self.id = int(data.get("id", "0"))
-        self.strand = int(data.get("strand", "0"))
-        self.address = int(data.get("address", "0"))
+        self.id = data.get("id", 0)
+        self.strand = data.get("strand", 0)
+        self.address = data.get("address", 0)
         self.type = data.get("type", "")
-        self.pixels = int(data.get("pixels", "0"))
-        self.pos1 = map(int, data.get("pos1", "0,0").split(','))
-        self.pos2 = map(int, data.get("pos2", "0,0").split(','))
+        self.pixels = data.get("pixels", 0)
+        self.pos1 = data.get("pos1", [0, 0])
+        self.pos2 = data.get("pos2", [0, 0])
         self.scale = float(data.get("scale", "0.0"))
         self.angle = float(data.get("angle", "0.0"))
+
+    def pack(self):
+        return {'id': self.id,
+                'strand': self.strand,
+                'address': self.address,
+                'type': self.type,
+                'pixels': self.pixels,
+                'pos1': self.pos1,
+                'pos2': self.pos2,
+                'scale': self.scale,
+                'angle': self.angle
+        }

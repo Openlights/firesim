@@ -24,6 +24,17 @@ class JSONLoader:
             log.info("Loaded " + self.filename)
             self.file_loaded = True
 
+    def save(self):
+        if self.filename is not None:
+            with open(self.filename, 'w') as f:
+                try:
+                    json.dump(self.data, f, indent=2, sort_keys=True)
+                except:
+                    log.error("Error saving " + self.filename)
+                    return
+
+            log.info("Saved " + self.filename)
+
     def get(self, key, default=None):
         if self.data is None:
             log.warn("No file was loaded!")

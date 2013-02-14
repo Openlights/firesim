@@ -57,3 +57,7 @@ class FireSimGUI(QtCore.QObject):
     @QtCore.Slot()
     def on_btn_clear(self):
         self.scenecontroller.clear_fixtures()
+
+    @QtCore.Slot()
+    def on_btn_save(self):
+        self.scenecontroller.save_scene()
