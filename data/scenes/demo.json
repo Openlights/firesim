@@ -1,0 +1,125 @@
+{
+  "backdrop_enable": true, 
+  "backdrop_filename": "light_dome.png", 
+  "fixtures": [
+    {
+      "address": 0, 
+      "angle": -60.0, 
+      "id": 0, 
+      "pixels": 32, 
+      "pos1": [
+        163, 
+        171
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 1, 
+      "angle": 60.0, 
+      "id": 1, 
+      "pixels": 32, 
+      "pos1": [
+        165, 
+        289
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 2, 
+      "angle": 180.0, 
+      "id": 2, 
+      "pixels": 32, 
+      "pos1": [
+        201, 
+        229
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 3, 
+      "angle": 60.0, 
+      "id": 3, 
+      "pixels": 32, 
+      "pos1": [
+        234, 
+        171
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 4, 
+      "angle": -60.0, 
+      "id": 4, 
+      "pixels": 32, 
+      "pos1": [
+        234, 
+        290
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 3.0, 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 0, 
+      "angle": 0.0, 
+      "id": 0, 
+      "pixels": 0, 
+      "pos1": [
+        199, 
+        352
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 0.0, 
+      "strand": 0, 
+      "type": ""
+    }, 
+    {
+      "address": 0, 
+      "angle": 0.0, 
+      "id": 0, 
+      "pixels": 0, 
+      "pos1": [
+        197, 
+        104
+      ], 
+      "pos2": [
+        0, 
+        0
+      ], 
+      "scale": 0.0, 
+      "strand": 0, 
+      "type": ""
+    }
+  ]
+}

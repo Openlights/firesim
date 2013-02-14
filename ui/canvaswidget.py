@@ -1,6 +1,5 @@
 from PySide import QtCore, QtGui, QtDeclarative
 
-from fixture import Fixture
 
 class CanvasWidget(QtDeclarative.QDeclarativeItem):
     def __init__(self, parent = None):
@@ -25,13 +24,13 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         painter.setRenderHints(QtGui.QPainter.Antialiasing, True)
 
         # TODO: support multi-dimensional fixtures
-        for fixture in self.fixture_list:
-            x, y, w, h = fixture.pos_rect
-            painter.fillRect(x, y, w, h, self.color)
-            for px, color in enumerate(fixture.pixels):
-                r, g, b = color
-                xp = int(x + w * (float(px) / fixture.num_pixels))
-                painter.fillRect(xp, y, (w / fixture.num_pixels), h, QtGui.QColor(r, g, b))
+        # for fixture in self.fixture_list:
+        #     x, y, w, h = fixture.rect.x(), fixture.rect.y(), fixture.rect.width(), fixture.rect.height()
+        #     painter.fillRect(fixture.rect, self.color)
+        #     for px, color in enumerate(fixture.model.pixel_data):
+        #         r, g, b = color
+        #         xp = int(x + w * (float(px) / fixture.model.pixels))
+        #         painter.fillRect(xp, y, (w / fixture.model.pixels), h, QtGui.QColor(r, g, b))
 
     def update_fixtures(self, fixture_list):
         self.fixture_list = fixture_list
@@ -53,4 +52,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         pass
 
     def mousePressEvent(self, event):
+        pass
+
+    def on_fixture_click(self, fixture):
         pass
