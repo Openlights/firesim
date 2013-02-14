@@ -1,5 +1,7 @@
 from PySide import QtCore, QtGui, QtDeclarative
 
+from draghandlewidget import DragHandleWidget
+
 
 class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
@@ -26,6 +28,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             x, y = canvas.get_next_new_fixture_pos_and_increment()
             self.setPos(x, y)
 
+        self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1)
+        self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2)
+
     def paint(self, painter, options, widget):
         if self.isSelected() or self.hovering:
             painter.setPen(QtGui.QColor(50, 100, 255, 255))
@@ -37,10 +42,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def hoverEnterEvent(self, event):
         self.hovering = True
+        self.drag1.hovering = True
+        self.drag2.hovering = True
         self.update()
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
+        self.drag1.hovering = False
+        self.drag2.hovering = False
         self.update()
 
     def mouseMoveEvent(self, event):
@@ -49,6 +58,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             npos = (event.scenePos() - self.drag_pos)
             if self.parent().sceneBoundingRect().contains(event.scenePos()):
                 self.moveBy(npos.x(), npos.y())
+                self.drag1.moveBy(npos.x(), npos.y())
+                self.drag2.moveBy(npos.x(), npos.y())
             self.drag_pos = event.scenePos()
         #super(FixtureWidget, self).mouseMoveEvent(event)
 
