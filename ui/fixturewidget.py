@@ -1,16 +1,16 @@
 from PySide import QtCore, QtGui, QtDeclarative
 
-from fixture import Fixture
 
 class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
-    def __init__(self, parent=None, id=0, move_callback=None):
+    def __init__(self, parent=None, id=0, model=None, move_callback=None):
         super(FixtureWidget, self).__init__(parent)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.id = id
+        self.model = model
         self.move_callback = move_callback
         self.setHeight(16)
         self.setWidth(128)

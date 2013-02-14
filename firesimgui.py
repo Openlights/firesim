@@ -3,11 +3,11 @@ import os.path
 
 from PySide import QtCore, QtGui, QtDeclarative
 
-from fixture import Fixture
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from util.config import Config
 from models.scene import Scene
+from models.fixture import Fixture
 from controllers.scenecontroller import SceneController
 
 
