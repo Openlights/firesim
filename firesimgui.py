@@ -48,6 +48,7 @@ class FireSimGUI(QtCore.QObject):
                 fw = FixtureWidget(self.canvas, fixture.id)
                 x, y = fixture.pos1
                 fw.setPos(x, y)
+                fw.setRotation(fixture.angle)
                 self.fixture_list.append(fw)
 
         log.info("FireSimGUI Ready.")
