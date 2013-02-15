@@ -49,14 +49,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.update(self.boundingRect())
 
     def boundingRect(self):
-        ws = self.width / max(1, abs(self.width))
-        hs = self.height / max(1, abs(self.height))
-        if self.width == 0:
-            ws = 1
-        if self.height == 0:
-            hs = 1
-
-        return QtCore.QRectF(ws * -8, hs * -8, self.width + (ws * 16), self.height + (hs * 16))
+        if self.width >= 0 and self.height >= 0:
+            return QtCore.QRectF(-8, -8, self.width + 16, self.height + 16)
+        elif self.width >= 0 and self.height < 0:
+            return QtCore.QRectF(-8, self.height - 8, self.width + 16, -self.height + 16)
+        elif self.width < 0 and self.height >= 0:
+            return QtCore.QRectF(self.width - 8, -8, -self.width + 16, self.height + 16)
+        else:
+            return QtCore.QRectF(self.width - 8, self.height - 8, -self.width + 16, -self.height + 16)
 
     def shape(self):
         path = QtGui.QPainterPath()
@@ -80,15 +80,11 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         return path
 
     def paint(self, painter, options, widget):
-
-        painter.fillRect(self.boundingRect(), QtGui.QColor(255, 0, 0, 50))
         painter.setBrush(QtGui.QColor(0, 0, 0, 0))
-
         #painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 0, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
-            painter.fillRect(self.boundingRect(), QtGui.QColor(255, 255, 0, 50))
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 200), 5, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
         painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.DashLine))
@@ -111,6 +107,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.hovering = False
             self.drag1.hovering = False
             self.drag2.hovering = False
+        self.drag1.update()
+        self.drag2.update()
         self.update()
 
     def mouseMoveEvent(self, event):

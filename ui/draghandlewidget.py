@@ -21,7 +21,8 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
             self.setPos(pos[0], pos[1])
 
     def boundingRect(self):
-        return QtCore.QRectF(-10, -10, 20, 20)
+        # Bigger than the actual handle so that the text gets erased
+        return QtCore.QRectF(-20, -20, 40, 40)
 
     def paint(self, painter, options, widget):
         #painter.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -32,9 +33,9 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
             painter.drawEllipse(hover_rect)
             painter.setPen(QtGui.QColor(255, 255, 255, 255))
             if self == self.fixture.drag1:
-                painter.drawText(-4, -4, "1")
+                painter.drawText(-8, -8, "1")
             else:
-                painter.drawText(-4, -4, "2")
+                painter.drawText(-8, -8, "2")
         fixture_bg = QtCore.QRect(-4, -4, 8, 8)
         painter.setBrush(QtGui.QColor(0, 100, 200, 200))
         painter.drawEllipse(fixture_bg)
