@@ -69,12 +69,47 @@ Item {
                 color: "#232323"
 
                 Column {
+                    id: fixture_info_column
                     spacing: 8
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     Text {
                         color: "#dddddd"
                         text: "Fixture Info"
+                    }
+
+                    Component {
+                        id: fixtureInfoDelegate
+                        Item {
+                            width: 60
+                            height: 20
+
+                            Row {
+                                anchors { right: parent.right }
+                                anchors { leftMargin: 2; rightMargin: 2 }
+                                Text { color: "#eeeeee"; text: key + ": "}
+                                Rectangle {
+                                    height: 16
+                                    width: 25
+                                    color: "#444444"
+                                    TextInput {
+                                        anchors.fill: parent
+                                        anchors { leftMargin: 2; rightMargin: 2 }
+                                        color: "#eeeeee"
+                                        text: value
+                                        selectByMouse: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    ListView {
+                        width: 60
+                        height: 80
+                        anchors { leftMargin: 2; rightMargin: 2 }
+                        model: FixtureInfoModel {}
+                        delegate: fixtureInfoDelegate
                     }
                 }
             }

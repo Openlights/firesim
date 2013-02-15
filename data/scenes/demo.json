@@ -90,7 +90,7 @@
         304
       ], 
       "strand": 0, 
-      "type": ""
+      "type": "linear"
     }, 
     {
       "address": 0, 
@@ -105,7 +105,7 @@
         161
       ], 
       "strand": 0, 
-      "type": ""
+      "type": "linear"
     }, 
     {
       "address": 0, 
@@ -120,7 +120,7 @@
         217
       ], 
       "strand": 0, 
-      "type": ""
+      "type": "linear"
     }, 
     {
       "address": 0, 
@@ -135,7 +135,7 @@
         216
       ], 
       "strand": 0, 
-      "type": ""
+      "type": "linear"
     }, 
     {
       "address": 0, 
@@ -150,7 +150,7 @@
         305
       ], 
       "strand": 0, 
-      "type": ""
+      "type": "linear"
     }
   ]
 }
