@@ -33,8 +33,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1, move_callback=self.handle_callback)
         self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2, move_callback=self.handle_callback)
 
-        self.width = int(abs(self.model.pos2[0] - self.model.pos1[0]))
-        self.height = int(abs(self.model.pos2[1] - self.model.pos1[1]))
+        self.update_geometry()
 
         self.poly = QtGui.QPolygon([
             QtCore.QPoint(0, 0),
@@ -43,25 +42,63 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             QtCore.QPoint(0, self.height)
         ])
 
+    def update_geometry(self):
+        self.width = int(self.model.pos2[0] - self.model.pos1[0])
+        self.height = int(self.model.pos2[1] - self.model.pos1[1])
+        self.prepareGeometryChange()
+        self.update(self.boundingRect())
+
     def boundingRect(self):
-        return QtCore.QRectF(-4, -4, self.width + 8, self.height + 8)
+        ws = self.width / max(1, abs(self.width))
+        hs = self.height / max(1, abs(self.height))
+        if self.width == 0:
+            ws = 1
+        if self.height == 0:
+            hs = 1
+
+        return QtCore.QRectF(ws * -8, hs * -8, self.width + (ws * 16), self.height + (hs * 16))
+
+    def shape(self):
+        path = QtGui.QPainterPath()
+        xout =  (self.model.pos2[0] - self.model.pos1[0]) / max(1, abs(self.model.pos2[0] - self.model.pos1[0]))
+        yout = -1 * (self.model.pos2[1] - self.model.pos1[1]) / max(1, abs(self.model.pos2[1] - self.model.pos1[1]))
+        p = QtGui.QPolygonF([
+            QtCore.QPoint(xout, yout),
+            QtCore.QPoint(self.width - xout, self.height + yout),
+            QtCore.QPoint(self.width + xout, self.height - yout),
+            QtCore.QPoint(-xout, -yout)
+        ])
+        path.addPolygon(p)
+        path.closeSubpath()
+        return path
 
     def paint(self, painter, options, widget):
-        self.width = int(abs(self.model.pos2[0] - self.model.pos1[0]))
-        self.height = int(abs(self.model.pos2[1] - self.model.pos1[1]))
-        #painter.fillRect(self.boundingRect(), QtGui.QColor(255, 0, 0, 50))
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+
+        painter.fillRect(self.boundingRect(), QtGui.QColor(255, 0, 0, 50))
+        painter.setBrush(QtGui.QColor(0, 0, 0, 0))
+
+        #painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 0, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
-            #painter.fillRect(self.boundingRect(), QtGui.QColor(255, 255, 0, 50))
+            painter.fillRect(self.boundingRect(), QtGui.QColor(255, 255, 0, 50))
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 200), 5, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
+        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 2, QtCore.Qt.DashLine))
+        painter.drawPath(self.shape())
 
     def hoverEnterEvent(self, event):
-        self.hovering = True
-        self.drag1.hovering = True
-        self.drag2.hovering = True
+        pass
+
+    def hoverMoveEvent(self, event):
+        if self.shape().contains(event.pos()):
+            self.hovering = True
+            self.drag1.hovering = True
+            self.drag2.hovering = True
+        else:
+            self.hovering = False
+            self.drag1.hovering = False
+            self.drag2.hovering = False
         self.update()
 
     def hoverLeaveEvent(self, event):
@@ -71,7 +108,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.update()
 
     def mouseMoveEvent(self, event):
-        if self.mouse_down:
+        if self.hovering and self.mouse_down:
             self.dragging = True
             npos = (event.scenePos() - self.drag_pos)
             if self.parent().sceneBoundingRect().contains(event.scenePos()):
@@ -108,6 +145,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def handle_callback(self, handle):
         if handle == self.drag1:
             self.model.pos1 = [int(handle.pos().x()), int(handle.pos().y())]
+            self.setPos(handle.pos())
         else:
             self.model.pos2 = [int(handle.pos().x()), int(handle.pos().y())]
-        self.update()
+        self.update_geometry()

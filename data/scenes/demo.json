@@ -1,44 +1,39 @@
 {
-  "backdrop_enable": false,
+  "backdrop_enable": false, 
   "backdrop_filename": "light_dome.png", 
   "fixtures": [
     {
       "address": 0, 
-      "angle": -60.0, 
       "id": 0, 
       "pixels": 32, 
       "pos1": [
-        100,
-        100
+        95, 
+        79
       ], 
       "pos2": [
-        100,
-        300
+        176, 
+        136
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 1, 
-      "angle": 60.0, 
       "id": 1, 
       "pixels": 32, 
       "pos1": [
-        165, 
-        289
+        113, 
+        267
       ], 
       "pos2": [
-        165,
-        300
+        62, 
+        303
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 2, 
-      "angle": 180.0, 
       "id": 2, 
       "pixels": 32, 
       "pos1": [
@@ -46,16 +41,14 @@
         229
       ], 
       "pos2": [
-        220,
-        229
+        303, 
+        249
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 3, 
-      "angle": 60.0, 
       "id": 3, 
       "pixels": 32, 
       "pos1": [
@@ -63,33 +56,29 @@
         171
       ], 
       "pos2": [
-        284,
+        284, 
         171
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 4, 
-      "angle": -60.0, 
       "id": 4, 
       "pixels": 32, 
       "pos1": [
-        234, 
-        290
+        244, 
+        298
       ], 
       "pos2": [
-        284,
-        290
+        353, 
+        373
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 0, 
-      "angle": 0.0, 
       "id": 0, 
       "pixels": 0, 
       "pos1": [
@@ -97,27 +86,24 @@
         352
       ], 
       "pos2": [
-        250,
+        250, 
         352
       ], 
-      "scale": 0.0, 
       "strand": 0, 
       "type": ""
     }, 
     {
       "address": 0, 
-      "angle": 0.0, 
       "id": 0, 
       "pixels": 0, 
       "pos1": [
-        197, 
-        104
+        203, 
+        133
       ], 
       "pos2": [
-        250,
-        104
+        286, 
+        47
       ], 
-      "scale": 0.0, 
       "strand": 0, 
       "type": ""
     }

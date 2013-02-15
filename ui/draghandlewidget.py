@@ -24,12 +24,17 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         return QtCore.QRectF(-10, -10, 20, 20)
 
     def paint(self, painter, options, widget):
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        #painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 255), 2, QtCore.Qt.SolidLine))
         if self.hovering:
             painter.setBrush(QtGui.QColor(50, 100, 255, 255))
             hover_rect = QtCore.QRect(-6, -6, 12, 12)
             painter.drawEllipse(hover_rect)
+            painter.setPen(QtGui.QColor(255, 255, 255, 255))
+            if self == self.fixture.drag1:
+                painter.drawText(-4, -4, "1")
+            else:
+                painter.drawText(-4, -4, "2")
         fixture_bg = QtCore.QRect(-4, -4, 8, 8)
         painter.setBrush(QtGui.QColor(0, 100, 200, 200))
         painter.drawEllipse(fixture_bg)

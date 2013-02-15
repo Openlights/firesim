@@ -11,8 +11,6 @@ class Fixture:
         self.pixels = 0
         self.pos1 = (0, 0)
         self.pos2 = (0, 0)
-        self.scale = 0.0
-        self.angle = 0.0
 
         if data is not None:
             self.unpack(data)
@@ -44,8 +42,6 @@ class Fixture:
         self.pixels = data.get("pixels", 0)
         self.pos1 = data.get("pos1", [0, 0])
         self.pos2 = data.get("pos2", [0, 0])
-        self.scale = float(data.get("scale", "0.0"))
-        self.angle = float(data.get("angle", "0.0"))
 
     def pack(self):
         return {'id': self.id,
@@ -54,15 +50,13 @@ class Fixture:
                 'type': self.type,
                 'pixels': self.pixels,
                 'pos1': self.pos1,
-                'pos2': self.pos2,
-                'scale': self.scale,
-                'angle': self.angle
+                'pos2': self.pos2
         }
 
     def fixture_move_callback(self, fixture):
         self.pos1 = map(int, fixture.drag1.pos().toTuple())
         self.pos2 = map(int, fixture.drag2.pos().toTuple())
-        fixture.update()
+        fixture.update_geometry()
 
     def blackout(self):
         self.pixels = [(0, 0, 0)] * self.size
