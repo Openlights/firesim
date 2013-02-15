@@ -90,6 +90,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def hoverEnterEvent(self, event):
         pass
 
+    def hoverLeaveEvent(self, event):
+        pass
+
     def hoverMoveEvent(self, event):
         if self.shape().contains(event.pos()):
             self.hovering = True
@@ -99,12 +102,6 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.hovering = False
             self.drag1.hovering = False
             self.drag2.hovering = False
-        self.update()
-
-    def hoverLeaveEvent(self, event):
-        self.hovering = False
-        self.drag1.hovering = False
-        self.drag2.hovering = False
         self.update()
 
     def mouseMoveEvent(self, event):
