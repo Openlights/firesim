@@ -14,6 +14,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.dragging = False
         self.mouse_down = False
         self.hovering = False
+        self.hidden = True
         self.drag_pos = None
         self.move_callback = move_callback
         #self.rect = QtCore.QRect(0, 0, 16, 16)
@@ -30,6 +31,8 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         return path
 
     def paint(self, painter, options, widget):
+        if self.hidden:
+            return
         #painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 255), 2, QtCore.Qt.SolidLine))
         if self.hovering:
@@ -54,6 +57,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
 
     def hoverMoveEvent(self, event):
         if self.shape().contains(event.pos()):
+            self.hidden = False
             self.hovering = True
         else:
             self.hovering = False

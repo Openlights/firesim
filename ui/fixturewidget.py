@@ -97,6 +97,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.hovering = False
         self.drag1.hovering = False
         self.drag2.hovering = False
+        self.drag1.hidden = True
+        self.drag2.hidden = True
+        self.drag1.update()
+        self.drag2.update()
 
     def hoverMoveEvent(self, event):
         if self.shape().contains(event.pos()):
@@ -107,6 +111,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.hovering = False
             self.drag1.hovering = False
             self.drag2.hovering = False
+        self.drag1.hidden = False
+        self.drag2.hidden = False
         self.drag1.update()
         self.drag2.update()
         self.update()
