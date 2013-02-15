@@ -63,7 +63,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         line = QtCore.QLineF(0, 0, self.width, self.height)
         offset1 = line.normalVector().unitVector()
-        offset1.setLength(3)
+        offset1.setLength(5)
         ol1 = QtCore.QLineF(0, 0, self.width, self.height)
         ol1.translate(offset1.dx(), offset1.dy())
         ol2 = QtCore.QLineF(0, 0, self.width, self.height)
