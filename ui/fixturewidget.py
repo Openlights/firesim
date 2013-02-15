@@ -85,7 +85,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
-            painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 200), 5, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+            painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 7, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
         #painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.SolidLine))
         #painter.drawPath(self.shape())

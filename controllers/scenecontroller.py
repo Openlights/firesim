@@ -54,3 +54,6 @@ class SceneController:
         for f in self.fixtures:
             if f.id == id:
                 return f
+
+    def get_fixtures(self):
+        return self.fixtures

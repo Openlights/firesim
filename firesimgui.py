@@ -7,7 +7,8 @@ from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from util.config import Config
 from models.scene import Scene
-from models.fixture import Fixture
+from models.fixture import FixtureWrapper
+from ui.fixtureinfolistmodel import FixtureInfoListModel
 from controllers.scenecontroller import SceneController
 
 
@@ -26,7 +27,7 @@ class FireSimGUI(QtCore.QObject):
         QtDeclarative.qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
 
         self.view = QtDeclarative.QDeclarativeView()
-        self.view.setSource(QtCore.QUrl('ui/qml/FireSimGUI.qml'))
+
         self.view.setWindowTitle("FireSim")
         self.view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
         w, h = self.view.size().toTuple()
@@ -36,10 +37,19 @@ class FireSimGUI(QtCore.QObject):
         self.context = self.view.rootContext()
         self.context.setContextProperty('main', self)
 
+        self.fixture_info_list = []
+        self.context.setContextProperty('fixtureInfoModel', self.fixture_info_list)
+
+        self.view.setSource(QtCore.QUrl('ui/qml/FireSimGUI.qml'))
+
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(CanvasWidget)
 
         self.scenecontroller = SceneController(canvas=self.canvas, scene=self.scene)
+
+        self.fixture_wrapper_list = [FixtureWrapper(fix) for fix in self.scenecontroller.get_fixtures()]
+        self.fixture_info_list = FixtureInfoListModel(self.fixture_wrapper_list)
+        self.context.setContextProperty('fixtureInfoModel', self.fixture_info_list)
 
         log.info("FireSimGUI Ready.")
         self.view.show()

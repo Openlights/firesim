@@ -70,47 +70,22 @@ Item {
 
                 Column {
                     id: fixture_info_column
-                    spacing: 8
+                    spacing: 4
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    Text {
-                        color: "#dddddd"
-                        text: "Fixture Info"
-                    }
-
-                    Component {
-                        id: fixtureInfoDelegate
-                        Item {
-                            width: 60
-                            height: 20
-
-                            Row {
-                                anchors { right: parent.right }
-                                anchors { leftMargin: 2; rightMargin: 2 }
-                                Text { color: "#eeeeee"; text: key + ": "}
-                                Rectangle {
-                                    height: 16
-                                    width: 25
-                                    color: "#444444"
-                                    TextInput {
-                                        anchors.fill: parent
-                                        anchors { leftMargin: 2; rightMargin: 2 }
-                                        color: "#eeeeee"
-                                        text: value
-                                        selectByMouse: true
-                                    }
-                                }
-                            }
+                    Row {
+                        anchors { bottomMargin: 8; topMargin: 24 }
+                        Text {
+                            font.pixelSize: 12
+                            color: "#dddddd"
+                            text: "Fixture Info"
                         }
                     }
 
-                    ListView {
-                        width: 60
-                        height: 80
-                        anchors { leftMargin: 2; rightMargin: 2 }
-                        model: FixtureInfoModel {}
-                        delegate: fixtureInfoDelegate
-                    }
+                    LabeledInput { key: "id"; value: "" }
+                    LabeledInput { key: "strand"; value: "" }
+                    LabeledInput { key: "address"; value: "" }
+                    LabeledInput { key: "pixels"; value: "" }
                 }
             }
         }

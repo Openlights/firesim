@@ -1,5 +1,19 @@
+from PySide import QtCore
+
 from ui.fixturewidget import FixtureWidget
 
+
+class FixtureWrapper(QtCore.QObject):
+
+    def __init__(self, fixture):
+        QtCore.QObject.__init__(self)
+        self._fixture = fixture
+
+    def _id(self):
+        return self._fixture.id
+
+    changed = QtCore.Signal()
+    id = QtCore.Property(int, _id, notify=changed)
 
 class Fixture:
 
