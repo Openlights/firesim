@@ -24,6 +24,11 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         # Bigger than the actual handle so that the text gets erased
         return QtCore.QRectF(-20, -20, 40, 40)
 
+    def shape(self):
+        path = QtGui.QPainterPath()
+        path.addEllipse(-6, -6, 12, 12)
+        return path
+
     def paint(self, painter, options, widget):
         #painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 255), 2, QtCore.Qt.SolidLine))
@@ -41,11 +46,17 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         painter.drawEllipse(fixture_bg)
 
     def hoverEnterEvent(self, event):
-        self.hovering = True
-        self.update()
+        pass
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
+        self.update()
+
+    def hoverMoveEvent(self, event):
+        if self.shape().contains(event.pos()):
+            self.hovering = True
+        else:
+            self.hovering = False
         self.update()
 
     def mouseMoveEvent(self, event):

@@ -9,8 +9,8 @@ class Fixture:
         self.address = 0
         self.type = ""
         self.pixels = 0
-        self.pos1 = (0, 0)
-        self.pos2 = (0, 0)
+        self.pos1 = (10, 10)
+        self.pos2 = (50, 50)
 
         if data is not None:
             self.unpack(data)
