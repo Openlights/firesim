@@ -68,11 +68,11 @@
       "pixels": 32, 
       "pos1": [
         339, 
-        218
+        215
       ], 
       "pos2": [
         260, 
-        243
+        240
       ], 
       "strand": 0, 
       "type": "linear"
@@ -80,7 +80,7 @@
     {
       "address": 0, 
       "id": 0, 
-      "pixels": 0, 
+      "pixels": 32,
       "pos1": [
         261, 
         241
@@ -95,7 +95,7 @@
     {
       "address": 0, 
       "id": 0, 
-      "pixels": 0, 
+      "pixels": 32,
       "pos1": [
         260, 
         240
@@ -110,7 +110,7 @@
     {
       "address": 0, 
       "id": 0, 
-      "pixels": 0, 
+      "pixels": 32,
       "pos1": [
         260, 
         163
@@ -125,7 +125,7 @@
     {
       "address": 0, 
       "id": 0, 
-      "pixels": 0, 
+      "pixels": 32,
       "pos1": [
         209, 
         305
@@ -140,7 +140,7 @@
     {
       "address": 0, 
       "id": 0, 
-      "pixels": 0, 
+      "pixels": 32,
       "pos1": [
         340, 
         218

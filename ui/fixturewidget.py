@@ -82,13 +82,26 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def paint(self, painter, options, widget):
         painter.setBrush(QtGui.QColor(0, 0, 0, 0))
         #painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 0, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 200), 5, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
-        #painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.DashLine))
+        #painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.SolidLine))
         #painter.drawPath(self.shape())
+
+        color_line = QtCore.QLineF(0, 0, self.width, self.height)
+        color_line.setLength(color_line.length() / self.model.pixels)
+
+        for pixel in self.model.pixel_data:
+            px, py = color_line.x1(), color_line.y1()
+            r, g, b = pixel[0], pixel[1], pixel[2]
+            painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 255), 2, QtCore.Qt.SolidLine))
+            painter.drawEllipse(QtCore.QPointF(px, py), 1, 1)
+            color_line.translate(color_line.dx(), color_line.dy())
+
+
+
 
     def hoverEnterEvent(self, event):
         pass
@@ -164,7 +177,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         #super(FixtureWidget, self).mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event):
-        super(FixtureWidget, self).mouseDoubleClickEvent(event)
+        self.model.set_all((255, 0, 0))
+        #super(FixtureWidget, self).mouseDoubleClickEvent(event)
 
     def handle_callback(self, handle):
         if handle == self.drag1:

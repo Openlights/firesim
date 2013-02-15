@@ -45,7 +45,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
             else:
                 painter.drawText(-8, -8, "2")
         fixture_bg = QtCore.QRect(-4, -4, 8, 8)
-        painter.setBrush(QtGui.QColor(0, 100, 200, 200))
+        painter.setBrush(QtGui.QColor(100, 100, 100, 200))
         painter.drawEllipse(fixture_bg)
 
     def hoverEnterEvent(self, event):

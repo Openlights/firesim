@@ -7,8 +7,8 @@ class Fixture:
         self.id = 0
         self.strand = 0
         self.address = 0
-        self.type = ""
-        self.pixels = 0
+        self.type = "linear"
+        self.pixels = 32
         self.pos1 = (10, 10)
         self.pos2 = (50, 50)
 
@@ -59,12 +59,12 @@ class Fixture:
         fixture.update_geometry()
 
     def blackout(self):
-        self.pixels = [(0, 0, 0)] * self.size
+        self.pixel_data = [(0, 0, 0)] * self.pixels
 
     def set(self, pixel, color):
         assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
-        self.pixels[pixel] = color
+        self.pixel_data[pixel] = color
 
     def set_all(self, color):
         assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
-        self.pixels = [color] * self.size
+        self.pixel_data = [color] * self.pixels
