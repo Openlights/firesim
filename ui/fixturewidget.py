@@ -87,8 +87,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if self.isSelected() or self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 200), 5, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
-        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.DashLine))
-        painter.drawPath(self.shape())
+        #painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.DashLine))
+        #painter.drawPath(self.shape())
 
     def hoverEnterEvent(self, event):
         pass
