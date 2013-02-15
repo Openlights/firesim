@@ -53,6 +53,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
+        self.hidden = not self.fixture.isSelected()
         self.update()
 
     def hoverMoveEvent(self, event):

@@ -97,8 +97,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.hovering = False
         self.drag1.hovering = False
         self.drag2.hovering = False
-        self.drag1.hidden = True
-        self.drag2.hidden = True
+        self.drag1.hidden = not self.isSelected()
+        self.drag2.hidden = not self.isSelected()
         self.drag1.update()
         self.drag2.update()
 
@@ -107,12 +107,15 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.hovering = True
             self.drag1.hovering = True
             self.drag2.hovering = True
+            self.drag1.hidden = False
+            self.drag2.hidden = False
         else:
             self.hovering = False
             self.drag1.hovering = False
             self.drag2.hovering = False
-        self.drag1.hidden = False
-        self.drag2.hidden = False
+            self.drag1.hidden = not self.isSelected()
+            self.drag2.hidden = not self.isSelected()
+
         self.drag1.update()
         self.drag2.update()
         self.update()
@@ -141,6 +144,17 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 self.setSelected(not self.isSelected())
                 if not self.isSelected():
                     self.hovering = False
+                    self.drag1.hovering = False
+                    self.drag2.hovering = False
+                    self.drag1.hidden = True
+                    self.drag2.hidden = True
+                    self.setZValue(0)
+                else:
+                    self.drag1.hidden = False
+                    self.drag2.hidden = False
+                    self.setZValue(100)
+                self.drag1.update()
+                self.drag2.update()
                 self.canvas.on_fixture_click(self)
         self.dragging = False
         self.mouse_down = False
