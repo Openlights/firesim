@@ -81,7 +81,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def paint(self, painter, options, widget):
         painter.setBrush(QtGui.QColor(0, 0, 0, 0))
-        #painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
@@ -92,16 +92,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         color_line = QtCore.QLineF(0, 0, self.width, self.height)
         color_line.setLength(color_line.length() / self.model.pixels)
+        painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
 
         for pixel in self.model.pixel_data:
             px, py = color_line.x1(), color_line.y1()
             r, g, b = pixel[0], pixel[1], pixel[2]
-            painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 255), 2, QtCore.Qt.SolidLine))
-            painter.drawEllipse(QtCore.QPointF(px, py), 1, 1)
+            painter.setBrush(QtGui.QColor(r, g, b, 255))
+            painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
             color_line.translate(color_line.dx(), color_line.dy())
-
-
-
 
     def hoverEnterEvent(self, event):
         pass
