@@ -60,13 +60,20 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def shape(self):
         path = QtGui.QPainterPath()
-        xout =  (self.model.pos2[0] - self.model.pos1[0]) / max(1, abs(self.model.pos2[0] - self.model.pos1[0]))
-        yout = -1 * (self.model.pos2[1] - self.model.pos1[1]) / max(1, abs(self.model.pos2[1] - self.model.pos1[1]))
+
+        line = QtCore.QLineF(0, 0, self.width, self.height)
+        offset1 = line.normalVector().unitVector()
+        offset1.setLength(3)
+        ol1 = QtCore.QLineF(0, 0, self.width, self.height)
+        ol1.translate(offset1.dx(), offset1.dy())
+        ol2 = QtCore.QLineF(0, 0, self.width, self.height)
+        ol2.translate(-offset1.dx(), -offset1.dy())
+
         p = QtGui.QPolygonF([
-            QtCore.QPoint(xout, yout),
-            QtCore.QPoint(self.width - xout, self.height + yout),
-            QtCore.QPoint(self.width + xout, self.height - yout),
-            QtCore.QPoint(-xout, -yout)
+            QtCore.QPoint(ol1.x1(), ol1.y1()),
+            QtCore.QPoint(ol1.x2(), ol1.y2()),
+            QtCore.QPoint(ol2.x2(), ol2.y2()),
+            QtCore.QPoint(ol2.x1(), ol2.y1())
         ])
         path.addPolygon(p)
         path.closeSubpath()
@@ -84,14 +91,16 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             painter.fillRect(self.boundingRect(), QtGui.QColor(255, 255, 0, 50))
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 200), 5, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
-        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 2, QtCore.Qt.DashLine))
+        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.DashLine))
         painter.drawPath(self.shape())
 
     def hoverEnterEvent(self, event):
         pass
 
     def hoverLeaveEvent(self, event):
-        pass
+        self.hovering = False
+        self.drag1.hovering = False
+        self.drag2.hovering = False
 
     def hoverMoveEvent(self, event):
         if self.shape().contains(event.pos()):
