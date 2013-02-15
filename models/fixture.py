@@ -33,7 +33,7 @@ class Fixture:
             self.widget = FixtureWidget(self.controller.get_canvas(), self.id, model=self, move_callback=self.fixture_move_callback)
             x, y = self.pos1[0], self.pos1[1]
             self.widget.setPos(x, y)
-            self.widget.setRotation(self.angle)
+            #self.widget.setRotation(self.angle)
         return self.widget
 
     def unpack(self, data):
@@ -59,8 +59,10 @@ class Fixture:
                 'angle': self.angle
         }
 
-    def fixture_move_callback(self, pos):
-        self.pos1 = map(int, pos.toTuple())
+    def fixture_move_callback(self, fixture):
+        self.pos1 = map(int, fixture.drag1.pos().toTuple())
+        self.pos2 = map(int, fixture.drag2.pos().toTuple())
+        fixture.update()
 
     def blackout(self):
         self.pixels = [(0, 0, 0)] * self.size

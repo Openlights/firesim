@@ -22,23 +22,41 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.setSelected(False)
         self.hovering = False
         self.drag_pos = None
-        self.rect = QtCore.QRect(0, 0, 128, 16)
+        #self.rect = QtCore.QRect(0, 0, 128, 16)
         if canvas:
             self.canvas = canvas
             x, y = canvas.get_next_new_fixture_pos_and_increment()
+            #self.model.pos1 = [x, y]
+            #self.model.pos2 = [x + 100, y]
             self.setPos(x, y)
 
-        self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1)
-        self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2)
+        self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1, move_callback=self.handle_callback)
+        self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2, move_callback=self.handle_callback)
+
+        self.width = int(abs(self.model.pos2[0] - self.model.pos1[0]))
+        self.height = int(abs(self.model.pos2[1] - self.model.pos1[1]))
+
+        self.poly = QtGui.QPolygon([
+            QtCore.QPoint(0, 0),
+            QtCore.QPoint(self.width, 0),
+            QtCore.QPoint(self.width, self.height),
+            QtCore.QPoint(0, self.height)
+        ])
+
+    def boundingRect(self):
+        return QtCore.QRectF(-4, -4, self.width + 8, self.height + 8)
 
     def paint(self, painter, options, widget):
+        self.width = int(abs(self.model.pos2[0] - self.model.pos1[0]))
+        self.height = int(abs(self.model.pos2[1] - self.model.pos1[1]))
+        #painter.fillRect(self.boundingRect(), QtGui.QColor(255, 0, 0, 50))
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 0, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+        painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
-            painter.setPen(QtGui.QColor(50, 100, 255, 255))
-            painter.setBrush(QtGui.QColor(50, 100, 255, 255))
-            hover_rect = QtCore.QRect(2, 4, 124, 8)
-            painter.drawRoundRect(hover_rect, 16, 16)
-        fixture_bg = QtCore.QRect(4, 6, 120, 4)
-        painter.fillRect(fixture_bg, QtGui.QColor(200, 200, 0, 200))
+            #painter.fillRect(self.boundingRect(), QtGui.QColor(255, 255, 0, 50))
+            painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 200), 5, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+            painter.drawLine(0, 0, self.width, self.height)
 
     def hoverEnterEvent(self, event):
         self.hovering = True
@@ -61,6 +79,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 self.drag1.moveBy(npos.x(), npos.y())
                 self.drag2.moveBy(npos.x(), npos.y())
             self.drag_pos = event.scenePos()
+            if self.move_callback:
+                self.move_callback(self)
         #super(FixtureWidget, self).mouseMoveEvent(event)
 
     def mousePressEvent(self, event):
@@ -79,8 +99,15 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.mouse_down = False
         self.drag_pos = None
         if self.move_callback:
-            self.move_callback(self.pos())
+            self.move_callback(self)
         #super(FixtureWidget, self).mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event):
         super(FixtureWidget, self).mouseDoubleClickEvent(event)
+
+    def handle_callback(self, handle):
+        if handle == self.drag1:
+            self.model.pos1 = [int(handle.pos().x()), int(handle.pos().y())]
+        else:
+            self.model.pos2 = [int(handle.pos().x()), int(handle.pos().y())]
+        self.update()
