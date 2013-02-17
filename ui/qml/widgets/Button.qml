@@ -7,7 +7,7 @@ Rectangle {
     property variant action
 
     color: "#282828"
-    width: 100
+    width: 110
     height: 32
     radius: 5
 

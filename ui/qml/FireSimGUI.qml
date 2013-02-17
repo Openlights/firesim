@@ -8,6 +8,8 @@ Item {
     width: 640
     height: 480
 
+    signal backdrop_showhide_callback(variant obj)
+
     MouseArea {
         anchors.fill: parent
         onClicked: window.focus = false;
@@ -24,7 +26,7 @@ Item {
     Rectangle {
         id: toolbox
 
-        width: 120
+        width: 130
         color: "#121212";
         anchors { left: parent.left; top: parent.top; bottom: parent.bottom; }
 
@@ -57,12 +59,18 @@ Item {
             }
 
             Button {
+                id: btn_enable_bg
+                text: if(main.is_backdrop_enabled()) "Hide Backdrop"; else "Show Backdrop"
+                onClicked: backdrop_showhide_callback(btn_enable_bg)
+            }
+
+            Button {
                 id: btn_load_bg
                 text: "Load Backdrop"
             }
 
             Rectangle {
-                width: 100
+                width: 110
                 height: 150
 
                 radius: 5

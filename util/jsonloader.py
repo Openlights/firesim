@@ -40,3 +40,6 @@ class JSONLoader:
             log.warn("No file was loaded!")
         val = self.data.get(key, default)
         return val
+
+    def set(self, key, value):
+        self.data[key] = value

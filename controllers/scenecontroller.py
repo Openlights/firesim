@@ -13,25 +13,37 @@ class SceneController:
         self.canvas = canvas
         self.scene = scene
         self.fixtures = []
-        self.init_view()
+        if self.canvas is not None:
+            self.init_view()
 
     def init_view(self):
-        if self.scene.get("backdrop_enable", False):
-            log.info("Loading backdrop from " + self.scene.get("backdrop_filename"))
-            self.canvas.set_background_image(QtGui.QImage(self.scene.get("backdrop_filename")))
-
+        self.load_backdrop()
         self.fixtures = []
         fixture_data = self.scene.get("fixtures", [])
         for fixture_data_item in fixture_data:
             self.fixtures.append(Fixture(fixture_data_item, controller=self))
         self.update_canvas()
 
+    def load_backdrop(self):
+        if self.canvas is not None:
+            if self.scene.get("backdrop_enable", False):
+                log.info("Loading backdrop from " + self.scene.get("backdrop_filename"))
+                self.canvas.set_background_image(QtGui.QImage(self.scene.get("backdrop_filename")))
+            else:
+                self.canvas.set_background_image(None)
+            self.canvas.update()
+
+    def set_canvas(self, canvas):
+        self.canvas = canvas
+        self.init_view()
+
     def get_canvas(self):
         return self.canvas
 
     def update_canvas(self):
-        fl = [f.get_widget() for f in self.fixtures]
-        self.canvas.update_fixtures(fl)
+        if self.canvas is not None:
+            fl = [f.get_widget() for f in self.fixtures]
+            self.canvas.update_fixtures(fl)
 
     def add_fixture(self):
         self.fixtures.append(Fixture( controller=self))
@@ -57,3 +69,13 @@ class SceneController:
 
     def get_fixtures(self):
         return self.fixtures
+
+    def toggle_background_enable(self):
+        if self.scene.get("backdrop_enable", False):
+            self.scene.set("backdrop_enable", False)
+            self.load_backdrop()
+            return False
+        else:
+            self.scene.set("backdrop_enable", True)
+            self.load_backdrop()
+            return True

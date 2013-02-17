@@ -17,8 +17,10 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
     def paint(self, painter, options, widget):
         self.rect = QtCore.QRect(0, 0, self.width(), self.height())
         painter.fillRect(self.rect, QtGui.QColor(0, 0, 0))
+
         if self.background_image is not None:
             painter.drawImage(self.rect, self.background_image)
+
         pen = QtGui.QPen(self.color, 2)
         painter.setPen(pen)
         painter.setRenderHints(QtGui.QPainter.Antialiasing, True)
@@ -37,7 +39,8 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.update()
 
     def set_background_image(self, image):
-        assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
+        if image is not None:
+            assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
         self.background_image = image
 
     def get_next_new_fixture_pos_and_increment(self):

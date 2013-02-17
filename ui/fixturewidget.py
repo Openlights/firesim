@@ -63,7 +63,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         line = QtCore.QLineF(0, 0, self.width, self.height)
         offset1 = line.normalVector().unitVector()
-        offset1.setLength(5)
+        offset1.setLength(10)
         ol1 = QtCore.QLineF(0, 0, self.width, self.height)
         ol1.translate(offset1.dx(), offset1.dy())
         ol2 = QtCore.QLineF(0, 0, self.width, self.height)
@@ -87,8 +87,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if self.isSelected() or self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 7, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
-        #painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.SolidLine))
-        #painter.drawPath(self.shape())
+        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.SolidLine))
+        painter.drawPath(self.shape())
 
         color_line = QtCore.QLineF(0, 0, self.width, self.height)
         color_line.setLength(color_line.length() / self.model.pixels)
@@ -102,7 +102,22 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             color_line.translate(color_line.dx(), color_line.dy())
 
     def hoverEnterEvent(self, event):
-        pass
+        if self.shape().contains(event.pos()):
+            self.hovering = True
+            self.drag1.hovering = True
+            self.drag2.hovering = True
+            self.drag1.hidden = False
+            self.drag2.hidden = False
+        else:
+            self.hovering = False
+            self.drag1.hovering = False
+            self.drag2.hovering = False
+            self.drag1.hidden = not self.isSelected()
+            self.drag2.hidden = not self.isSelected()
+
+        self.drag1.update()
+        self.drag2.update()
+        self.update()
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
@@ -149,10 +164,15 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag_pos = event.scenePos()
         #super(FixtureWidget, self).mousePressEvent(event)
 
+    def select(self, selected):
+        self.drag1.setSelected(selected)
+        self.drag2.setSelected(selected)
+        self.setSelected(selected)
+
     def mouseReleaseEvent(self, event):
         if not self.dragging:
-            if event.button() == QtCore.Qt.MouseButton.LeftButton:
-                self.setSelected(not self.isSelected())
+            if event.button() == QtCore.Qt.MouseButton.LeftButton and self.shape().contains(event.pos()):
+                self.select(not self.isSelected())
                 if not self.isSelected():
                     self.hovering = False
                     self.drag1.hovering = False

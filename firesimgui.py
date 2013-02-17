@@ -22,6 +22,7 @@ class FireSimGUI(QtCore.QObject):
         self.config = Config("data/config.json")
 
         self.scene = Scene(os.path.join(self.config.get("scene_root"), self.args.scene) + ".json")
+        self.scenecontroller = SceneController(scene=self.scene)
 
         QtDeclarative.qmlRegisterType(CanvasWidget, "FireSim", 1, 0, "SimCanvas")
         QtDeclarative.qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
@@ -45,7 +46,9 @@ class FireSimGUI(QtCore.QObject):
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(CanvasWidget)
 
-        self.scenecontroller = SceneController(canvas=self.canvas, scene=self.scene)
+        self.scenecontroller.set_canvas(self.canvas)
+
+        self.root.backdrop_showhide_callback.connect(self.on_btn_backdrop_showhide)
 
         self.fixture_wrapper_list = [FixtureWrapper(fix) for fix in self.scenecontroller.get_fixtures()]
         self.fixture_info_list = FixtureInfoListModel(self.fixture_wrapper_list)
@@ -60,6 +63,10 @@ class FireSimGUI(QtCore.QObject):
     def on_close(self, e):
         pass
 
+    @QtCore.Slot(result=bool)
+    def is_backdrop_enabled(self):
+        return self.scenecontroller.scene.get("backdrop_enable", False)
+
     @QtCore.Slot()
     def on_btn_add_fixture(self):
         self.scenecontroller.add_fixture()
@@ -71,3 +78,13 @@ class FireSimGUI(QtCore.QObject):
     @QtCore.Slot()
     def on_btn_save(self):
         self.scenecontroller.save_scene()
+
+    @QtCore.Slot(result=bool)
+    def on_btn_backdrop_showhide(self, obj):
+        enabled = self.scenecontroller.toggle_background_enable()
+        if enabled:
+            obj.setProperty("text", "Hide Backdrop")
+        else:
+            obj.setProperty("text", "Show Backdrop")
+        return enabled
+
