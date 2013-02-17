@@ -185,10 +185,16 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.setZValue(100)
             self.drag1.setZValue(150)
             self.drag2.setZValue(150)
+            self.drag1.hidden = False
+            self.drag2.hidden = False
         else:
             self.setZValue(0)
             self.drag1.setZValue(0)
             self.drag2.setZValue(0)
+            self.drag1.hidden = True
+            self.drag2.hidden = True
+        self.drag1.update()
+        self.drag2.update()
 
     def mouseReleaseEvent(self, event):
         if not self.dragging:
@@ -197,18 +203,6 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 # TODO: Implement multi-select with control or shift key
                 multi = False
                 self.model.controller.widget_selected(self.isSelected(), self.model, multi)
-                if not self.isSelected():
-                    self.hovering = False
-                    self.drag1.hovering = False
-                    self.drag2.hovering = False
-                    self.drag1.hidden = True
-                    self.drag2.hidden = True
-                else:
-                    self.drag1.hidden = False
-                    self.drag2.hidden = False
-
-                self.drag1.update()
-                self.drag2.update()
                 self.canvas.on_fixture_click(self)
 
         if event.button() == QtCore.Qt.MouseButton.MiddleButton:
