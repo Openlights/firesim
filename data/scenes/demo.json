@@ -1,5 +1,5 @@
 {
-  "backdrop_enable": true, 
+  "backdrop_enable": false, 
   "backdrop_filename": "light_dome.png", 
   "fixtures": [
     {
@@ -123,8 +123,8 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 10, 
       "pixels": 32, 
       "pos1": [
         170, 
@@ -134,7 +134,7 @@
         258, 
         160
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -173,18 +173,18 @@
       "pixels": 32, 
       "pos1": [
         96, 
-        191
+        190
       ], 
       "pos2": [
         167, 
-        125
+        124
       ], 
       "strand": 1, 
       "type": "linear"
     }, 
     {
       "address": 0, 
-      "id": 0, 
+      "id": 11, 
       "pixels": 32, 
       "pos1": [
         258, 
@@ -262,11 +262,11 @@
       "id": 1, 
       "pixels": 32, 
       "pos1": [
-        255, 
+        256, 
         82
       ], 
       "pos2": [
-        343, 
+        344, 
         126
       ], 
       "strand": 1, 
@@ -288,7 +288,7 @@
       "type": "linear"
     }, 
     {
-      "address": 2, 
+      "address": 1, 
       "id": 0, 
       "pixels": 32, 
       "pos1": [

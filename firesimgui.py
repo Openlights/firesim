@@ -96,16 +96,12 @@ class FireSimGUI(QtCore.QObject):
         return enabled
 
     def widget_selected(self, selected, fixture, multi):
-        if selected:
-            self.selected_fixture = fixture
-        else:
-            self.selected_fixture = None
+        self.selected_fixture = None
 
         if multi:
             pass
         else:
             if selected:
-                log.info("Fixture %s selected" % fixture)
                 self.selected_fixture_id = fixture.id
                 self.selected_fixture_strand = fixture.strand
                 self.selected_fixture_address = fixture.address
@@ -115,6 +111,10 @@ class FireSimGUI(QtCore.QObject):
                 self.selected_fixture_strand = 0
                 self.selected_fixture_address = 0
                 self.selected_fixture_pixels = 0
+
+        if selected:
+            self.selected_fixture = fixture
+            self.update_selected_fixture_properties()
 
     def update_selected_fixture_properties(self):
         if self.selected_fixture is not None:
@@ -157,7 +157,6 @@ class FireSimGUI(QtCore.QObject):
         return self._selected_fixture_pixels
 
     def _set_selected_fixture_pixels(self, pixels):
-        print "setting pixels to %d" % pixels
         if self._selected_fixture_pixels == pixels:
             return
         self._selected_fixture_pixels = pixels
