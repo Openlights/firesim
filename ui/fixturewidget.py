@@ -71,7 +71,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         path = QtGui.QPainterPath()
         line = QtCore.QLineF(0, 0, self.width, self.height)
         offset1 = line.normalVector().unitVector()
-        offset1.setLength(7)
+        offset1.setLength(10)
         ol1 = QtCore.QLineF(0, 0, self.width, self.height)
         ol1.translate(offset1.dx(), offset1.dy())
         ol2 = QtCore.QLineF(0, 0, self.width, self.height)
@@ -96,8 +96,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if self.isSelected() or self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 9, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
-        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
-        painter.drawPath(self.shape())
+        #painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
+        #painter.drawPath(self.shape())
 
         if self.model.pixels > 0:
             color_line = QtCore.QLineF(0, 0, self.width, self.height)
@@ -118,12 +118,12 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.drag2.hovering = True
             self.drag1.hidden = False
             self.drag2.hidden = False
-        else:
-            self.hovering = False
-            self.drag1.hovering = False
-            self.drag2.hovering = False
-            self.drag1.hidden = not self.isSelected()
-            self.drag2.hidden = not self.isSelected()
+        #else:
+        #    self.hovering = False
+        #    self.drag1.hovering = False
+        #    self.drag2.hovering = False
+        #    self.drag1.hidden = not self.isSelected()
+        #    self.drag2.hidden = not self.isSelected()
 
         self.drag1.update()
         self.drag2.update()
@@ -142,6 +142,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def hoverMoveEvent(self, event):
         if self.shape().contains(event.pos()):
+            self.setZValue(50)
             self.hovering = True
             self.drag1.hovering = True
             self.drag2.hovering = True

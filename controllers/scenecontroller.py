@@ -36,6 +36,7 @@ class SceneController:
 
     def set_canvas(self, canvas):
         self.canvas = canvas
+        canvas.controller = self
         self.init_view()
 
     def get_canvas(self):

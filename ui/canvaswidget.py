@@ -12,6 +12,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.fixture_list = []
         self.background_image = None
         self.rect = None
+        self.controller = None
         self.next_new_fixture_pos = (0, 0)
 
     def paint(self, painter, options, widget):
@@ -56,6 +57,9 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def mousePressEvent(self, event):
         pass
+
+    def mouseReleaseEvent(self, event):
+        self.controller.widget_selected(False, None, False)
 
     def on_fixture_click(self, fixture):
         pass
