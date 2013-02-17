@@ -127,11 +127,11 @@
       "id": 0, 
       "pixels": 32, 
       "pos1": [
-        169, 
+        170, 
         126
       ], 
       "pos2": [
-        257, 
+        258, 
         160
       ], 
       "strand": 0, 
@@ -168,8 +168,8 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 9, 
       "pixels": 32, 
       "pos1": [
         96, 
@@ -179,7 +179,7 @@
         167, 
         125
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -243,8 +243,8 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 8, 
       "pixels": 32, 
       "pos1": [
         94, 
@@ -254,12 +254,12 @@
         114, 
         284
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 1, 
       "pixels": 32, 
       "pos1": [
         255, 
@@ -269,7 +269,7 @@
         343, 
         126
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -288,18 +288,18 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
+      "address": 2, 
       "id": 0, 
       "pixels": 32, 
       "pos1": [
-        169, 
+        168, 
         126
       ], 
       "pos2": [
-        254, 
+        253, 
         80
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -333,8 +333,8 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 2, 
       "pixels": 32, 
       "pos1": [
         343, 
@@ -344,7 +344,7 @@
         416, 
         193
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -363,18 +363,18 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 3, 
       "pixels": 32, 
       "pos1": [
-        417, 
+        418, 
         194
       ], 
       "pos2": [
-        397, 
+        398, 
         284
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -408,8 +408,8 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 7, 
       "pixels": 32, 
       "pos1": [
         115, 
@@ -419,7 +419,7 @@
         158, 
         369
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -438,18 +438,18 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 6, 
       "pixels": 32, 
       "pos1": [
-        159, 
+        160, 
         369
       ], 
       "pos2": [
-        255, 
+        256, 
         380
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -483,8 +483,8 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 5, 
       "pixels": 32, 
       "pos1": [
         256, 
@@ -494,7 +494,7 @@
         355, 
         367
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -513,18 +513,18 @@
       "type": "linear"
     }, 
     {
-      "address": 0, 
-      "id": 0, 
+      "address": 2, 
+      "id": 4, 
       "pixels": 32, 
       "pos1": [
         355, 
-        367
+        368
       ], 
       "pos2": [
         398, 
-        286
+        287
       ], 
-      "strand": 0, 
+      "strand": 1, 
       "type": "linear"
     }
   ]

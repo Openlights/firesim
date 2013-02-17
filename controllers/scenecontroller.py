@@ -9,9 +9,10 @@ from models.fixture import Fixture
 
 class SceneController:
 
-    def __init__(self, canvas=None, scene=None):
+    def __init__(self, parent=None, canvas=None, scene=None):
         self.canvas = canvas
         self.scene = scene
+        self.parent = parent
         self.fixtures = []
         if self.canvas is not None:
             self.init_view()
@@ -67,6 +68,7 @@ class SceneController:
             for f in self.fixtures:
                 if f is not fixture:
                     f.widget.select(False)
+        self.parent.widget_selected(selected, fixture, multi)
 
     def save_scene(self):
         fd = []

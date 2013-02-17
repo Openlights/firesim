@@ -93,10 +93,49 @@ Item {
                         }
                     }
 
-                    LabeledInput { key: "id"; value: "" }
-                    LabeledInput { key: "strand"; value: "" }
-                    LabeledInput { key: "address"; value: "" }
-                    LabeledInput { key: "pixels"; value: "" }
+                    LabeledInput {
+                        id: input_fixture_id
+                        key: "id"
+                        value: main.selected_fixture_id
+                        Binding {
+                            target: main
+                            property: "selected_fixture_id"
+                            value: input_fixture_id.value
+                        }
+                    }
+
+                    LabeledInput {
+                        id: input_fixture_strand
+                        key: "strand"
+                        value: main.selected_fixture_strand
+                        Binding {
+                            target: main
+                            property: "selected_fixture_strand"
+                            value: input_fixture_strand.value
+                        }
+                    }
+
+                    LabeledInput {
+                        id: input_fixture_address
+                        key: "address"
+                        value: main.selected_fixture_address
+                        Binding {
+                            target: main
+                            property: "selected_fixture_address"
+                            value: input_fixture_address.value
+                        }
+                    }
+
+                    LabeledInput {
+                        id: input_fixture_pixels
+                        key: "pixels"
+                        value: main.selected_fixture_pixels
+                        Binding {
+                            target: main
+                            property: "selected_fixture_pixels"
+                            value: input_fixture_pixels.value
+                        }
+                    }
                 }
             }
         }

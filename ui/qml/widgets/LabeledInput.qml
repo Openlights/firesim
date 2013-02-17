@@ -4,7 +4,7 @@ Column {
     id: labeledInput
 
     property variant key
-    property variant value
+    property alias value: textfield.text
 
     signal changed
 
@@ -20,10 +20,11 @@ Column {
             width: 25
             color: "#444444"
             TextInput {
+                id: textfield
                 anchors.fill: parent
                 anchors { leftMargin: 2; rightMargin: 2 }
                 color: "#eeeeee"
-                text: value
+                //text: ""
                 selectByMouse: true
             }
         }

@@ -21,8 +21,15 @@ class FireSimGUI(QtCore.QObject):
         self.args = args
         self.config = Config("data/config.json")
 
+        self._selected_fixture_id = 0
+        self._selected_fixture_strand = 0
+        self._selected_fixture_address = 0
+        self._selected_fixture_pixels = 0
+
+        self.selected_fixture = None
+
         self.scene = Scene(os.path.join(self.config.get("scene_root"), self.args.scene) + ".json")
-        self.scenecontroller = SceneController(scene=self.scene)
+        self.scenecontroller = SceneController(parent=self, scene=self.scene)
 
         QtDeclarative.qmlRegisterType(CanvasWidget, "FireSim", 1, 0, "SimCanvas")
         QtDeclarative.qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
@@ -87,4 +94,83 @@ class FireSimGUI(QtCore.QObject):
         else:
             obj.setProperty("text", "Show Backdrop")
         return enabled
+
+    def widget_selected(self, selected, fixture, multi):
+        if selected:
+            self.selected_fixture = fixture
+        else:
+            self.selected_fixture = None
+
+        if multi:
+            pass
+        else:
+            if selected:
+                log.info("Fixture %s selected" % fixture)
+                self.selected_fixture_id = fixture.id
+                self.selected_fixture_strand = fixture.strand
+                self.selected_fixture_address = fixture.address
+                self.selected_fixture_pixels = fixture.pixels
+            else:
+                self.selected_fixture_id = 0
+                self.selected_fixture_strand = 0
+                self.selected_fixture_address = 0
+                self.selected_fixture_pixels = 0
+
+    def update_selected_fixture_properties(self):
+        if self.selected_fixture is not None:
+            self.selected_fixture.id = int(self.selected_fixture_id)
+            self.selected_fixture.strand = int(self.selected_fixture_strand)
+            self.selected_fixture.address = int(self.selected_fixture_address)
+            self.selected_fixture.pixels = int(self.selected_fixture_pixels)
+
+    def _get_selected_fixture_id(self):
+        return self._selected_fixture_id
+
+    def _set_selected_fixture_id(self, id):
+        if self._selected_fixture_id == id:
+            return
+        self._selected_fixture_id = id
+        self.update_selected_fixture_properties()
+        self.on_selected_fixture_id.emit()
+
+    def _get_selected_fixture_strand(self):
+        return self._selected_fixture_strand
+
+    def _set_selected_fixture_strand(self, strand):
+        if self._selected_fixture_strand == strand:
+            return
+        self._selected_fixture_strand = strand
+        self.update_selected_fixture_properties()
+        self.on_selected_fixture_strand.emit()
+
+    def _get_selected_fixture_address(self):
+        return self._selected_fixture_address
+
+    def _set_selected_fixture_address(self, address):
+        if self._selected_fixture_address == address:
+            return
+        self._selected_fixture_address = address
+        self.update_selected_fixture_properties()
+        self.on_selected_fixture_address.emit()
+
+    def _get_selected_fixture_pixels(self):
+        return self._selected_fixture_pixels
+
+    def _set_selected_fixture_pixels(self, pixels):
+        print "setting pixels to %d" % pixels
+        if self._selected_fixture_pixels == pixels:
+            return
+        self._selected_fixture_pixels = pixels
+        self.update_selected_fixture_properties()
+        self.on_selected_fixture_pixels.emit()
+
+    on_selected_fixture_id = QtCore.Signal()
+    on_selected_fixture_strand = QtCore.Signal()
+    on_selected_fixture_address = QtCore.Signal()
+    on_selected_fixture_pixels = QtCore.Signal()
+
+    selected_fixture_id = QtCore.Property(int, _get_selected_fixture_id, _set_selected_fixture_id, notify=on_selected_fixture_id)
+    selected_fixture_strand = QtCore.Property(int, _get_selected_fixture_strand, _set_selected_fixture_strand, notify=on_selected_fixture_strand)
+    selected_fixture_address = QtCore.Property(int, _get_selected_fixture_address, _set_selected_fixture_address, notify=on_selected_fixture_address)
+    selected_fixture_pixels = QtCore.Property(int, _get_selected_fixture_pixels, _set_selected_fixture_pixels, notify=on_selected_fixture_pixels)
 
