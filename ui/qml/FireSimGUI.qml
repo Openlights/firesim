@@ -50,10 +50,10 @@ Item {
                 onClicked: main.on_btn_clear()
             }
 
-            Button {
+            /*Button {
                 id: btn_load
                 text: "Load Scene"
-            }
+            }*/
 
             Button {
                 id: btn_save
@@ -67,10 +67,10 @@ Item {
                 onClicked: backdrop_showhide_callback(btn_enable_bg)
             }
 
-            Button {
+            /*Button {
                 id: btn_load_bg
                 text: "Load Backdrop"
-            }
+            }*/
 
             Rectangle {
                 width: 110
