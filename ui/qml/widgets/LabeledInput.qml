@@ -8,7 +8,7 @@ Column {
 
     signal changed
 
-    width: 60
+    width: 80
     height: 16
 
     Row {

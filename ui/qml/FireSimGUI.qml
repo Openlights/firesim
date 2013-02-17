@@ -76,7 +76,7 @@ Item {
                     Row {
                         anchors { bottomMargin: 8; topMargin: 24 }
                         Text {
-                            font.pixelSize: 12
+                            font.pixelSize: 14
                             color: "#dddddd"
                             text: "Fixture Info"
                         }
