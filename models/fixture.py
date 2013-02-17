@@ -1,5 +1,19 @@
+from PySide import QtCore
+
 from ui.fixturewidget import FixtureWidget
 
+
+class FixtureWrapper(QtCore.QObject):
+
+    def __init__(self, fixture):
+        QtCore.QObject.__init__(self)
+        self._fixture = fixture
+
+    def _id(self):
+        return self._fixture.id
+
+    changed = QtCore.Signal()
+    id = QtCore.Property(int, _id, notify=changed)
 
 class Fixture:
 
@@ -7,12 +21,10 @@ class Fixture:
         self.id = 0
         self.strand = 0
         self.address = 0
-        self.type = ""
-        self.pixels = 0
-        self.pos1 = (0, 0)
-        self.pos2 = (0, 0)
-        self.scale = 0.0
-        self.angle = 0.0
+        self.type = "linear"
+        self.pixels = 32
+        self.pos1 = (10, 10)
+        self.pos2 = (50, 50)
 
         if data is not None:
             self.unpack(data)
@@ -33,7 +45,7 @@ class Fixture:
             self.widget = FixtureWidget(self.controller.get_canvas(), self.id, model=self, move_callback=self.fixture_move_callback)
             x, y = self.pos1[0], self.pos1[1]
             self.widget.setPos(x, y)
-            self.widget.setRotation(self.angle)
+            #self.widget.setRotation(self.angle)
         return self.widget
 
     def unpack(self, data):
@@ -44,8 +56,6 @@ class Fixture:
         self.pixels = data.get("pixels", 0)
         self.pos1 = data.get("pos1", [0, 0])
         self.pos2 = data.get("pos2", [0, 0])
-        self.scale = float(data.get("scale", "0.0"))
-        self.angle = float(data.get("angle", "0.0"))
 
     def pack(self):
         return {'id': self.id,
@@ -54,21 +64,21 @@ class Fixture:
                 'type': self.type,
                 'pixels': self.pixels,
                 'pos1': self.pos1,
-                'pos2': self.pos2,
-                'scale': self.scale,
-                'angle': self.angle
+                'pos2': self.pos2
         }
 
-    def fixture_move_callback(self, pos):
-        self.pos1 = map(int, pos.toTuple())
+    def fixture_move_callback(self, fixture):
+        self.pos1 = map(int, fixture.drag1.pos().toTuple())
+        self.pos2 = map(int, fixture.drag2.pos().toTuple())
+        fixture.update_geometry()
 
     def blackout(self):
-        self.pixels = [(0, 0, 0)] * self.size
+        self.pixel_data = [(0, 0, 0)] * self.pixels
 
     def set(self, pixel, color):
         assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
-        self.pixels[pixel] = color
+        self.pixel_data[pixel] = color
 
     def set_all(self, color):
         assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
-        self.pixels = [color] * self.size
+        self.pixel_data = [color] * self.pixels

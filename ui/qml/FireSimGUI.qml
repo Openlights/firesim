@@ -69,13 +69,23 @@ Item {
                 color: "#232323"
 
                 Column {
-                    spacing: 8
+                    id: fixture_info_column
+                    spacing: 4
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    Text {
-                        color: "#dddddd"
-                        text: "Fixture Info"
+                    Row {
+                        anchors { bottomMargin: 8; topMargin: 24 }
+                        Text {
+                            font.pixelSize: 12
+                            color: "#dddddd"
+                            text: "Fixture Info"
+                        }
                     }
+
+                    LabeledInput { key: "id"; value: "" }
+                    LabeledInput { key: "strand"; value: "" }
+                    LabeledInput { key: "address"; value: "" }
+                    LabeledInput { key: "pixels"; value: "" }
                 }
             }
         }

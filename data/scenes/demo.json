@@ -4,122 +4,153 @@
   "fixtures": [
     {
       "address": 0, 
-      "angle": -60.0, 
       "id": 0, 
       "pixels": 32, 
       "pos1": [
-        163, 
-        171
+        210, 
+        304
       ], 
       "pos2": [
-        0, 
-        0
+        259, 
+        241
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 1, 
-      "angle": 60.0, 
       "id": 1, 
       "pixels": 32, 
       "pos1": [
-        165, 
-        289
+        310, 
+        305
       ], 
       "pos2": [
-        0, 
-        0
+        210, 
+        305
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 2, 
-      "angle": 180.0, 
       "id": 2, 
       "pixels": 32, 
       "pos1": [
-        201, 
-        229
+        178, 
+        214
       ], 
       "pos2": [
-        0, 
-        0
+        258, 
+        240
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 3, 
-      "angle": 60.0, 
       "id": 3, 
       "pixels": 32, 
       "pos1": [
-        234, 
-        171
+        261, 
+        162
       ], 
       "pos2": [
-        0, 
-        0
+        342, 
+        218
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 4, 
-      "angle": -60.0, 
       "id": 4, 
       "pixels": 32, 
       "pos1": [
-        234, 
-        290
+        339, 
+        215
       ], 
       "pos2": [
-        0, 
-        0
+        260, 
+        240
       ], 
-      "scale": 3.0, 
       "strand": 0, 
       "type": "linear"
     }, 
     {
       "address": 0, 
-      "angle": 0.0, 
       "id": 0, 
-      "pixels": 0, 
+      "pixels": 32,
       "pos1": [
-        199, 
-        352
+        261, 
+        241
       ], 
       "pos2": [
-        0, 
-        0
+        311, 
+        304
       ], 
-      "scale": 0.0, 
       "strand": 0, 
-      "type": ""
+      "type": "linear"
     }, 
     {
       "address": 0, 
-      "angle": 0.0, 
       "id": 0, 
-      "pixels": 0, 
+      "pixels": 32,
       "pos1": [
-        197, 
-        104
+        260, 
+        240
       ], 
       "pos2": [
-        0, 
-        0
+        261, 
+        161
       ], 
-      "scale": 0.0, 
       "strand": 0, 
-      "type": ""
+      "type": "linear"
+    }, 
+    {
+      "address": 0, 
+      "id": 0, 
+      "pixels": 32,
+      "pos1": [
+        260, 
+        163
+      ], 
+      "pos2": [
+        179, 
+        217
+      ], 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 0, 
+      "id": 0, 
+      "pixels": 32,
+      "pos1": [
+        209, 
+        305
+      ], 
+      "pos2": [
+        180, 
+        216
+      ], 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 0, 
+      "id": 0, 
+      "pixels": 32,
+      "pos1": [
+        340, 
+        218
+      ], 
+      "pos2": [
+        311, 
+        305
+      ], 
+      "strand": 0, 
+      "type": "linear"
     }
   ]
 }
