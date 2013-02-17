@@ -220,7 +220,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         #super(FixtureWidget, self).mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event):
-        self.model.set_all((255, 0, 0))
+        self.model.random_color()
         #super(FixtureWidget, self).mouseDoubleClickEvent(event)
 
     def handle_callback(self, handle):
