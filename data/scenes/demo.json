@@ -151,21 +151,6 @@
       ], 
       "strand": 0, 
       "type": "linear"
-    }, 
-    {
-      "address": 0, 
-      "id": 0, 
-      "pixels": 32, 
-      "pos1": [
-        96, 
-        190
-      ], 
-      "pos2": [
-        167, 
-        128
-      ], 
-      "strand": 0, 
-      "type": "linear"
     }
   ]
 }

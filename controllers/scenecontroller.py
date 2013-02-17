@@ -46,8 +46,13 @@ class SceneController:
             self.canvas.update_fixtures(fl)
 
     def add_fixture(self):
-        self.fixtures.append(Fixture( controller=self))
+        self.fixtures.append(Fixture(controller=self))
         self.update_canvas()
+
+    def delete_fixture(self, fixture):
+        self.fixtures = [f for f in self.fixtures if f is not fixture]
+        log.info("Destroying fixture %s" % fixture)
+        fixture.destroy()
 
     def clear_fixtures(self):
         while len(self.fixtures) > 0:

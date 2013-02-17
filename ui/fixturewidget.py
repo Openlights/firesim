@@ -1,3 +1,5 @@
+import logging as log
+
 from PySide import QtCore, QtGui, QtDeclarative
 
 from draghandlewidget import DragHandleWidget
@@ -9,7 +11,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         super(FixtureWidget, self).__init__(canvas)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
+        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton | QtCore.Qt.MouseButton.MiddleButton | QtCore.Qt.MouseButton.RightButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.id = id
@@ -42,6 +44,11 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             QtCore.QPoint(0, self.height)
         ])
 
+    def deleteLater(self):
+        self.drag1.deleteLater()
+        self.drag2.deleteLater()
+        super(FixtureWidget, self).deleteLater()
+
     def update_geometry(self):
         self.width = int(self.model.pos2[0] - self.model.pos1[0])
         self.height = int(self.model.pos2[1] - self.model.pos1[1])
@@ -49,6 +56,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.update(self.boundingRect())
 
     def boundingRect(self):
+        """Defines an outer bounding rectangle, used for repaint only"""
         if self.width >= 0 and self.height >= 0:
             return QtCore.QRectF(-8, -8, self.width + 16, self.height + 16)
         elif self.width >= 0 and self.height < 0:
@@ -59,8 +67,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             return QtCore.QRectF(self.width - 8, self.height - 8, -self.width + 16, -self.height + 16)
 
     def shape(self):
+        """Defines a 4-gon for mouse selection/hovering, larger than the drawn fixture"""
         path = QtGui.QPainterPath()
-
         line = QtCore.QLineF(0, 0, self.width, self.height)
         offset1 = line.normalVector().unitVector()
         offset1.setLength(7)
@@ -75,6 +83,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             QtCore.QPoint(ol2.x2(), ol2.y2()),
             QtCore.QPoint(ol2.x1(), ol2.y1())
         ])
+
         path.addPolygon(p)
         path.closeSubpath()
         return path
@@ -187,6 +196,13 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 self.drag1.update()
                 self.drag2.update()
                 self.canvas.on_fixture_click(self)
+
+        if event.button() == QtCore.Qt.MouseButton.MiddleButton:
+            self.model.request_destruction()
+
+        if event.button() == QtCore.Qt.MouseButton.RightButton:
+            pass
+
         self.dragging = False
         self.mouse_down = False
         self.drag_pos = None

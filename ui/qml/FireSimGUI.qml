@@ -12,7 +12,10 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: window.focus = false;
+        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+        onClicked: {
+            window.focus = false;
+        }
     }
 
     SimCanvas {

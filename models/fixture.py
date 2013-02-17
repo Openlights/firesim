@@ -1,3 +1,5 @@
+import logging as log
+
 from PySide import QtCore
 
 from ui.fixturewidget import FixtureWidget
@@ -35,10 +37,13 @@ class Fixture:
         self.pixel_data = [(0, 0, 0)] * self.pixels
 
     def __repr__(self):
-        return "Fixture %d [%d:%d]" % (self.id, self.strand, self.address)
+        return "F%d [%d:%d]" % (self.id, self.strand, self.address)
 
     def destroy(self):
         self.widget.deleteLater()
+
+    def request_destruction(self):
+        self.controller.delete_fixture(self)
 
     def get_widget(self):
         if self.widget is None:
