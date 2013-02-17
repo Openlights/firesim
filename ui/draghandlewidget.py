@@ -40,7 +40,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
             painter.setBrush(QtGui.QColor(50, 100, 255, 255))
             hover_rect = QtCore.QRect(-6, -6, 12, 12)
             painter.drawEllipse(hover_rect)
-        if self.hovering or self.isSelected():
+        if self.isSelected():
             painter.setBrush(QtGui.QColor(0, 0, 0, 180))
             painter.setPen(QtGui.QColor(100, 100, 100, 100))
             painter.drawRoundedRect(-14, -26, 15, 18, 5, 5)
@@ -54,7 +54,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         painter.drawEllipse(fixture_bg)
 
     def hoverEnterEvent(self, event):
-        pass
+        self.setZValue(50)
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
