@@ -96,8 +96,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if self.isSelected() or self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 9, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
-        #painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.SolidLine))
-        #painter.drawPath(self.shape())
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
+        painter.drawPath(self.shape())
 
         if self.model.pixels > 0:
             color_line = QtCore.QLineF(0, 0, self.width, self.height)
@@ -128,6 +128,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag1.update()
         self.drag2.update()
         self.update()
+        event.ignore()
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
@@ -137,6 +138,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag2.hidden = not self.isSelected()
         self.drag1.update()
         self.drag2.update()
+        event.ignore()
 
     def hoverMoveEvent(self, event):
         if self.shape().contains(event.pos()):
@@ -155,6 +157,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag1.update()
         self.drag2.update()
         self.update()
+        event.ignore()
 
     def mouseMoveEvent(self, event):
         if self.hovering and self.mouse_down:
@@ -178,6 +181,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag1.setSelected(selected)
         self.drag2.setSelected(selected)
         self.setSelected(selected)
+        if selected:
+            self.setZValue(100)
+            self.drag1.setZValue(150)
+            self.drag2.setZValue(150)
+        else:
+            self.setZValue(0)
+            self.drag1.setZValue(0)
+            self.drag2.setZValue(0)
 
     def mouseReleaseEvent(self, event):
         if not self.dragging:
@@ -192,11 +203,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                     self.drag2.hovering = False
                     self.drag1.hidden = True
                     self.drag2.hidden = True
-                    self.setZValue(0)
                 else:
                     self.drag1.hidden = False
                     self.drag2.hidden = False
-                    self.setZValue(100)
+
                 self.drag1.update()
                 self.drag2.update()
                 self.canvas.on_fixture_click(self)

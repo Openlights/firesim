@@ -278,7 +278,7 @@
       "pixels": 32, 
       "pos1": [
         254, 
-        84
+        80
       ], 
       "pos2": [
         254, 
@@ -296,8 +296,8 @@
         126
       ], 
       "pos2": [
-        253, 
-        80
+        252, 
+        79
       ], 
       "strand": 1, 
       "type": "linear"
@@ -525,6 +525,36 @@
         287
       ], 
       "strand": 1, 
+      "type": "linear"
+    }, 
+    {
+      "address": 0, 
+      "id": 0, 
+      "pixels": 32, 
+      "pos1": [
+        64, 
+        100
+      ], 
+      "pos2": [
+        64, 
+        36
+      ], 
+      "strand": 0, 
+      "type": "linear"
+    }, 
+    {
+      "address": 0, 
+      "id": 0, 
+      "pixels": 32, 
+      "pos1": [
+        115, 
+        68
+      ], 
+      "pos2": [
+        19, 
+        64
+      ], 
+      "strand": 0, 
       "type": "linear"
     }
   ]

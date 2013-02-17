@@ -6,6 +6,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
     def __init__(self, canvas=None, fixture=None, pos=None, move_callback=None):
         super(DragHandleWidget, self).__init__(canvas)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
+        self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
@@ -39,6 +40,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
             painter.setBrush(QtGui.QColor(50, 100, 255, 255))
             hover_rect = QtCore.QRect(-6, -6, 12, 12)
             painter.drawEllipse(hover_rect)
+        if self.hovering or self.isSelected():
             painter.setPen(QtGui.QColor(255, 255, 255, 255))
             if self == self.fixture.drag1:
                 painter.drawText(-8, -8, "1")
@@ -53,7 +55,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
-        self.hidden = not self.fixture.isSelected()
+        #self.hidden = not self.fixture.isSelected()
         self.update()
 
     def hoverMoveEvent(self, event):
