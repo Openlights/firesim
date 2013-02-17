@@ -173,7 +173,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag_pos = event.scenePos()
         #super(FixtureWidget, self).mousePressEvent(event)
 
-    def select(self, selected):
+    def select(self, selected, multi=False):
         self.drag1.setSelected(selected)
         self.drag2.setSelected(selected)
         self.setSelected(selected)
@@ -182,6 +182,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if not self.dragging:
             if event.button() == QtCore.Qt.MouseButton.LeftButton and self.shape().contains(event.pos()):
                 self.select(not self.isSelected())
+                # TODO: Implement multi-select with control or shift key
+                multi = False
+                self.model.controller.widget_selected(self.isSelected(), self.model, multi)
                 if not self.isSelected():
                     self.hovering = False
                     self.drag1.hovering = False

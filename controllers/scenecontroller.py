@@ -60,6 +60,14 @@ class SceneController:
             fixture.destroy()
             del fixture
 
+    def widget_selected(self, selected, fixture, multi):
+        if multi:
+            pass
+        else:
+            for f in self.fixtures:
+                if f is not fixture:
+                    f.widget.select(False)
+
     def save_scene(self):
         fd = []
         for fixture in self.fixtures:
