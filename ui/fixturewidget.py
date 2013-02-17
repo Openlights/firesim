@@ -63,7 +63,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         line = QtCore.QLineF(0, 0, self.width, self.height)
         offset1 = line.normalVector().unitVector()
-        offset1.setLength(10)
+        offset1.setLength(7)
         ol1 = QtCore.QLineF(0, 0, self.width, self.height)
         ol1.translate(offset1.dx(), offset1.dy())
         ol2 = QtCore.QLineF(0, 0, self.width, self.height)
@@ -82,13 +82,13 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def paint(self, painter, options, widget):
         painter.setBrush(QtGui.QColor(0, 0, 0, 0))
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 4, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 6, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
-            painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 7, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+            painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 9, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
-        painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.SolidLine))
-        painter.drawPath(self.shape())
+        #painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 255), 1, QtCore.Qt.SolidLine))
+        #painter.drawPath(self.shape())
 
         color_line = QtCore.QLineF(0, 0, self.width, self.height)
         color_line.setLength(color_line.length() / self.model.pixels)
