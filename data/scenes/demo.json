@@ -494,5 +494,5 @@
     }
   ], 
   "labels_enable": false, 
-  "locked": false
+  "locked": true
 }

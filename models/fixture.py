@@ -36,7 +36,7 @@ class Fixture:
 
     def get_widget(self):
         if self.widget is None:
-            self.widget = FixtureWidget(self.controller.get_canvas(), model=self, move_callback=self.fixture_move_callback)
+            self.widget = FixtureWidget(self.controller.get_canvas(), model=self)
             x, y = self.pos1[0], self.pos1[1]
             self.widget.setPos(x, y)
             #self.widget.setRotation(self.angle)

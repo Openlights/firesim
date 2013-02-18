@@ -7,7 +7,7 @@ from draghandlewidget import DragHandleWidget
 
 class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
-    def __init__(self, canvas=None, model=None, move_callback=None):
+    def __init__(self, canvas=None, model=None):
         super(FixtureWidget, self).__init__(canvas)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
@@ -16,7 +16,6 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.color = QtGui.QColor(100, 100, 100)
         self.model = model
         self.about_to_delete = False
-        self.move_callback = move_callback
         self.setHeight(16)
         self.setWidth(128)
         self.dragging = False
@@ -34,8 +33,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.setPos(x, y)
             self.canvas.hover_move_event.connect(self.hover_move_handler)
 
-        self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1, move_callback=self.handle_callback)
-        self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2, move_callback=self.handle_callback)
+        self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1)
+        self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2)
 
         self.update_geometry()
 
@@ -211,8 +210,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 self.drag1.moveBy(npos.x(), npos.y())
                 self.drag2.moveBy(npos.x(), npos.y())
             self.drag_pos = event.scenePos()
-            if self.move_callback:
-                self.move_callback(self)
+            self.model.fixture_move_callback(self)
 
         event.ignore()
         #super(FixtureWidget, self).mouseMoveEvent(event)
@@ -266,8 +264,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.dragging = False
             self.mouse_down = False
             self.drag_pos = None
-            if self.move_callback:
-                self.move_callback(self)
+            self.model.fixture_move_callback(self)
         else:
             if self.isSelected():
                 self.select(not self.isSelected())
@@ -277,7 +274,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if self.shape().contains(event.pos()) and event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.model.random_color()
 
-    def handle_callback(self, handle):
+    def handle_move_callback(self, handle):
         if handle == self.drag1:
             self.model.pos1 = [int(handle.pos().x()), int(handle.pos().y())]
             self.setPos(handle.pos())

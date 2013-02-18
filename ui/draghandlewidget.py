@@ -3,7 +3,7 @@ from PySide import QtCore, QtGui, QtDeclarative
 
 class DragHandleWidget(QtDeclarative.QDeclarativeItem):
 
-    def __init__(self, canvas=None, fixture=None, pos=None, move_callback=None):
+    def __init__(self, canvas=None, fixture=None, pos=None):
         super(DragHandleWidget, self).__init__(canvas)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
@@ -17,7 +17,6 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.hovering = False
         self.hidden = True
         self.drag_pos = None
-        self.move_callback = move_callback
         #self.rect = QtCore.QRect(0, 0, 16, 16)
         if pos:
             self.setPos(pos[0], pos[1])
@@ -76,8 +75,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
             if self.canvas.sceneBoundingRect().contains(event.scenePos()):
                 self.moveBy(npos.x(), npos.y())
             self.drag_pos = event.scenePos()
-            if self.move_callback:
-                self.move_callback(self)
+            self.fixture.handle_move_callback(self)
 
     def mousePressEvent(self, event):
         self.mouse_down = True
@@ -87,8 +85,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.dragging = False
         self.mouse_down = False
         self.drag_pos = None
-        if self.move_callback:
-            self.move_callback(self)
+        self.fixture.handle_move_callback(self)
 
     def mouseDoubleClickEvent(self, event):
         pass
