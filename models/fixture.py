@@ -16,6 +16,7 @@ class Fixture:
         self.pixels = 32
         self.pos1 = (10, 10)
         self.pos2 = (50, 50)
+        self.locked = False
 
         if data is not None:
             self.unpack(data)

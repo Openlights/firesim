@@ -491,8 +491,22 @@
       ], 
       "strand": 0, 
       "type": "linear"
+    }, 
+    {
+      "address": 0, 
+      "pixels": 32, 
+      "pos1": [
+        307, 
+        24
+      ], 
+      "pos2": [
+        160, 
+        101
+      ], 
+      "strand": 0, 
+      "type": "linear"
     }
   ], 
   "labels_enable": false, 
-  "locked": true
+  "locked": false
 }

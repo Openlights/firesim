@@ -11,7 +11,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         super(FixtureWidget, self).__init__(canvas)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton | QtCore.Qt.MouseButton.MiddleButton | QtCore.Qt.MouseButton.RightButton)
+        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton |
+                                     QtCore.Qt.MouseButton.MiddleButton |
+                                     QtCore.Qt.MouseButton.RightButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.model = model
@@ -92,13 +94,25 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
     def paint(self, painter, options, widget):
         painter.setBrush(QtGui.QColor(0, 0, 0, 0))
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 6, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200),
+                                  6,
+                                  QtCore.Qt.SolidLine,
+                                  QtCore.Qt.RoundCap,
+                                  QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
             if not self.about_to_delete:
-                painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 10, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+                painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225),
+                                          10,
+                                          QtCore.Qt.SolidLine,
+                                          QtCore.Qt.RoundCap,
+                                          QtCore.Qt.RoundJoin))
             else:
-                painter.setPen(QtGui.QPen(QtGui.QColor(255, 50, 50, 225), 10, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+                painter.setPen(QtGui.QPen(QtGui.QColor(255, 50, 50, 225),
+                                          10,
+                                          QtCore.Qt.SolidLine,
+                                          QtCore.Qt.RoundCap,
+                                          QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
         #if self.bb_hovering:
         #    painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
@@ -202,7 +216,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.update()
 
     def mouseMoveEvent(self, event):
-        if self.shape().contains(event.pos()) and self.hovering and self.mouse_down and not self.model.controller.scene.get("locked", False):
+        if self.hovering and self.mouse_down and not self.model.locked:
             self.dragging = True
             npos = (event.scenePos() - self.drag_pos)
             if self.parent().sceneBoundingRect().contains(event.scenePos()):
