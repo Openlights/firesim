@@ -27,7 +27,7 @@ class Fixture:
         self.pixel_data = [(0, 0, 0)] * self.pixels
 
     def __repr__(self):
-        return "F%d [%d:%d]*%d" % (self.id, self.strand, self.address, self.pixels)
+        return "[%d:%d]*%d" % (self.strand, self.address, self.pixels)
 
     def destroy(self):
         self.widget.deleteLater()

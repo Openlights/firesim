@@ -127,7 +127,11 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 px, py = color_line.x1(), color_line.y1()
                 r, g, b = pixel[0], pixel[1], pixel[2]
                 painter.setBrush(QtGui.QColor(r, g, b, 255))
-                painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
+                painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 255),
+                                          3,
+                                          QtCore.Qt.SolidLine))
+                #painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
+                painter.drawLine(color_line.unitVector())
                 color_line.translate(color_line.dx(), color_line.dy())
 
         if self.model.controller.scene.get("labels_enable", False):
