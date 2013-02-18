@@ -528,5 +528,6 @@
       "type": "linear"
     }
   ], 
-  "labels_enable": true
+  "labels_enable": false, 
+  "locked": true
 }

@@ -10,6 +10,7 @@ Item {
 
     signal backdrop_showhide_callback(variant obj)
     signal labels_showhide_callback(variant obj)
+    signal lock_callback(variant obj)
 
     MouseArea {
         anchors.fill: parent
@@ -72,6 +73,12 @@ Item {
                 id: btn_labels_showhide
                 text: if(main.are_labels_enabled()) "Hide Labels"; else "Show Labels"
                 onClicked: labels_showhide_callback(btn_labels_showhide)
+            }
+
+            Button {
+                id: btn_lock
+                text: if(main.is_locked()) "Unlock Scene"; else "Lock Scene"
+                onClicked: lock_callback(btn_lock)
             }
 
             /*Button {

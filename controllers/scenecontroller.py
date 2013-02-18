@@ -105,3 +105,9 @@ class SceneController:
         self.scene.set("labels_enable", enabled)
         self.update_all()
         return enabled
+
+    def toggle_locked(self):
+        locked = not self.scene.get("locked", False)
+        self.scene.set("locked", locked)
+        self.update_all()
+        return locked

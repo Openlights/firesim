@@ -186,7 +186,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         event.ignore()
 
     def mouseMoveEvent(self, event):
-        if self.hovering and self.mouse_down:
+        if self.hovering and self.mouse_down and not self.model.controller.scene.get("locked", False):
             self.dragging = True
             npos = (event.scenePos() - self.drag_pos)
             if self.parent().sceneBoundingRect().contains(event.scenePos()):
