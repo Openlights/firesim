@@ -109,7 +109,5 @@ class SceneController:
     def toggle_locked(self):
         locked = not self.scene.get("locked", False)
         self.scene.set("locked", locked)
-        for f in self.fixtures:
-            f.locked = locked
         self.update_all()
         return locked
