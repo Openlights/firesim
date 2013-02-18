@@ -137,20 +137,20 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 r, g, b = pixel[0], pixel[1], pixel[2]
                 painter.setBrush(QtGui.QColor(r, g, b, 255))
                 painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 255),
-                                          3,
+                                          4,
                                           QtCore.Qt.SolidLine))
                 #painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
                 painter.drawLine(color_line.unitVector())
                 color_line.translate(color_line.dx(), color_line.dy())
 
-        if self.model.controller.scene.get("labels_enable", False):
-            x = self.width / 2 - 16
-            y = self.height / 2 - 8
+        if self.hovering or self.isSelected() or self.model.controller.scene.get("labels_enable", False):
+            x = self.width / 2 - 12
+            y = self.height / 2 - 7
             label_font = QtGui.QFont()
             label_font.setPointSize(8)
             painter.setFont(label_font)
-            label_rect = QtCore.QRectF(x, y, 32, 16)
-            painter.setBrush(QtGui.QColor(128, 64, 128, 180))
+            label_rect = QtCore.QRectF(x, y, 24, 14)
+            painter.setBrush(QtGui.QColor(128, 64, 128, 220))
             painter.setPen(QtGui.QColor(100, 100, 100, 100))
             painter.drawRoundedRect(label_rect, 5, 5)
             painter.setPen(QtGui.QColor(255, 255, 255, 255))
