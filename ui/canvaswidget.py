@@ -51,6 +51,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def hoverMoveEvent(self, event):
         pass
+        #self.propagate_hover_move(None, event)
 
     def mouseMoveEvent(self, event):
         pass
@@ -63,3 +64,9 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def on_fixture_click(self, fixture):
         pass
+
+    @QtCore.Slot()
+    def propagate_hover_move(self, widget, scenepos):
+        self.hover_move_event.emit(widget, scenepos)
+
+    hover_move_event = QtCore.Signal(QtGui.QWidget, QtCore.QEvent)

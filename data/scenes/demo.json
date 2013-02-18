@@ -277,11 +277,11 @@
       "id": 0, 
       "pixels": 32, 
       "pos1": [
-        254, 
+        256, 
         80
       ], 
       "pos2": [
-        254, 
+        256, 
         159
       ], 
       "strand": 1, 
@@ -529,5 +529,5 @@
     }
   ], 
   "labels_enable": false, 
-  "locked": true
+  "locked": false
 }
