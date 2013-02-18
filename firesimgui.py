@@ -56,6 +56,7 @@ class FireSimGUI(QtCore.QObject):
         self.scenecontroller.set_canvas(self.canvas)
 
         self.root.backdrop_showhide_callback.connect(self.on_btn_backdrop_showhide)
+        self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)
 
         self.fixture_wrapper_list = [FixtureWrapper(fix) for fix in self.scenecontroller.get_fixtures()]
         self.fixture_info_list = FixtureInfoListModel(self.fixture_wrapper_list)
@@ -73,6 +74,10 @@ class FireSimGUI(QtCore.QObject):
     @QtCore.Slot(result=bool)
     def is_backdrop_enabled(self):
         return self.scenecontroller.scene.get("backdrop_enable", False)
+
+    @QtCore.Slot(result=bool)
+    def are_labels_enabled(self):
+        return self.scenecontroller.scene.get("labels_enable", False)
 
     @QtCore.Slot()
     def on_btn_add_fixture(self):
@@ -93,6 +98,15 @@ class FireSimGUI(QtCore.QObject):
             obj.setProperty("text", "Hide Backdrop")
         else:
             obj.setProperty("text", "Show Backdrop")
+        return enabled
+
+    @QtCore.Slot(result=bool)
+    def on_btn_labels_showhide(self, obj):
+        enabled = self.scenecontroller.toggle_labels_enable()
+        if enabled:
+            obj.setProperty("text", "Hide Labels")
+        else:
+            obj.setProperty("text", "Show Labels")
         return enabled
 
     def widget_selected(self, selected, fixture, multi):

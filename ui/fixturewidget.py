@@ -16,6 +16,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.color = QtGui.QColor(100, 100, 100)
         self.id = id
         self.model = model
+        self.about_to_delete = False
         self.move_callback = move_callback
         self.setHeight(16)
         self.setWidth(128)
@@ -94,7 +95,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 6, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         painter.drawLine(0, 0, self.width, self.height)
         if self.isSelected() or self.hovering:
-            painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 9, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+            if not self.about_to_delete:
+                painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 225), 10, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+            else:
+                painter.setPen(QtGui.QPen(QtGui.QColor(255, 50, 50, 225), 10, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
         #painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
         #painter.drawPath(self.shape())
@@ -111,7 +115,21 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
                 color_line.translate(color_line.dx(), color_line.dy())
 
+        if self.model.controller.scene.get("labels_enable", False):
+            x = self.width / 2 - 16
+            y = self.height / 2 - 8
+            label_font = QtGui.QFont()
+            label_font.setPointSize(8)
+            painter.setFont(label_font)
+            label_rect = QtCore.QRectF(x, y, 32, 16)
+            painter.setBrush(QtGui.QColor(128, 64, 128, 180))
+            painter.setPen(QtGui.QColor(100, 100, 100, 100))
+            painter.drawRoundedRect(label_rect, 5, 5)
+            painter.setPen(QtGui.QColor(255, 255, 255, 255))
+            painter.drawText(label_rect, QtCore.Qt.AlignCenter, "%d:%d" % (self.model.strand, self.model.address))
+
     def hoverEnterEvent(self, event):
+        self.setZValue(1)
         if self.shape().contains(event.pos()):
             self.hovering = True
             self.drag1.hovering = True
@@ -131,6 +149,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         event.ignore()
 
     def hoverLeaveEvent(self, event):
+        self.setZValue(0)
         self.hovering = False
         self.drag1.hovering = False
         self.drag2.hovering = False
@@ -213,7 +232,12 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 self.canvas.on_fixture_click(self)
 
         if event.button() == QtCore.Qt.MouseButton.MiddleButton:
-            self.model.request_destruction()
+            if not self.about_to_delete:
+                self.about_to_delete = True
+            else:
+                self.model.request_destruction()
+        else:
+            self.about_to_delete = False
 
         if event.button() == QtCore.Qt.MouseButton.RightButton:
             pass
@@ -223,11 +247,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag_pos = None
         if self.move_callback:
             self.move_callback(self)
-        #super(FixtureWidget, self).mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event):
-        self.model.random_color()
-        #super(FixtureWidget, self).mouseDoubleClickEvent(event)
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.model.random_color()
 
     def handle_callback(self, handle):
         if handle == self.drag1:

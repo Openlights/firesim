@@ -9,6 +9,7 @@ Item {
     height: 480
 
     signal backdrop_showhide_callback(variant obj)
+    signal labels_showhide_callback(variant obj)
 
     MouseArea {
         anchors.fill: parent
@@ -62,9 +63,15 @@ Item {
             }
 
             Button {
-                id: btn_enable_bg
+                id: btn_backdrop_showhide
                 text: if(main.is_backdrop_enabled()) "Hide Backdrop"; else "Show Backdrop"
-                onClicked: backdrop_showhide_callback(btn_enable_bg)
+                onClicked: backdrop_showhide_callback(btn_backdrop_showhide)
+            }
+
+            Button {
+                id: btn_labels_showhide
+                text: if(main.are_labels_enabled()) "Hide Labels"; else "Show Labels"
+                onClicked: labels_showhide_callback(btn_labels_showhide)
             }
 
             /*Button {

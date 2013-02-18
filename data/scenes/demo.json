@@ -1,5 +1,6 @@
 {
-  "backdrop_enable": false, 
+  "backdrop_enable": false,
+  "labels_enable": true,
   "backdrop_filename": "light_dome.png", 
   "fixtures": [
     {

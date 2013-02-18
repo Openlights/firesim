@@ -95,3 +95,10 @@ class SceneController:
             self.scene.set("backdrop_enable", True)
             self.load_backdrop()
             return True
+
+    def toggle_labels_enable(self):
+        enabled = not self.scene.get("labels_enable", False)
+        self.scene.set("labels_enable", enabled)
+        for f in self.fixtures:
+            f.widget.update()
+        return enabled
