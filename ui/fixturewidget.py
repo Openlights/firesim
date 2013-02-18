@@ -7,14 +7,13 @@ from draghandlewidget import DragHandleWidget
 
 class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
-    def __init__(self, canvas=None, id=0, model=None, move_callback=None):
+    def __init__(self, canvas=None, model=None, move_callback=None):
         super(FixtureWidget, self).__init__(canvas)
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton | QtCore.Qt.MouseButton.MiddleButton | QtCore.Qt.MouseButton.RightButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
-        self.id = id
         self.model = model
         self.about_to_delete = False
         self.move_callback = move_callback

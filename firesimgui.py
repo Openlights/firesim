@@ -7,8 +7,6 @@ from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from util.config import Config
 from models.scene import Scene
-from models.fixture import FixtureWrapper
-from ui.fixtureinfolistmodel import FixtureInfoListModel
 from controllers.scenecontroller import SceneController
 
 
@@ -21,7 +19,6 @@ class FireSimGUI(QtCore.QObject):
         self.args = args
         self.config = Config("data/config.json")
 
-        self._selected_fixture_id = 0
         self._selected_fixture_strand = 0
         self._selected_fixture_address = 0
         self._selected_fixture_pixels = 0
@@ -58,10 +55,6 @@ class FireSimGUI(QtCore.QObject):
         self.root.backdrop_showhide_callback.connect(self.on_btn_backdrop_showhide)
         self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)
         self.root.lock_callback.connect(self.on_btn_lock)
-
-        self.fixture_wrapper_list = [FixtureWrapper(fix) for fix in self.scenecontroller.get_fixtures()]
-        self.fixture_info_list = FixtureInfoListModel(self.fixture_wrapper_list)
-        self.context.setContextProperty('fixtureInfoModel', self.fixture_info_list)
 
         log.info("FireSimGUI Ready.")
         self.view.show()
@@ -130,12 +123,10 @@ class FireSimGUI(QtCore.QObject):
             pass
         else:
             if selected:
-                self.selected_fixture_id = fixture.id
                 self.selected_fixture_strand = fixture.strand
                 self.selected_fixture_address = fixture.address
                 self.selected_fixture_pixels = fixture.pixels
             else:
-                self.selected_fixture_id = 0
                 self.selected_fixture_strand = 0
                 self.selected_fixture_address = 0
                 self.selected_fixture_pixels = 0
@@ -146,21 +137,10 @@ class FireSimGUI(QtCore.QObject):
 
     def update_selected_fixture_properties(self):
         if self.selected_fixture is not None:
-            self.selected_fixture.id = int(self.selected_fixture_id)
             self.selected_fixture.strand = int(self.selected_fixture_strand)
             self.selected_fixture.address = int(self.selected_fixture_address)
             self.selected_fixture.pixels = int(self.selected_fixture_pixels)
             self.selected_fixture.widget.update()
-
-    def _get_selected_fixture_id(self):
-        return self._selected_fixture_id
-
-    def _set_selected_fixture_id(self, id):
-        if self._selected_fixture_id == id:
-            return
-        self._selected_fixture_id = id
-        self.update_selected_fixture_properties()
-        self.on_selected_fixture_id.emit()
 
     def _get_selected_fixture_strand(self):
         return self._selected_fixture_strand
@@ -192,12 +172,10 @@ class FireSimGUI(QtCore.QObject):
         self.update_selected_fixture_properties()
         self.on_selected_fixture_pixels.emit()
 
-    on_selected_fixture_id = QtCore.Signal()
     on_selected_fixture_strand = QtCore.Signal()
     on_selected_fixture_address = QtCore.Signal()
     on_selected_fixture_pixels = QtCore.Signal()
 
-    selected_fixture_id = QtCore.Property(int, _get_selected_fixture_id, _set_selected_fixture_id, notify=on_selected_fixture_id)
     selected_fixture_strand = QtCore.Property(int, _get_selected_fixture_strand, _set_selected_fixture_strand, notify=on_selected_fixture_strand)
     selected_fixture_address = QtCore.Property(int, _get_selected_fixture_address, _set_selected_fixture_address, notify=on_selected_fixture_address)
     selected_fixture_pixels = QtCore.Property(int, _get_selected_fixture_pixels, _set_selected_fixture_pixels, notify=on_selected_fixture_pixels)

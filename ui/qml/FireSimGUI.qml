@@ -108,17 +108,6 @@ Item {
                     }
 
                     LabeledInput {
-                        id: input_fixture_id
-                        key: "id"
-                        value: main.selected_fixture_id
-                        Binding {
-                            target: main
-                            property: "selected_fixture_id"
-                            value: input_fixture_id.value
-                        }
-                    }
-
-                    LabeledInput {
                         id: input_fixture_strand
                         key: "strand"
                         value: main.selected_fixture_strand
