@@ -286,7 +286,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 self.about_to_delete = False
 
             if event.button() == QtCore.Qt.MouseButton.RightButton:
-                pass
+                self.canvas.generate_markup_color()
 
             self.dragging = False
             self.mouse_down = False
@@ -299,7 +299,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def mouseDoubleClickEvent(self, event):
         if self.shape().contains(event.pos()) and event.button() == QtCore.Qt.MouseButton.LeftButton:
-            self.model.random_color()
+            self.model.set_all(self.canvas.markup_color)
 
     def handle_move_callback(self, handle):
         if handle == self.drag1:

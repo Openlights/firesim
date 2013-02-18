@@ -1,3 +1,6 @@
+import colorsys
+import random
+
 from PySide import QtCore, QtGui, QtDeclarative
 
 
@@ -6,14 +9,15 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         super(CanvasWidget, self).__init__()
         self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
         self.setFlag(QtGui.QGraphicsItem.ItemClipsChildrenToShape, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
+        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton | QtCore.Qt.MouseButton.RightButton)
         self.setAcceptsHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.fixture_list = []
         self.background_image = None
         self.rect = None
         self.controller = None
-        self.next_new_fixture_pos = (0, 0)
+        self.next_new_fixture_pos = (10, 10)
+        self.markup_color = (255, 255, 0)
 
     def paint(self, painter, options, widget):
         self.rect = QtCore.QRect(0, 0, self.width(), self.height())
@@ -21,19 +25,6 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
         if self.background_image is not None:
             painter.drawImage(self.rect, self.background_image)
-
-        pen = QtGui.QPen(self.color, 2)
-        painter.setPen(pen)
-        painter.setRenderHints(QtGui.QPainter.Antialiasing, True)
-
-        # TODO: support multi-dimensional fixtures
-        # for fixture in self.fixture_list:
-        #     x, y, w, h = fixture.rect.x(), fixture.rect.y(), fixture.rect.width(), fixture.rect.height()
-        #     painter.fillRect(fixture.rect, self.color)
-        #     for px, color in enumerate(fixture.model.pixel_data):
-        #         r, g, b = color
-        #         xp = int(x + w * (float(px) / fixture.model.pixels))
-        #         painter.fillRect(xp, y, (w / fixture.model.pixels), h, QtGui.QColor(r, g, b))
 
     def update_fixtures(self, fixture_list):
         self.fixture_list = fixture_list
@@ -46,7 +37,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def get_next_new_fixture_pos_and_increment(self):
         x, y = self.next_new_fixture_pos
-        self.next_new_fixture_pos = (x + 2, y + 2)
+        self.next_new_fixture_pos = (x + 10, y + 10)
         return (x, y)
 
     def hoverMoveEvent(self, event):
@@ -60,7 +51,14 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         pass
 
     def mouseReleaseEvent(self, event):
-        self.controller.widget_selected(False, None, False)
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+            self.controller.widget_selected(False, None, False)
+        elif event.button() == QtCore.Qt.MouseButton.RightButton:
+            self.generate_markup_color()
+
+    def generate_markup_color(self):
+        r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(random.random(), 1.0, 1.0)]
+        self.markup_color = (r, g, b)
 
     def on_fixture_click(self, fixture):
         pass
