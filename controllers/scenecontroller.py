@@ -86,6 +86,10 @@ class SceneController:
     def get_fixtures(self):
         return self.fixtures
 
+    def update_all(self):
+        for f in self.fixtures:
+            f.widget.update()
+
     def toggle_background_enable(self):
         if self.scene.get("backdrop_enable", False):
             self.scene.set("backdrop_enable", False)
@@ -99,6 +103,5 @@ class SceneController:
     def toggle_labels_enable(self):
         enabled = not self.scene.get("labels_enable", False)
         self.scene.set("labels_enable", enabled)
-        for f in self.fixtures:
-            f.widget.update()
+        self.update_all()
         return enabled
