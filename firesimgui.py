@@ -8,6 +8,7 @@ from ui.fixturewidget import FixtureWidget
 from util.config import Config
 from models.scene import Scene
 from controllers.scenecontroller import SceneController
+from controllers.netcontroller import NetController
 
 
 class FireSimGUI(QtCore.QObject):
@@ -55,6 +56,8 @@ class FireSimGUI(QtCore.QObject):
         self.root.backdrop_showhide_callback.connect(self.on_btn_backdrop_showhide)
         self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)
         self.root.lock_callback.connect(self.on_btn_lock)
+
+        self.netcontroller = NetController()
 
         log.info("FireSimGUI Ready.")
         self.view.show()
