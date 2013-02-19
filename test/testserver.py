@@ -1,5 +1,6 @@
 import msgpack
-import logging as log
+import signal
+import sys
 
 from PySide import QtCore, QtNetwork
 
@@ -27,20 +28,25 @@ class TestServer(QtCore.QObject):
             datagram = QtCore.QByteArray()
             datagram.resize(self.socket.pendingDatagramSize())
             (sender, sport) = self.socket.readDatagram(datagram.data(), datagram.size())
-            log.info("Got data")
 
     def write(self, data):
         packed = msgpack.packb(data)
         datagram = QtCore.QByteArray(packed)
         self.socket.writeDatagram(datagram, QtNetwork.QHostAddress.LocalHost, 3020)
-        print "wrote %d bytes" % datagram.size()
+        #print "wrote %d bytes" % datagram.size()
 
     @QtCore.Slot()
     def demo_write(self):
         self.write([-1, -1, -1, 255, 0, 255])
 
+def sigint_handler(signal, frame):
+    global app
+    app.exit()
+
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, sigint_handler)
     app = QtCore.QCoreApplication(["testserver"])
+    print "Press Ctrl-C to quit"
     nc = TestServer()
     nc.init_socket()
     app.exec_()
