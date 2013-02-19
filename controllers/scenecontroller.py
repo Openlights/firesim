@@ -111,3 +111,11 @@ class SceneController:
         self.scene.set("locked", locked)
         self.update_all()
         return locked
+
+    def net_set(self, strand, address, pixel, color):
+        for f in self.fixtures:
+            if (strand == -1 or f.strand == strand) and (address == -1 or f.address == address):
+                if pixel == -1:
+                    f.set_all(color)
+                else:
+                    f.set(pixel, color)

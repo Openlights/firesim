@@ -57,7 +57,7 @@ class FireSimGUI(QtCore.QObject):
         self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)
         self.root.lock_callback.connect(self.on_btn_lock)
 
-        self.netcontroller = NetController()
+        self.netcontroller = NetController(self)
 
         log.info("FireSimGUI Ready.")
         self.view.show()

@@ -68,15 +68,18 @@ class Fixture:
 
     def blackout(self):
         self.pixel_data = [(0, 0, 0)] * self.pixels
+        self.widget.update()
 
     def set(self, pixel, color):
         assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
         self.pixel_data[pixel] = color
+        self.widget.update()
 
     def set_all(self, color):
         assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
         print "set_all", color
         self.pixel_data = [color] * self.pixels
+        self.widget.update()
 
     def random_color(self):
         r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(random.random(), 1.0, 1.0)]

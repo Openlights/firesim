@@ -8,9 +8,10 @@ class NetController(QtCore.QObject):
 
     ready_to_read = QtCore.Signal()
 
-    def __init__(self):
+    def __init__(self, app):
         super(NetController, self).__init__()
         self.socket = None
+        self.app = app
         self.init_socket()
 
     def init_socket(self):
@@ -25,5 +26,5 @@ class NetController(QtCore.QObject):
             datagram = QtCore.QByteArray()
             datagram.resize(self.socket.pendingDatagramSize())
             (datagram, sender, sport) = self.socket.readDatagram(datagram.size())
-            unpacked = msgpack.unpackb(datagram.data())
-            print unpacked
+            msg = msgpack.unpackb(datagram.data())
+            self.app.scenecontroller.net_set(msg['s'], msg['a'], msg['p'], msg['c'])

@@ -33,11 +33,14 @@ class TestServer(QtCore.QObject):
         packed = msgpack.packb(data)
         datagram = QtCore.QByteArray(packed)
         self.socket.writeDatagram(datagram, QtNetwork.QHostAddress.LocalHost, 3020)
-        print "wrote", datagram
+        print "wrote %d bytes" % datagram.size()
 
     @QtCore.Slot()
     def demo_write(self):
-        self.write({"test": 123})
+        self.write({'s': -1,
+                    'a': -1,
+                    'p': -1,
+                    'c': (255, 0, 255)})
 
 if __name__ == "__main__":
     app = QtCore.QCoreApplication(["testserver"])
