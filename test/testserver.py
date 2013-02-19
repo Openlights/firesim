@@ -1,6 +1,7 @@
 import msgpack
 import signal
-import sys
+import colorsys
+import math
 
 from PySide import QtCore, QtNetwork
 
@@ -13,6 +14,7 @@ class TestServer(QtCore.QObject):
         super(TestServer, self).__init__()
         self.socket = None
         self.timer = None
+        self.h = 0.0
 
     def init_socket(self):
         self.socket = QtNetwork.QUdpSocket(self)
@@ -20,7 +22,7 @@ class TestServer(QtCore.QObject):
         self.socket.readyRead.connect(self.read_datagrams)
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.demo_write)
-        self.timer.start(100)
+        self.timer.start(10)
 
     @QtCore.Slot()
     def read_datagrams(self):
@@ -37,7 +39,10 @@ class TestServer(QtCore.QObject):
 
     @QtCore.Slot()
     def demo_write(self):
-        self.write([-1, -1, -1, 255, 0, 255])
+        for strand in range(5):
+            r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(math.fmod((self.h + (0.2 * strand)), 1.0), 1.0, 1.0)]
+            self.write([strand, -1, -1, r, g, b])
+        self.h += 0.004
 
 def sigint_handler(signal, frame):
     global app

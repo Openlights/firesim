@@ -65,7 +65,7 @@ class FireSimGUI(QtCore.QObject):
 
         log.info("FireSimGUI Ready.")
         self.view.show()
-        self.canvas_timer.start(1000)
+        self.canvas_timer.start(300)
 
     def run(self):
         return self.app.exec_()
