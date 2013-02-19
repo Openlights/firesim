@@ -1,4 +1,5 @@
 import msgpack
+import time
 import logging as log
 
 from PySide import QtCore, QtNetwork, QtGui
@@ -12,6 +13,8 @@ class NetController(QtCore.QObject):
         super(NetController, self).__init__()
         self.socket = None
         self.app = app
+        self.updates = 0
+        self.last_time = time.clock()
         self.init_socket()
 
     def init_socket(self):
@@ -28,3 +31,12 @@ class NetController(QtCore.QObject):
             (datagram, sender, sport) = self.socket.readDatagram(datagram.size())
             msg = msgpack.unpackb(datagram.data())
             self.app.scenecontroller.net_set(msg[0], msg[1], msg[2], (msg[3], msg[4], msg[5]))
+            self.updates += 1
+
+    #@QtCore.Slot(result=float)
+    def get_ups(self):
+        dt = time.clock() - self.last_time
+        ups = self.updates / dt
+        self.last_time = time.clock()
+        self.updates = 0
+        return ups

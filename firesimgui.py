@@ -27,7 +27,7 @@ class FireSimGUI(QtCore.QObject):
         self.selected_fixture = None
 
         self.scene = Scene(os.path.join(self.config.get("scene_root"), self.args.scene) + ".json")
-        self.scenecontroller = SceneController(parent=self, scene=self.scene)
+        self.scenecontroller = SceneController(app=self, scene=self.scene)
 
         QtDeclarative.qmlRegisterType(CanvasWidget, "FireSim", 1, 0, "SimCanvas")
         QtDeclarative.qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
@@ -59,14 +59,24 @@ class FireSimGUI(QtCore.QObject):
 
         self.netcontroller = NetController(self)
 
+        self.canvas_timer = QtCore.QTimer(self)
+        self.canvas_timer.timeout.connect(self.on_canvas_timer)
+
+
         log.info("FireSimGUI Ready.")
         self.view.show()
+        self.canvas_timer.start(1000)
 
     def run(self):
         return self.app.exec_()
 
     def on_close(self, e):
         pass
+
+    @QtCore.Slot()
+    def on_canvas_timer(self):
+        self.canvas.stat_ups = self.netcontroller.get_ups()
+        self.canvas.update()
 
     @QtCore.Slot(result=bool)
     def is_backdrop_enabled(self):

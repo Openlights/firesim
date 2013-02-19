@@ -19,7 +19,7 @@ class TestServer(QtCore.QObject):
         self.socket.readyRead.connect(self.read_datagrams)
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.demo_write)
-        self.timer.start(1000)
+        self.timer.start(100)
 
     @QtCore.Slot()
     def read_datagrams(self):

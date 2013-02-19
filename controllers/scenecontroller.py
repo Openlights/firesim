@@ -9,10 +9,10 @@ from models.fixture import Fixture
 
 class SceneController:
 
-    def __init__(self, parent=None, canvas=None, scene=None):
+    def __init__(self, app=None, canvas=None, scene=None):
         self.canvas = canvas
         self.scene = scene
-        self.parent = parent
+        self.app = app
         self.fixtures = []
         if self.canvas is not None:
             self.init_view()

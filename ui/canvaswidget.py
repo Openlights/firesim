@@ -15,6 +15,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.fixture_list = []
         self.background_image = None
         self.rect = None
+        self.stat_ups = 0.0
         self.controller = None
         self.next_new_fixture_pos = (10, 10)
         self.markup_color = (255, 255, 0)
@@ -25,6 +26,12 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
         if self.background_image is not None:
             painter.drawImage(self.rect, self.background_image)
+
+        f = QtGui.QFont()
+        f.setPointSize(8)
+        painter.setFont(f)
+        painter.setPen(QtGui.QColor(200, 200, 200, 255))
+        painter.drawText(0, 20, "%0.1f updates/sec" % self.stat_ups)
 
     def update_fixtures(self, fixture_list):
         self.fixture_list = fixture_list
