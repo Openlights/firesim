@@ -27,4 +27,4 @@ class NetController(QtCore.QObject):
             datagram.resize(self.socket.pendingDatagramSize())
             (datagram, sender, sport) = self.socket.readDatagram(datagram.size())
             msg = msgpack.unpackb(datagram.data())
-            self.app.scenecontroller.net_set(msg[0], msg[1], msg[2], msg[3])
+            self.app.scenecontroller.net_set(msg[0], msg[1], msg[2], (msg[3], msg[4], msg[5]))

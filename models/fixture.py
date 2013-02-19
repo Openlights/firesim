@@ -77,7 +77,6 @@ class Fixture:
 
     def set_all(self, color):
         assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
-        print "set_all", color
         self.pixel_data = [color] * self.pixels
         self.widget.update()
 

@@ -37,7 +37,7 @@ class TestServer(QtCore.QObject):
 
     @QtCore.Slot()
     def demo_write(self):
-        self.write([-1, -1, -1, (255, 0, 255)])
+        self.write([-1, -1, -1, 255, 0, 255])
 
 if __name__ == "__main__":
     app = QtCore.QCoreApplication(["testserver"])
