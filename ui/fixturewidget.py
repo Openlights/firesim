@@ -15,7 +15,6 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                                      QtCore.Qt.MouseButton.MiddleButton |
                                      QtCore.Qt.MouseButton.RightButton)
         self.setAcceptsHoverEvents(True)
-        self.color = QtGui.QColor(100, 100, 100)
         self.model = model
         self.about_to_delete = False
         self.setHeight(16)
@@ -26,12 +25,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.hovering = False
         self.bb_hovering = False
         self.drag_pos = None
-        #self.rect = QtCore.QRect(0, 0, 128, 16)
+
         if canvas:
             self.canvas = canvas
             x, y = canvas.get_next_new_fixture_pos_and_increment()
-            #self.model.pos1 = [x, y]
-            #self.model.pos2 = [x + 100, y]
             self.setPos(x, y)
             self.canvas.hover_move_event.connect(self.hover_move_handler)
 
@@ -40,12 +37,6 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         self.update_geometry()
 
-        self.poly = QtGui.QPolygon([
-            QtCore.QPoint(0, 0),
-            QtCore.QPoint(self.width, 0),
-            QtCore.QPoint(self.width, self.height),
-            QtCore.QPoint(0, self.height)
-        ])
 
     def deleteLater(self):
         self.drag1.deleteLater()
@@ -123,9 +114,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                                           QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
 
-        #if self.bb_hovering:
-        #    painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
-        #    painter.drawPath(self.shape())
+        if self.bb_hovering:
+            painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
+            painter.drawPath(self.shape())
 
         if self.model.pixels > 0:
             color_line = QtCore.QLineF(0, 0, self.width, self.height)
@@ -175,7 +166,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag1.update()
         self.drag2.update()
         self.update()
-        event.ignore()
+        #event.ignore()
 
     def hoverLeaveEvent(self, event):
         self.bb_hovering = False
@@ -187,7 +178,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.drag2.hidden = not self.isSelected()
         self.drag1.update()
         self.drag2.update()
-        event.ignore()
+        #event.ignore()
 
     def hoverMoveEvent(self, event):
         self.hover_move_handler(None, None, e=event)
