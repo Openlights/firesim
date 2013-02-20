@@ -69,7 +69,7 @@ class SceneController:
             for f in self.fixtures:
                 if f is not fixture:
                     f.widget.select(False)
-        self.parent.widget_selected(selected, fixture, multi)
+        self.app.widget_selected(selected, fixture, multi)
 
     def save_scene(self):
         fd = []
