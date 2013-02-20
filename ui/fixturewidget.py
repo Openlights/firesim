@@ -114,9 +114,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                                           QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, self.width, self.height)
 
-        if self.bb_hovering:
-            painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
-            painter.drawPath(self.shape())
+        #if self.bb_hovering:
+        #    painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
+        #    painter.drawPath(self.shape())
 
         if self.model.pixels > 0:
             color_line = QtCore.QLineF(0, 0, self.width, self.height)

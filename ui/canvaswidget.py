@@ -30,8 +30,8 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         f = QtGui.QFont()
         f.setPointSize(8)
         painter.setFont(f)
-        painter.setPen(QtGui.QColor(200, 200, 200, 255))
-        painter.drawText(0, 20, "%0.1f updates/sec" % self.stat_ups)
+        painter.setPen(QtGui.QColor(170, 170, 200, 255))
+        painter.drawText(8, 16, "%0.1f updates/sec" % self.stat_ups)
 
     def update_fixtures(self, fixture_list):
         self.fixture_list = fixture_list
