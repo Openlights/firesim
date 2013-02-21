@@ -126,48 +126,52 @@ class SceneController:
             print packet
             return
 
-        cmd = packet[0]
-        datalen = (packet[1] << 8) + packet[2]
-        data = packet[3:3+datalen]
+        while True:
+            cmd = packet[0]
+            datalen = (packet[1] << 8) + packet[2]
+            data = packet[3:3+datalen]
 
-        # Set All
-        if cmd == 0x21:
-            assert datalen == 3
-            for f in self.fixtures:
-                f.set_all((data[0], data[1], data[2]))
+            # Set All
+            if cmd == 0x21:
+                assert datalen == 3
+                for f in self.fixtures:
+                    f.set_all((data[0], data[1], data[2]))
 
-        # Set Strand
-        if cmd == 0x22:
-            assert datalen == 4
-            for f in self.fixtures:
-                if f.strand == data[0]:
-                    f.set_all((data[1], data[2], data[3]))
+            # Set Strand
+            if cmd == 0x22:
+                assert datalen == 4
+                for f in self.fixtures:
+                    if f.strand == data[0]:
+                        f.set_all((data[1], data[2], data[3]))
 
-        # Set Fixture
-        if cmd == 0x23:
-            assert datalen == 5
-            for f in self.fixtures:
-                if f.strand == data[0] and f.address == data[1]:
-                    f.set_all((data[2], data[3], data[4]))
+            # Set Fixture
+            if cmd == 0x23:
+                assert datalen == 5
+                for f in self.fixtures:
+                    if f.strand == data[0] and f.address == data[1]:
+                        f.set_all((data[2], data[3], data[4]))
 
-        # Set Pixel
-        if cmd == 0x24:
-            assert datalen == 6
-            for f in self.fixtures:
-                if f.strand == data[0] and f.address == data[1]:
-                    f.set(data[2], (data[3], data[4], data[5]))
+            # Set Pixel
+            if cmd == 0x24:
+                assert datalen == 6
+                for f in self.fixtures:
+                    if f.strand == data[0] and f.address == data[1]:
+                        f.set(data[2], (data[3], data[4], data[5]))
 
-        # Set Strand Pixels
-        if cmd == 0x25:
-            raise NotImplementedError
+            # Set Strand Pixels
+            if cmd == 0x25:
+                raise NotImplementedError
 
-        # Set Fixture Pixels
-        if cmd == 0x26:
-            raise NotImplementedError
+            # Set Fixture Pixels
+            if cmd == 0x26:
+                raise NotImplementedError
 
-        # Bulk Set
-        if cmd == 0x27:
-            raise NotImplementedError
+            # Bulk Set
+            if cmd == 0x27:
+                raise NotImplementedError
 
-        if len(packet) > (3 + datalen):
-            self.process_command(packet[3 + datalen:])
+            if len(packet) > (3 + datalen):
+                packet = packet[3 + datalen:]
+                #print len(packet)
+            else:
+                break
