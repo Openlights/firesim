@@ -276,8 +276,11 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             else:
                 self.about_to_delete = False
 
-            if event.button() == QtCore.Qt.MouseButton.RightButton:
-                self.canvas.generate_markup_color()
+            if event.button() == QtCore.Qt.MouseButton.RightButton and self.isSelected() and not self.model.controller.scene.get("locked", False):
+                temp = self.drag1
+                self.drag1 = self.drag2
+                self.drag2 = temp
+                self.update_handle_positions()
 
             self.dragging = False
             self.mouse_down = False
@@ -292,10 +295,11 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if self.shape().contains(event.pos()) and event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.model.set_all(self.canvas.markup_color)
 
-    def handle_move_callback(self, handle):
-        if handle == self.drag1:
-            self.model.pos1 = [int(handle.pos().x()), int(handle.pos().y())]
-            self.setPos(handle.pos())
-        else:
-            self.model.pos2 = [int(handle.pos().x()), int(handle.pos().y())]
+    def update_handle_positions(self):
+        self.model.pos1 = [int(self.drag1.pos().x()), int(self.drag1.pos().y())]
+        self.setPos(self.drag1.pos())
+        self.model.pos2 = [int(self.drag2.pos().x()), int(self.drag2.pos().y())]
         self.update_geometry()
+
+    def handle_move_callback(self, handle):
+        self.update_handle_positions()
