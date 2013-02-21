@@ -1,2 +1,1 @@
-msgpack-python==0.3.0
 PySide>=1.1.2
