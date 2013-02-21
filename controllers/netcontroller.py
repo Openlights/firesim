@@ -1,4 +1,3 @@
-import msgpack
 import time
 import logging as log
 
