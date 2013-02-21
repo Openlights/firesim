@@ -121,18 +121,20 @@ class SceneController:
                     f.set(pixel, color)
 
     def process_command(self, packet):
-        assert len(packet) >= 3
-        packet = [ord(c) for c in packet]
+        if len(packet) < 3:
+            log.error("Malformed packet!")
+            print packet
+            return
+
         cmd = packet[0]
         datalen = (packet[1] << 8) + packet[2]
-        data = packet[3:]
+        data = packet[3:3+datalen]
 
         # Set All
         if cmd == 0x21:
             assert datalen == 3
             for f in self.fixtures:
                 f.set_all((data[0], data[1], data[2]))
-            return
 
         # Set Strand
         if cmd == 0x22:
@@ -140,7 +142,6 @@ class SceneController:
             for f in self.fixtures:
                 if f.strand == data[0]:
                     f.set_all((data[1], data[2], data[3]))
-            return
 
         # Set Fixture
         if cmd == 0x23:
@@ -148,7 +149,6 @@ class SceneController:
             for f in self.fixtures:
                 if f.strand == data[0] and f.address == data[1]:
                     f.set_all((data[2], data[3], data[4]))
-            return
 
         # Set Pixel
         if cmd == 0x24:
@@ -156,7 +156,6 @@ class SceneController:
             for f in self.fixtures:
                 if f.strand == data[0] and f.address == data[1]:
                     f.set(data[2], (data[3], data[4], data[5]))
-            return
 
         # Set Strand Pixels
         if cmd == 0x25:
@@ -169,3 +168,6 @@ class SceneController:
         # Bulk Set
         if cmd == 0x27:
             raise NotImplementedError
+
+        if len(packet) > (3 + datalen):
+            self.process_command(packet[3 + datalen:])

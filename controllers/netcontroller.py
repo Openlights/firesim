@@ -29,9 +29,8 @@ class NetController(QtCore.QObject):
             datagram = QtCore.QByteArray()
             datagram.resize(self.socket.pendingDatagramSize())
             (datagram, sender, sport) = self.socket.readDatagram(datagram.size())
-            #msg = msgpack.unpackb(datagram.data())
-            #self.app.scenecontroller.net_set(msg[0], msg[1], msg[2], (msg[3], msg[4], msg[5]))
-            self.app.scenecontroller.process_command(datagram.data())
+            packet = [ord(c) for c in datagram.data()]
+            self.app.scenecontroller.process_command(packet)
             self.updates += 1
 
     #@QtCore.Slot(result=float)
