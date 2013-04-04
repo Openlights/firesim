@@ -40,6 +40,10 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
     def set_background_image(self, image):
         if image is not None:
             assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
+            self.w = image.width()
+            self.h = image.height()
+            self.setWidth(self.w/2)
+            self.setHeight(self.h/2)
         self.background_image = image
 
     def get_next_new_fixture_pos_and_increment(self):

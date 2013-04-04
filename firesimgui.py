@@ -1,7 +1,7 @@
 import logging as log
 import os.path
 
-from PySide import QtCore, QtGui, QtDeclarative
+from PySide import QtCore, QtGui, QtDeclarative, QtDeclarative
 
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
@@ -36,8 +36,7 @@ class FireSimGUI(QtCore.QObject):
 
         self.view.setWindowTitle("FireSim")
         self.view.setResizeMode(QtDeclarative.QDeclarativeView.SizeRootObjectToView)
-        w, h = self.view.size().toTuple()
-        self.view.setFixedSize(w, h)
+
         self.view.closeEvent = self.on_close
 
         self.context = self.view.rootContext()
@@ -49,9 +48,14 @@ class FireSimGUI(QtCore.QObject):
         self.view.setSource(QtCore.QUrl('ui/qml/FireSimGUI.qml'))
 
         self.root = self.view.rootObject()
+        self.item_frame = self.root.findChild(QtDeclarative.QDeclarativeItem)
         self.canvas = self.root.findChild(CanvasWidget)
 
         self.scenecontroller.set_canvas(self.canvas)
+
+        cw, ch = self.scenecontroller.scene.get("extents")
+        self.canvas.setWidth(cw)
+        self.canvas.setHeight(ch)
 
         self.root.backdrop_showhide_callback.connect(self.on_btn_backdrop_showhide)
         self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)
@@ -62,6 +66,7 @@ class FireSimGUI(QtCore.QObject):
         self.canvas_timer = QtCore.QTimer(self)
         self.canvas_timer.timeout.connect(self.on_canvas_timer)
 
+        self.view.setFixedSize(max(640, cw + 130), max(480, ch))
 
         log.info("FireSimGUI Ready.")
         self.view.show()

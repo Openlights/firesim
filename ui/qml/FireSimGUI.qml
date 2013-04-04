@@ -4,9 +4,8 @@ import "widgets"
 
 Item {
     id: window
-
-    width: 640
-    height: 480
+    width: 100 //640
+    height: 100 //480
 
     signal backdrop_showhide_callback(variant obj)
     signal labels_showhide_callback(variant obj)
@@ -23,7 +22,6 @@ Item {
     SimCanvas {
         id: sim
         anchors {left: toolbox.right; top: parent.top; bottom: parent.bottom; right: parent.right}
-
     }
 
     SystemPalette { id: activePalette }

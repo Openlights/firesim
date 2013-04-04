@@ -1,5 +1,7 @@
 {
-  "backdrop_enable": false, 
+  "name": "Demo",
+  "extents": [640, 640],
+  "backdrop_enable": true,
   "backdrop_filename": "light_dome.png", 
   "fixtures": [
     {
