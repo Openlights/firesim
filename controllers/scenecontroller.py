@@ -1,4 +1,6 @@
 import logging as log
+import msgpack
+import array
 from PySide import QtGui
 
 from ui.canvaswidget import CanvasWidget
@@ -168,7 +170,16 @@ class SceneController:
 
             # Bulk Set
             if cmd == 0x27:
-                raise NotImplementedError
+                packed = array.array('B', data)
+                buffer = msgpack.unpackb(packed)
+                # TODO: This is stupid slow
+                for strand in buffer:
+                    for address in buffer[strand]:
+                        for pixel, color in enumerate(buffer[strand][address]):
+                            for f in self.fixtures:
+                                if f.strand == strand and f.address == address:
+                                    f.set(pixel, tuple(color))
+
 
             if len(packet) > (3 + datalen):
                 packet = packet[3 + datalen:]
