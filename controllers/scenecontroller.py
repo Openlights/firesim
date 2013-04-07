@@ -149,13 +149,17 @@ class SceneController:
         log.info("Scene has %d strands, creating array using %d fixtures by %d pixels." % (len(self._strand_keys), self._max_fixtures, self._max_pixels))
         self._output_buffer = np.zeros((len(self._strand_keys), self._max_fixtures, self._max_pixels, 3))
 
-    def net_set(self, strand, address, pixel, color):
+    def net_set(self, strand, address, color):
+        #start = time.time()
         for f in self.fixtures:
-            if (strand == -1 or f.strand == strand) and (address == -1 or f.address == address):
-                if pixel == -1:
+            if (strand == -1 or f.strand() == strand) and (address == -1 or f.address() == address):
+                if isinstance(color, tuple):
                     f.set_all(color)
                 else:
-                    f.set(pixel, color)
+                    assert isinstance(color, list)
+                    f.set_array(color)
+        #dt = time.time() - start
+        #log.info("net_set completed in %0.2f ms" % (dt * 1000.0))
 
     def process_command(self, packet):
         if len(packet) < 3:
@@ -209,16 +213,16 @@ class SceneController:
             # TODO: This will break if the addressing is not continuous.
             # TODO: Need to validate addressing in the GUI.  See #10
             if cmd == 0x27:
-                start = time.time()
+                #start = time.time()
                 bulk_data = msgpack.unpackb(array.array('B', data))
+                #dt = time.time() - start
+                #log.info("Unpacked frame data in %0.2f ms" % (dt * 1000.0))
+                start = time.time()
                 for strand, _ in enumerate(bulk_data):
                     for fixture, _ in enumerate(bulk_data[strand]):
-                        for pixel, _ in enumerate(bulk_data[strand][fixture]):
-                            color = tuple(map(int, bulk_data[strand][fixture][pixel]))
-                            self.net_set(strand, fixture, pixel, color)
-                dt = time.time() - start
-                if self._num_packets % 10 == 0:
-                    log.info("Unpacked frame in %0.2f ms" % (dt * 1000.0))
+                        self.net_set(strand, fixture, bulk_data[strand][fixture])
+                #dt = time.time() - start
+                #log.info("Rendered frame in %0.2f ms" % (dt * 1000.0))
 
 
             if len(packet) > (3 + datalen):

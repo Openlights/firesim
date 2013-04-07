@@ -110,6 +110,12 @@ class Fixture:
         self._pixel_data = [color] * self._pixels
         self._widget.update()
 
+    def set_array(self, color_array):
+        if len(color_array) != self.pixels():
+            raise ValueError("set_array argument length must match fixture pixel count")
+        self._pixel_data = color_array
+        self._widget.update()
+
     def random_color(self):
         r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(random.random(), 1.0, 1.0)]
         self.set_all((r, g, b))
