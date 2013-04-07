@@ -69,7 +69,7 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.update()
 
     def mouseMoveEvent(self, event):
-        if self.mouse_down and not self.fixture.model.controller.scene.get("locked", False):
+        if self.mouse_down and not self.fixture.model._controller.scene.get("locked", False):
             self.dragging = True
             npos = (event.scenePos() - self.drag_pos)
             if self.canvas.sceneBoundingRect().contains(event.scenePos()):

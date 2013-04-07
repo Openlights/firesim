@@ -32,8 +32,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.setPos(x, y)
             self.canvas.hover_move_event.connect(self.hover_move_handler)
 
-        self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1)
-        self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2)
+        self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1())
+        self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2())
 
         self.update_geometry()
 
@@ -44,8 +44,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         super(FixtureWidget, self).deleteLater()
 
     def update_geometry(self):
-        self.width = int(self.model.pos2[0] - self.model.pos1[0])
-        self.height = int(self.model.pos2[1] - self.model.pos1[1])
+        self.width = int(self.model.pos2()[0] - self.model.pos1()[0])
+        self.height = int(self.model.pos2()[1] - self.model.pos1()[1])
         self.prepareGeometryChange()
         self.update(self.boundingRect())
 
@@ -118,12 +118,12 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         #    painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
         #    painter.drawPath(self.shape())
 
-        if self.model.pixels > 0:
+        if self.model.pixels() > 0:
             color_line = QtCore.QLineF(0, 0, self.width, self.height)
-            color_line.setLength(color_line.length() / self.model.pixels)
+            color_line.setLength(color_line.length() / self.model.pixels())
             painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
 
-            for pixel in self.model.pixel_data:
+            for pixel in self.model._pixel_data:
                 px, py = color_line.x1(), color_line.y1()
                 r, g, b = pixel[0], pixel[1], pixel[2]
                 painter.setBrush(QtGui.QColor(r, g, b, 255))
@@ -134,7 +134,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 painter.drawLine(color_line.unitVector())
                 color_line.translate(color_line.dx(), color_line.dy())
 
-        if self.hovering or self.isSelected() or self.model.controller.scene.get("labels_enable", False):
+        if self.hovering or self.isSelected() or self.model._controller.scene.get("labels_enable", False):
             x = self.width / 2 - 12
             y = self.height / 2 - 7
             label_font = QtGui.QFont()
@@ -145,7 +145,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             painter.setPen(QtGui.QColor(100, 100, 100, 100))
             painter.drawRoundedRect(label_rect, 5, 5)
             painter.setPen(QtGui.QColor(255, 255, 255, 255))
-            painter.drawText(label_rect, QtCore.Qt.AlignCenter, "%d:%d" % (self.model.strand, self.model.address))
+            painter.drawText(label_rect, QtCore.Qt.AlignCenter, "%d:%d" % (self.model.strand(), self.model.address()))
 
     def hoverEnterEvent(self, event):
         self.bb_hovering = True
@@ -220,7 +220,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.update()
 
     def mouseMoveEvent(self, event):
-        if self.hovering and self.mouse_down and not self.model.controller.scene.get("locked", False):
+        if self.hovering and self.mouse_down and not self.model._controller.scene.get("locked", False):
             self.dragging = True
             npos = (event.scenePos() - self.drag_pos)
             if self.parent().sceneBoundingRect().contains(event.scenePos()):
@@ -265,7 +265,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                     self.select(not self.isSelected())
                     # TODO: Implement multi-select with control or shift key
                     multi = False
-                    self.model.controller.widget_selected(self.isSelected(), self.model, multi)
+                    self.model._controller.widget_selected(self.isSelected(), self.model, multi)
                     self.canvas.on_fixture_click(self)
 
             if event.button() == QtCore.Qt.MouseButton.MiddleButton:
@@ -276,7 +276,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             else:
                 self.about_to_delete = False
 
-            if event.button() == QtCore.Qt.MouseButton.RightButton and self.isSelected() and not self.model.controller.scene.get("locked", False):
+            if event.button() == QtCore.Qt.MouseButton.RightButton and self.isSelected() and not self.model._controller.scene.get("locked", False):
                 temp = self.drag1
                 self.drag1 = self.drag2
                 self.drag2 = temp
@@ -289,16 +289,16 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         else:
             if self.isSelected():
                 self.select(not self.isSelected())
-                self.model.controller.widget_selected(self.isSelected(), self.model, False)
+                self.model._controller.widget_selected(self.isSelected(), self.model, False)
 
     def mouseDoubleClickEvent(self, event):
         if self.shape().contains(event.pos()) and event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.model.set_all(self.canvas.markup_color)
 
     def update_handle_positions(self):
-        self.model.pos1 = [int(self.drag1.pos().x()), int(self.drag1.pos().y())]
+        self.model.set_pos1([int(self.drag1.pos().x()), int(self.drag1.pos().y())])
         self.setPos(self.drag1.pos())
-        self.model.pos2 = [int(self.drag2.pos().x()), int(self.drag2.pos().y())]
+        self.model.set_pos2([int(self.drag2.pos().x()), int(self.drag2.pos().y())])
         self.update_geometry()
 
     def handle_move_callback(self, handle):
