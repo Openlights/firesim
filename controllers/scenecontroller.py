@@ -1,6 +1,7 @@
 import logging as log
 import msgpack
 import array
+import time
 from PySide import QtGui
 
 from ui.canvaswidget import CanvasWidget
@@ -168,17 +169,19 @@ class SceneController:
             if cmd == 0x26:
                 raise NotImplementedError
 
-            # Bulk Set
+            # Bulk Strand Set
+            # TODO: This will break if the addressing is not continuous.
+            # TODO: Need to validate addressing in the GUI.  See #10
             if cmd == 0x27:
-                packed = array.array('B', data)
-                buffer = msgpack.unpackb(packed)
-                # TODO: This is stupid slow
-                for strand in buffer:
-                    for address in buffer[strand]:
-                        for pixel, color in enumerate(buffer[strand][address]):
-                            for f in self.fixtures:
-                                if f.strand == strand and f.address == address:
-                                    f.set(pixel, tuple(color))
+                # start = time.time()
+                bulk_data = msgpack.unpackb(array.array('B', data))
+                for strand, _ in enumerate(bulk_data):
+                    for fixture, _ in enumerate(bulk_data[strand]):
+                        for pixel, _ in enumerate(bulk_data[strand][fixture]):
+                            color = tuple(map(int, bulk_data[strand][fixture][pixel]))
+                            self.net_set(strand, fixture, pixel, color)
+                # dt = time.time() - start
+                # log.info("Unpacked frame in %0.2f ms" % (dt * 1000.0))
 
 
             if len(packet) > (3 + datalen):

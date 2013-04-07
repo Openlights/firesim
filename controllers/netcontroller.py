@@ -1,7 +1,7 @@
 import time
 import logging as log
 
-from PySide import QtCore, QtNetwork, QtGui
+from PySide import QtCore, QtNetwork
 
 
 class NetController(QtCore.QObject):
