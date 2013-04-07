@@ -159,6 +159,8 @@ class FireSimGUI(QtCore.QObject):
             self.selected_fixture.set_address(int(self.selected_fixture_address))
             self.selected_fixture.set_pixels(int(self.selected_fixture_pixels))
             self.selected_fixture.get_widget().update()
+            self.scenecontroller.update_scene()
+            self.scenecontroller.create_pixel_array()
 
     def _get_selected_fixture_strand(self):
         return self._selected_fixture_strand

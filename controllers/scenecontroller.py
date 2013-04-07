@@ -60,17 +60,23 @@ class SceneController:
     def add_fixture(self):
         self.fixtures.append(Fixture(controller=self))
         self.update_canvas()
+        self.update_scene()
+        self.create_pixel_array()
 
     def delete_fixture(self, fixture):
         self.fixtures = [f for f in self.fixtures if f is not fixture]
         log.info("Destroying fixture %s" % fixture)
         fixture.destroy()
+        self.update_scene()
+        self.create_pixel_array()
 
     def clear_fixtures(self):
         while len(self.fixtures) > 0:
             fixture = self.fixtures.pop()
             fixture.destroy()
             del fixture
+        self.update_scene()
+        self.create_pixel_array()
 
     def widget_selected(self, selected, fixture, multi):
         if multi:
@@ -81,11 +87,14 @@ class SceneController:
                     f.get_widget().select(False)
         self.app.widget_selected(selected, fixture, multi)
 
-    def save_scene(self):
+    def update_scene(self):
         fd = []
         for fixture in self.fixtures:
             fd.append(fixture.pack())
-        self.scene._data["fixtures"] = fd
+        self.scene.set_fixture_data(fd)
+
+    def save_scene(self):
+        self.update_scene()
         self.scene.save()
 
     def get_fixture(self, id):
@@ -128,8 +137,8 @@ class SceneController:
         Needs to be called when the shape of the scene has changed
         (fixtures added/removed, addresses changed, pixels per fixture changed)
         """
-        log.info("Generating pixel array")
         fh = self.scene.fixture_hierarchy()
+        self._strand_keys = list()
         for strand in fh:
             self._strand_keys.append(strand)
             if len(fh[strand]) > self._max_fixtures:
@@ -137,7 +146,7 @@ class SceneController:
             for fixture in fh[strand]:
                 if fh[strand][fixture].pixels() > self._max_pixels:
                     self._max_pixels = fh[strand][fixture].pixels()
-        log.info("Scene %d strands, will create array using %d fixtures by %d pixels." % (len(self._strand_keys), self._max_fixtures, self._max_pixels))
+        log.info("Scene has %d strands, creating array using %d fixtures by %d pixels." % (len(self._strand_keys), self._max_fixtures, self._max_pixels))
         self._output_buffer = np.zeros((len(self._strand_keys), self._max_fixtures, self._max_pixels, 3))
 
     def net_set(self, strand, address, pixel, color):

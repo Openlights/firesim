@@ -16,6 +16,11 @@ class Scene(JSONLoader):
     def name(self):
         return self._data.get("name", "")
 
+    def set_fixture_data(self, fd):
+        self._data["fixtures"] = fd
+        self._fixture_hierarchy = None
+        self._fixtures = None
+
     def fixtures(self):
         if self._fixtures is None:
             self._fixtures = [Fixture(fd) for fd in self._data["fixtures"]]
