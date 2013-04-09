@@ -1,6 +1,8 @@
 import logging as log
 import msgpack
 import array
+import time
+import numpy as np
 from PySide import QtGui
 
 from ui.canvaswidget import CanvasWidget
@@ -16,8 +18,14 @@ class SceneController:
         self.scene = scene
         self.app = app
         self.fixtures = []
+        self._num_packets = 0
+        self._max_fixtures = 0
+        self._max_pixels = 0
+        self._output_buffer = None
+        self._strand_keys = list()
         if self.canvas is not None:
             self.init_view()
+        self.create_pixel_array()
 
     def init_view(self):
         self.load_backdrop()
@@ -52,17 +60,23 @@ class SceneController:
     def add_fixture(self):
         self.fixtures.append(Fixture(controller=self))
         self.update_canvas()
+        self.update_scene()
+        self.create_pixel_array()
 
     def delete_fixture(self, fixture):
         self.fixtures = [f for f in self.fixtures if f is not fixture]
         log.info("Destroying fixture %s" % fixture)
         fixture.destroy()
+        self.update_scene()
+        self.create_pixel_array()
 
     def clear_fixtures(self):
         while len(self.fixtures) > 0:
             fixture = self.fixtures.pop()
             fixture.destroy()
             del fixture
+        self.update_scene()
+        self.create_pixel_array()
 
     def widget_selected(self, selected, fixture, multi):
         if multi:
@@ -70,14 +84,17 @@ class SceneController:
         else:
             for f in self.fixtures:
                 if f is not fixture:
-                    f.widget.select(False)
+                    f.get_widget().select(False)
         self.app.widget_selected(selected, fixture, multi)
 
-    def save_scene(self):
+    def update_scene(self):
         fd = []
         for fixture in self.fixtures:
             fd.append(fixture.pack())
-        self.scene.data["fixtures"] = fd
+        self.scene.set_fixture_data(fd)
+
+    def save_scene(self):
+        self.update_scene()
         self.scene.save()
 
     def get_fixture(self, id):
@@ -90,7 +107,7 @@ class SceneController:
 
     def update_all(self):
         for f in self.fixtures:
-            f.widget.update()
+            f.get_widget().update()
 
     def toggle_background_enable(self):
         if self.scene.get("backdrop_enable", False):
@@ -114,19 +131,43 @@ class SceneController:
         self.update_all()
         return locked
 
-    def net_set(self, strand, address, pixel, color):
+    def create_pixel_array(self):
+        """
+        Initializes the array of colors used for displaying incoming data from the network.
+        Needs to be called when the shape of the scene has changed
+        (fixtures added/removed, addresses changed, pixels per fixture changed)
+        """
+        fh = self.scene.fixture_hierarchy()
+        self._strand_keys = list()
+        for strand in fh:
+            self._strand_keys.append(strand)
+            if len(fh[strand]) > self._max_fixtures:
+                self._max_fixtures = len(fh[strand])
+            for fixture in fh[strand]:
+                if fh[strand][fixture].pixels() > self._max_pixels:
+                    self._max_pixels = fh[strand][fixture].pixels()
+        log.info("Scene has %d strands, creating array using %d fixtures by %d pixels." % (len(self._strand_keys), self._max_fixtures, self._max_pixels))
+        self._output_buffer = np.zeros((len(self._strand_keys), self._max_fixtures, self._max_pixels, 3))
+
+    def net_set(self, strand, address, color):
+        #start = time.time()
         for f in self.fixtures:
-            if (strand == -1 or f.strand == strand) and (address == -1 or f.address == address):
-                if pixel == -1:
+            if (strand == -1 or f.strand() == strand) and (address == -1 or f.address() == address):
+                if isinstance(color, tuple):
                     f.set_all(color)
                 else:
-                    f.set(pixel, color)
+                    assert isinstance(color, list)
+                    f.set_array(color)
+        #dt = time.time() - start
+        #log.info("net_set completed in %0.2f ms" % (dt * 1000.0))
 
     def process_command(self, packet):
         if len(packet) < 3:
             log.error("Malformed packet!")
             print packet
             return
+
+        self._num_packets += 1
 
         while True:
             cmd = packet[0]
@@ -168,17 +209,20 @@ class SceneController:
             if cmd == 0x26:
                 raise NotImplementedError
 
-            # Bulk Set
+            # Bulk Strand Set
+            # TODO: This will break if the addressing is not continuous.
+            # TODO: Need to validate addressing in the GUI.  See #10
             if cmd == 0x27:
-                packed = array.array('B', data)
-                buffer = msgpack.unpackb(packed)
-                # TODO: This is stupid slow
-                for strand in buffer:
-                    for address in buffer[strand]:
-                        for pixel, color in enumerate(buffer[strand][address]):
-                            for f in self.fixtures:
-                                if f.strand == strand and f.address == address:
-                                    f.set(pixel, tuple(color))
+                #start = time.time()
+                bulk_data = msgpack.unpackb(array.array('B', data))
+                #dt = time.time() - start
+                #log.info("Unpacked frame data in %0.2f ms" % (dt * 1000.0))
+                start = time.time()
+                for strand, _ in enumerate(bulk_data):
+                    for fixture, _ in enumerate(bulk_data[strand]):
+                        self.net_set(strand, fixture, bulk_data[strand][fixture])
+                #dt = time.time() - start
+                #log.info("Rendered frame in %0.2f ms" % (dt * 1000.0))
 
 
             if len(packet) > (3 + datalen):
