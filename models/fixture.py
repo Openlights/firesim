@@ -116,6 +116,14 @@ class Fixture:
         self._pixel_data = color_array
         self._widget.update()
 
+    def set_flat_array(self, color_array):
+        if len(color_array) != 3 * self.pixels():
+            print len(color_array)
+            raise ValueError("set_flat_array argument length must match fixture pixel count")
+        for i, _ in enumerate(self._pixel_data):
+            self._pixel_data[i] = (color_array[i * 3], color_array[i * 3 + 1], color_array[i * 3 + 2])
+        self._widget.update()
+
     def random_color(self):
         r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(random.random(), 1.0, 1.0)]
         self.set_all((r, g, b))

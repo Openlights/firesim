@@ -161,6 +161,15 @@ class SceneController:
         #dt = time.time() - start
         #log.info("net_set completed in %0.2f ms" % (dt * 1000.0))
 
+    def set_strand(self, strand, pixels):
+        start = 0
+        strand_fixtures = [f for f in self.fixtures if (f.strand() == strand or strand == -1)]
+        for f in sorted(strand_fixtures, key=lambda f: f.address()):
+            if (strand == -1 or f.strand() == strand):
+                nd = 3 * f.pixels()
+                f.set_flat_array(pixels[start:start + nd])
+                start += nd
+
     def process_command(self, packet):
         if len(packet) < 3:
             log.error("Malformed packet!")
@@ -213,17 +222,7 @@ class SceneController:
             # TODO: This will break if the addressing is not continuous.
             # TODO: Need to validate addressing in the GUI.  See #10
             if cmd == 0x27:
-                #start = time.time()
-                bulk_data = msgpack.unpackb(array.array('B', data))
-                #dt = time.time() - start
-                #log.info("Unpacked frame data in %0.2f ms" % (dt * 1000.0))
-                start = time.time()
-                for strand, _ in enumerate(bulk_data):
-                    for fixture, _ in enumerate(bulk_data[strand]):
-                        self.net_set(strand, fixture, bulk_data[strand][fixture])
-                #dt = time.time() - start
-                #log.info("Rendered frame in %0.2f ms" % (dt * 1000.0))
-
+                self.set_strand(data[0], data[1:])
 
             if len(packet) > (3 + datalen):
                 packet = packet[3 + datalen:]
