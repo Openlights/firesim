@@ -19,7 +19,7 @@ class NetController(QtCore.QObject):
     def init_socket(self):
         self.socket = QtNetwork.QUdpSocket(self)
         self.socket.readyRead.connect(self.read_datagrams)
-        self.socket.bind(3020)
+        self.socket.bind(3020, QtNetwork.QUdpSocket.ShareAddress | QtNetwork.QUdpSocket.ReuseAddressHint)
         log.info("Listening on UDP 3020")
 
     @QtCore.Slot()

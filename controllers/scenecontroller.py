@@ -167,7 +167,8 @@ class SceneController:
         for f in sorted(strand_fixtures, key=lambda f: f.address()):
             if (strand == -1 or f.strand() == strand):
                 nd = 3 * f.pixels()
-                f.set_flat_array(pixels[start:start + nd])
+                if len(pixels) >= (start + nd):
+                    f.set_flat_array(pixels[start:start + nd])
                 start += nd
 
     def process_command(self, packet):
@@ -179,9 +180,10 @@ class SceneController:
         self._num_packets += 1
 
         while True:
-            cmd = packet[0]
-            datalen = (packet[1] << 8) + packet[2]
-            data = packet[3:3+datalen]
+            strand = packet[0]
+            cmd = packet[1]
+            datalen = (packet[3] << 8) + packet[2]
+            data = packet[4:]
 
             # Set All
             if cmd == 0x21:
@@ -221,11 +223,11 @@ class SceneController:
             # Bulk Strand Set
             # TODO: This will break if the addressing is not continuous.
             # TODO: Need to validate addressing in the GUI.  See #10
-            if cmd == 0x27:
-                self.set_strand(data[0], data[1:])
+            if cmd == 0x10:
+                self.set_strand(strand, data)
 
-            if len(packet) > (3 + datalen):
-                packet = packet[3 + datalen:]
+            if len(packet) > (4 + datalen):
+                packet = packet[4 + datalen:]
                 #print len(packet)
             else:
                 break
