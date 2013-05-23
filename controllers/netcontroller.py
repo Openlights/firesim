@@ -7,6 +7,7 @@ from PySide import QtCore, QtNetwork
 class NetController(QtCore.QObject):
 
     ready_to_read = QtCore.Signal()
+    data_received = QtCore.Signal()
 
     def __init__(self, app):
         super(NetController, self).__init__()
@@ -31,6 +32,7 @@ class NetController(QtCore.QObject):
             packet = [ord(c) for c in datagram.data()]
             self.app.scenecontroller.process_command(packet)
             self.updates += 1
+            self.data_received.emit()
 
     #@QtCore.Slot(result=float)
     def get_ups(self):
