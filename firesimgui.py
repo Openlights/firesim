@@ -63,6 +63,11 @@ class FireSimGUI(QtCore.QObject):
 
         self.netcontroller = NetController(self)
 
+        self.ups_timer = QtCore.QTimer()
+        self.ups_timer.setInterval(1000)
+        self.ups_timer.timeout.connect(self.update_ups)
+        self.ups_timer.start()
+
         self.netcontroller.data_received.connect(self.on_network_event)
 
         self.view.setFixedSize(max(640, cw + 130), max(480, ch))
@@ -77,8 +82,11 @@ class FireSimGUI(QtCore.QObject):
         pass
 
     @QtCore.Slot()
-    def on_network_event(self):
+    def update_ups(self):
         self.canvas.stat_ups = self.netcontroller.get_ups()
+
+    @QtCore.Slot()
+    def on_network_event(self):
         self.canvas.update()
 
     @QtCore.Slot(result=bool)

@@ -32,7 +32,7 @@ class NetController(QtCore.QObject):
             packet = [ord(c) for c in datagram.data()]
             self.app.scenecontroller.process_command(packet)
             self.updates += 1
-            self.data_received.emit()
+        self.data_received.emit()
 
     #@QtCore.Slot(result=float)
     def get_ups(self):
