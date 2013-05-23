@@ -11,7 +11,7 @@ class Scene(JSONLoader):
         self._fixture_hierarchy = None
 
     def extents(self):
-        return tuple(self._data.get("extents", (0, 0)))
+        return tuple(self._data.get("extents", (100, 100)))
 
     def name(self):
         return self._data.get("name", "")
@@ -22,8 +22,10 @@ class Scene(JSONLoader):
         self._fixtures = None
 
     def fixtures(self):
-        if self._fixtures is None:
+        if self._fixtures is None and self._data.get("fixtures", None):
             self._fixtures = [Fixture(fd) for fd in self._data["fixtures"]]
+        else:
+            self._fixtures = []
         return self._fixtures
 
     def fixture(self, strand, address):

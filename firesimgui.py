@@ -53,7 +53,7 @@ class FireSimGUI(QtCore.QObject):
 
         self.scenecontroller.set_canvas(self.canvas)
 
-        cw, ch = self.scenecontroller.scene.get("extents")
+        cw, ch = self.scenecontroller.scene.extents()
         self.canvas.setWidth(cw)
         self.canvas.setHeight(ch)
 

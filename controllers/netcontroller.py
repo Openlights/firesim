@@ -35,6 +35,8 @@ class NetController(QtCore.QObject):
     #@QtCore.Slot(result=float)
     def get_ups(self):
         dt = time.clock() - self.last_time
+        if dt == 0:
+            return 0
         ups = self.updates / dt
         self.last_time = time.clock()
         self.updates = 0

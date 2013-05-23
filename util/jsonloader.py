@@ -13,13 +13,18 @@ class JSONLoader:
     def load(self):
         self._loaded = False
         if self._filename is not None:
-            with open(self._filename) as f:
-                try:
-                    self._data = json.load(f)
-                except:
-                    log.error("Error loading " + self._filename)
-                    self._data = None
-                    return
+            try:
+                with open(self._filename) as f:
+                    try:
+                        self._data = json.load(f)
+                    except:
+                        log.error("Error loading " + self._filename)
+                        self._data = None
+                        return
+            except IOError:
+                self._data = {}
+                with open(self._filename, 'w') as f:
+                    json.dump({}, f)
 
             log.info("Loaded " + self._filename)
             self._loaded = True
