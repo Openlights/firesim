@@ -19,13 +19,24 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.controller = None
         self.next_new_fixture_pos = (10, 10)
         self.markup_color = (255, 255, 0)
+        self.coordinate_scale = 1.0
+        self.x_offset = 0
+        self.y_offset = 0
 
     def paint(self, painter, options, widget):
         self.rect = QtCore.QRect(0, 0, self.width(), self.height())
         painter.fillRect(self.rect, QtGui.QColor(0, 0, 0))
 
         if self.background_image is not None:
-            painter.drawImage(self.rect, self.background_image)
+            img = self.background_image.scaled(self.rect.size(), QtCore.Qt.KeepAspectRatio)
+            if img.rect().width() != self.background_image.rect().width():
+                self.coordinate_scale = float(img.rect().width()) / self.background_image.rect().width()
+            if img.rect().width() < self.rect.width():
+                self.x_offset = (self.rect.width() - img.rect().width()) / 2
+                painter.drawImage(self.x_offset, 0, img)
+            elif img.rect().height() < self.rect.height():
+                self.y_offset = (self.rect.height() - img.rect().height()) / 2
+                painter.drawImage(0, self.y_offset, img)
 
         f = QtGui.QFont()
         f.setPointSize(8)
@@ -35,15 +46,17 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def update_fixtures(self, fixture_list):
         self.fixture_list = fixture_list
+        for fixture in fixture_list:
+            fixture.update()
         self.update()
 
     def set_background_image(self, image):
         if image is not None:
             assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
-            self.w = image.width()
-            self.h = image.height()
-            self.setWidth(self.w/2)
-            self.setHeight(self.h/2)
+            # self.w = image.width()
+            # self.h = image.height()
+            # self.setWidth(self.w/2)
+            # self.setHeight(self.h/2)
         self.background_image = image
 
     def get_next_new_fixture_pos_and_increment(self):
@@ -73,6 +86,14 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def on_fixture_click(self, fixture):
         pass
+
+    def scene_to_canvas(self, a, b=None):
+        """
+        Scales coordinates to the GUI
+        """
+        if not b:
+            a, b = a
+        return (self.coordinate_scale * (a + self.x_offset), self.coordinate_scale * (b + self.y_offset))
 
     @QtCore.Slot()
     def propagate_hover_move(self, widget, scenepos):

@@ -44,31 +44,35 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         super(FixtureWidget, self).deleteLater()
 
     def update_geometry(self):
-        self.width = int(self.model.pos2()[0] - self.model.pos1()[0])
-        self.height = int(self.model.pos2()[1] - self.model.pos1()[1])
+        p1 = self.canvas.scene_to_canvas(self.model.pos1())
+        p2 = self.canvas.scene_to_canvas(self.model.pos2())
+        self.width = int(p2[0] - p1[0])
+        self.height = int(p2[1] - p1[1])
         self.prepareGeometryChange()
         self.update(self.boundingRect())
 
     def boundingRect(self):
         """Defines an outer bounding rectangle, used for repaint only"""
-        if self.width >= 0 and self.height >= 0:
-            return QtCore.QRectF(-8, -8, self.width + 16, self.height + 16)
-        elif self.width >= 0 and self.height < 0:
-            return QtCore.QRectF(-8, self.height - 8, self.width + 16, -self.height + 16)
-        elif self.width < 0 and self.height >= 0:
-            return QtCore.QRectF(self.width - 8, -8, -self.width + 16, self.height + 16)
+        width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
+        if width >= 0 and height >= 0:
+            return QtCore.QRectF(-8, -8, width + 16, height + 16)
+        elif width >= 0 and height < 0:
+            return QtCore.QRectF(-8, height - 8, width + 16, -height + 16)
+        elif width < 0 and height >= 0:
+            return QtCore.QRectF(width - 8, -8, -width + 16, height + 16)
         else:
-            return QtCore.QRectF(self.width - 8, self.height - 8, -self.width + 16, -self.height + 16)
+            return QtCore.QRectF(width - 8, height - 8, -width + 16, -height + 16)
 
     def shape(self):
         """Defines a 4-gon for mouse selection/hovering, larger than the drawn fixture"""
+        width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
         path = QtGui.QPainterPath()
-        line = QtCore.QLineF(0, 0, self.width, self.height)
+        line = QtCore.QLineF(0, 0, width, height)
         offset1 = line.normalVector().unitVector()
         offset1.setLength(7)
-        ol1 = QtCore.QLineF(0, 0, self.width, self.height)
+        ol1 = QtCore.QLineF(0, 0, width, height)
         ol1.translate(offset1.dx(), offset1.dy())
-        ol2 = QtCore.QLineF(0, 0, self.width, self.height)
+        ol2 = QtCore.QLineF(0, 0, width, height)
         ol2.translate(-offset1.dx(), -offset1.dy())
 
         p = QtGui.QPolygonF([
@@ -83,13 +87,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         return path
 
     def paint(self, painter, options, widget):
+        width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
         if self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 225),
                                       12,
                                       QtCore.Qt.SolidLine,
                                       QtCore.Qt.RoundCap,
                                       QtCore.Qt.RoundJoin))
-            painter.drawLine(0, 0, self.width, self.height)
+            painter.drawLine(0, 0, width, height)
 
         painter.setBrush(QtGui.QColor(0, 0, 0, 0))
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
@@ -98,7 +103,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                                   QtCore.Qt.SolidLine,
                                   QtCore.Qt.RoundCap,
                                   QtCore.Qt.RoundJoin))
-        painter.drawLine(0, 0, self.width, self.height)
+        painter.drawLine(0, 0, width, height)
         if self.isSelected():
             if self.about_to_delete:
                 painter.setPen(QtGui.QPen(QtGui.QColor(255, 50, 50, 225),
@@ -112,14 +117,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                                           QtCore.Qt.SolidLine,
                                           QtCore.Qt.RoundCap,
                                           QtCore.Qt.RoundJoin))
-            painter.drawLine(0, 0, self.width, self.height)
+            painter.drawLine(0, 0, width, height)
 
         #if self.bb_hovering:
         #    painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
         #    painter.drawPath(self.shape())
 
         if self.model.pixels() > 0:
-            color_line = QtCore.QLineF(0, 0, self.width, self.height)
+            color_line = QtCore.QLineF(0, 0, width, height)
             color_line.setLength(color_line.length() / self.model.pixels())
             painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
 
@@ -135,8 +140,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 color_line.translate(color_line.dx(), color_line.dy())
 
         if self.hovering or self.isSelected() or self.model._controller.scene.get("labels_enable", False):
-            x = self.width / 2 - 12
-            y = self.height / 2 - 7
+            x = width / 2 - 12
+            y = height / 2 - 7
             label_font = QtGui.QFont()
             label_font.setPointSize(8)
             painter.setFont(label_font)
@@ -296,9 +301,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.model.set_all(self.canvas.markup_color)
 
     def update_handle_positions(self):
-        self.model.set_pos1([int(self.drag1.pos().x()), int(self.drag1.pos().y())])
-        self.setPos(self.drag1.pos())
-        self.model.set_pos2([int(self.drag2.pos().x()), int(self.drag2.pos().y())])
+        self.model.set_pos1([int(self.drag1.scene_x), int(self.drag1.scene_y)])
+        x, y = self.canvas.scene_to_canvas(self.drag1.scene_x, self.drag1.scene_y)
+        self.setPos(x, y)
+        self.model.set_pos2([int(self.drag2.scene_x), int(self.drag2.scene_y)])
         self.update_geometry()
 
     def handle_move_callback(self, handle):

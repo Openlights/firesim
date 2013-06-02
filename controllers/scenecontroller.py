@@ -161,14 +161,14 @@ class SceneController:
         #dt = time.time() - start
         #log.info("net_set completed in %0.2f ms" % (dt * 1000.0))
 
-    def set_strand(self, strand, pixels):
+    def set_strand(self, strand, pixels, bgr=False):
         start = 0
         strand_fixtures = [f for f in self.fixtures if (f.strand() == strand or strand == -1)]
         for f in sorted(strand_fixtures, key=lambda f: f.address()):
             if (strand == -1 or f.strand() == strand):
                 nd = 3 * f.pixels()
                 if len(pixels) >= (start + nd):
-                    f.set_flat_array(pixels[start:start + nd])
+                    f.set_flat_array(pixels[start:start + nd], bgr)
                 start += nd
 
     def process_command(self, packet):
@@ -223,8 +223,9 @@ class SceneController:
             # Bulk Strand Set
             # TODO: This will break if the addressing is not continuous.
             # TODO: Need to validate addressing in the GUI.  See #10
-            if cmd == 0x10:
+            if cmd == 0x10 or cmd == 0x20:
                 self.set_strand(strand, data)
+
 
             if len(packet) > (4 + datalen):
                 packet = packet[4 + datalen:]

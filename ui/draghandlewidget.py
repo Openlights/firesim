@@ -17,9 +17,13 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.hovering = False
         self.hidden = True
         self.drag_pos = None
+        self.scene_x = 0.0
+        self.scene_y = 0.0
         #self.rect = QtCore.QRect(0, 0, 16, 16)
         if pos:
-            self.setPos(pos[0], pos[1])
+            self.scene_x, self.scene_y = pos
+            x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
+            self.setPos(x, y)
 
     def boundingRect(self):
         # Bigger than the actual handle so that the text gets erased

@@ -74,6 +74,9 @@ class FireSimGUI(QtCore.QObject):
 
         log.info("FireSimGUI Ready.")
         self.view.show()
+        #self.view.showFullScreen()
+        self.view.setGeometry(self.app.desktop().availableGeometry())
+
 
     def run(self):
         return self.app.exec_()

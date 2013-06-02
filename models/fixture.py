@@ -116,12 +116,15 @@ class Fixture:
         self._pixel_data = color_array
         self._widget.update()
 
-    def set_flat_array(self, color_array):
+    def set_flat_array(self, color_array, bgr=False):
         if len(color_array) != 3 * self.pixels():
             print len(color_array)
             raise ValueError("set_flat_array argument length must match fixture pixel count")
         for i, _ in enumerate(self._pixel_data):
-            self._pixel_data[i] = (color_array[i * 3], color_array[i * 3 + 1], color_array[i * 3 + 2])
+            if bgr:
+                self._pixel_data[i] = (color_array[i * 3 + 2], color_array[i * 3 + 1], color_array[i * 3])
+            else:
+                self._pixel_data[i] = (color_array[i * 3], color_array[i * 3 + 1], color_array[i * 3 + 2])
         self._widget.update()
 
     def random_color(self):
