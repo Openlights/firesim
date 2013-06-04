@@ -1,5 +1,4 @@
 import logging as log
-import msgpack
 import array
 import time
 import numpy as np
