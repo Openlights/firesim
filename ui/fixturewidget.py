@@ -98,7 +98,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         painter.setBrush(QtGui.QColor(0, 0, 0, 0))
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200),
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 60),
                                   6,
                                   QtCore.Qt.SolidLine,
                                   QtCore.Qt.RoundCap,
@@ -109,6 +109,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 painter.setPen(QtGui.QPen(QtGui.QColor(255, 50, 50, 225),
                                           10,
                                           QtCore.Qt.SolidLine,
+                                          QtCore.Qt.RoundCap,
                                           QtCore.Qt.RoundCap,
                                           QtCore.Qt.RoundJoin))
             else:
@@ -132,11 +133,11 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 px, py = color_line.x1(), color_line.y1()
                 r, g, b = pixel[0], pixel[1], pixel[2]
                 painter.setBrush(QtGui.QColor(r, g, b, 255))
-                painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 255),
-                                          4,
+                painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 60),
+                                          5,
                                           QtCore.Qt.SolidLine))
-                #painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
-                painter.drawLine(color_line.unitVector())
+                painter.drawEllipse(QtCore.QPointF(px, py), 1.5, 1.5)
+                #painter.drawLine(color_line.unitVector())
                 color_line.translate(color_line.dx(), color_line.dy())
 
         if self.hovering or self.isSelected() or self.model._controller.scene.get("labels_enable", False):
