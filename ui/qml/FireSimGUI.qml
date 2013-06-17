@@ -10,6 +10,7 @@ Item {
     signal backdrop_showhide_callback(variant obj)
     signal labels_showhide_callback(variant obj)
     signal lock_callback(variant obj)
+    signal show_center_callback(variant obj)
 
     MouseArea {
         anchors.fill: parent
@@ -77,6 +78,12 @@ Item {
                 id: btn_lock
                 text: if(main.is_locked()) "Unlock Scene"; else "Lock Scene"
                 onClicked: lock_callback(btn_lock)
+            }
+
+            Button {
+                id: btn_show_center
+                text: if(main.is_center_shown()) "Hide Center"; else "Show Center"
+                onClicked: show_center_callback(btn_show_center)
             }
 
             /*Button {

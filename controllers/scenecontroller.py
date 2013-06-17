@@ -6,6 +6,7 @@ from PySide import QtGui
 
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
+from ui.crosshairwidget import CrosshairWidget
 
 from models.scene import Scene
 from models.fixture import Fixture
@@ -21,12 +22,16 @@ class SceneController:
         self._max_fixtures = 0
         self._max_pixels = 0
         self._output_buffer = None
+        self.show_center = False
         self._strand_keys = list()
+
         if self.canvas is not None:
             self.init_view()
+
         self.create_pixel_array()
 
     def init_view(self):
+        self.center_widget = CrosshairWidget(self.canvas, self.scene.center(), "Center", callback=self.on_center_moved)
         self.load_backdrop()
         self.fixtures = []
         fixture_data = self.scene.get("fixtures", [])
@@ -55,6 +60,10 @@ class SceneController:
         if self.canvas is not None:
             fl = [f.get_widget() for f in self.fixtures]
             self.canvas.update_fixtures(fl)
+
+    def on_center_moved(self, pos):
+        ipos = (int(pos.x()), int(pos.y()))
+        self.scene.set_center(ipos)
 
     def add_fixture(self):
         self.fixtures.append(Fixture(controller=self))
@@ -107,6 +116,8 @@ class SceneController:
     def update_all(self):
         for f in self.fixtures:
             f.get_widget().update()
+        self.center_widget.update()
+        self.canvas.update()
 
     def toggle_background_enable(self):
         if self.scene.get("backdrop_enable", False):
@@ -129,6 +140,12 @@ class SceneController:
         self.scene.set("locked", locked)
         self.update_all()
         return locked
+
+    def toggle_show_center(self):
+        self.show_center = not self.show_center
+        self.center_widget.hidden = not self.show_center
+        self.update_all()
+        return self.show_center
 
     def create_pixel_array(self):
         """

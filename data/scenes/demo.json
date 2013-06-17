@@ -1,6 +1,14 @@
 {
   "backdrop_enable": false, 
   "backdrop_filename": "light_dome.png", 
+  "bounding_box": [
+    640, 
+    640
+  ], 
+  "center": [
+    460, 
+    321
+  ], 
   "extents": [
     640, 
     640

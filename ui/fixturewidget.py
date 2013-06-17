@@ -193,6 +193,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         if widget is self:
             return
 
+        if self.canvas.controller.scene.get("locked", False):
+            return
+
         if e is not None:
             pos = e.pos()
         else:

@@ -60,6 +60,7 @@ class FireSimGUI(QtCore.QObject):
         self.root.backdrop_showhide_callback.connect(self.on_btn_backdrop_showhide)
         self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)
         self.root.lock_callback.connect(self.on_btn_lock)
+        self.root.show_center_callback.connect(self.on_btn_show_center)
 
         self.netcontroller = NetController(self)
 
@@ -75,7 +76,7 @@ class FireSimGUI(QtCore.QObject):
         log.info("FireSimGUI Ready.")
         self.view.show()
         #self.view.showFullScreen()
-        self.view.setGeometry(self.app.desktop().availableGeometry())
+        #self.view.setGeometry(self.app.desktop().availableGeometry())
 
 
     def run(self):
@@ -103,6 +104,10 @@ class FireSimGUI(QtCore.QObject):
     @QtCore.Slot(result=bool)
     def is_locked(self):
         return self.scenecontroller.scene.get("locked", False)
+
+    @QtCore.Slot(result=bool)
+    def is_center_shown(self):
+        return self.scenecontroller.show_center
 
     @QtCore.Slot()
     def on_btn_add_fixture(self):
@@ -142,6 +147,15 @@ class FireSimGUI(QtCore.QObject):
         else:
             obj.setProperty("text", "Lock Scene")
         return locked
+
+    @QtCore.Slot(result=bool)
+    def on_btn_show_center(self, obj):
+        show_center = self.scenecontroller.toggle_show_center()
+        if show_center:
+            obj.setProperty("text", "Hide Center")
+        else:
+            obj.setProperty("text", "Show Center")
+        return show_center
 
     def widget_selected(self, selected, fixture, multi):
         self.selected_fixture = None

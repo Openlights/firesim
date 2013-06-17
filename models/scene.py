@@ -13,6 +13,15 @@ class Scene(JSONLoader):
     def extents(self):
         return tuple(self._data.get("extents", (100, 100)))
 
+    def bounding_box(self):
+        return tuple(self._data.get("bounding_box", self.extents()))
+
+    def center(self):
+        return tuple(self._data.get("center", (50, 50)))
+
+    def set_center(self, point):
+        self._data["center"] = point
+
     def name(self):
         return self._data.get("name", "")
 
