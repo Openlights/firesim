@@ -6,8 +6,8 @@
     640
   ], 
   "center": [
-    321, 
-    322
+    383, 
+    248
   ], 
   "extents": [
     640, 
@@ -507,5 +507,42 @@
   ], 
   "labels_enable": false, 
   "locked": true, 
-  "name": "Demo"
+  "name": "Demo",
+  "strand-settings": [
+    {
+        "color-mode": "BGR8",
+        "enabled": true,
+        "id": 0
+    },
+    {
+        "color-mode": "BGR8",
+        "enabled": true,
+        "id": 1
+    },
+    {
+        "color-mode": "BGR8",
+        "enabled": true,
+        "id": 2
+    },
+    {
+        "color-mode": "BGR8",
+        "enabled": true,
+        "id": 3
+    },
+    {
+        "color-mode": "BGR8",
+        "enabled": true,
+        "id": 4
+    },
+    {
+        "color-mode": "BGR8",
+        "enabled": true,
+        "id": 5
+    },
+    {
+        "color-mode": "BGR8",
+        "enabled": true,
+        "id": 6
+    }
+  ]
 }
