@@ -91,7 +91,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         """
         Scales coordinates to the GUI
         """
-        if not b:
+        if b is None:
             a, b = a
         return (self.coordinate_scale * (a + self.x_offset), self.coordinate_scale * (b + self.y_offset))
 

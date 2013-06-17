@@ -27,6 +27,7 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
         if pos:
             self.scene_x, self.scene_y = pos
             x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
+            print x, y
             self.setPos(x, y)
 
     def boundingRect(self):
@@ -83,7 +84,7 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
                 self.moveBy(npos.x(), npos.y())
             self.drag_pos = event.scenePos()
             if self.callback is not None:
-                self.callback(event.scenePos())
+                self.callback(self.pos())
 
     def mousePressEvent(self, event):
         self.mouse_down = True
@@ -94,7 +95,7 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
         self.mouse_down = False
         self.drag_pos = None
         if self.callback is not None:
-            self.callback(event.scenePos())
+            self.callback(self.pos())
 
     def mouseDoubleClickEvent(self, event):
         pass

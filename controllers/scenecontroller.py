@@ -62,6 +62,7 @@ class SceneController:
             self.canvas.update_fixtures(fl)
 
     def on_center_moved(self, pos):
+        print pos
         ipos = (int(pos.x()), int(pos.y()))
         self.scene.set_center(ipos)
 

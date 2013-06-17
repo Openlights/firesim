@@ -154,6 +154,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             painter.drawText(label_rect, QtCore.Qt.AlignCenter, "%d:%d" % (self.model.strand(), self.model.address()))
 
     def hoverEnterEvent(self, event):
+        if self.canvas.controller.scene.get("locked", False):
+            return
+
         self.bb_hovering = True
         #self.setZValue(1)
         if self.shape().contains(event.pos()):
@@ -175,6 +178,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         #event.ignore()
 
     def hoverLeaveEvent(self, event):
+        if self.canvas.controller.scene.get("locked", False):
+            return
+
         self.bb_hovering = False
         self.setZValue(0)
         self.hovering = False
@@ -243,6 +249,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         #super(FixtureWidget, self).mouseMoveEvent(event)
 
     def mousePressEvent(self, event):
+        if self.canvas.controller.scene.get("locked", False):
+            return
+
         if self.shape().contains(event.pos()):
             self.mouse_down = True
             self.drag_pos = event.scenePos()
