@@ -1,14 +1,15 @@
 import logging as log
+import struct
 import array
-import time
 import numpy as np
-from PySide import QtGui
 
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from ui.crosshairwidget import CrosshairWidget
 
-from models.scene import Scene
+from PySide import QtGui
+
+
 from models.fixture import Fixture
 
 class SceneController:
@@ -24,7 +25,7 @@ class SceneController:
         self._output_buffer = None
         self.show_center = False
         self._strand_keys = list()
-
+        self._color_mode = self.app.config.get("color_mode")
         if self.canvas is not None:
             self.init_view()
 
@@ -184,8 +185,13 @@ class SceneController:
         for f in sorted(strand_fixtures, key=lambda f: f.address()):
             if (strand == -1 or f.strand() == strand):
                 nd = 3 * f.pixels()
+                if self._color_mode == "HLSF32":
+                    nd *= 4
                 if len(pixels) >= (start + nd):
-                    f.set_flat_array(pixels[start:start + nd], bgr)
+                    fixture_pixels = pixels[start:start + nd]
+                    if self._color_mode == "HLSF32":
+                        fixture_pixels = struct.unpack("%sf" % 3 * f.pixels(), array.array('B', fixture_pixels))
+                    f.set_flat_array(fixture_pixels, bgr=bgr, color_mode=self._color_mode)
                 start += nd
 
     def process_command(self, packet):

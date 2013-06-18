@@ -1,3 +1,4 @@
 {
-    "scene_root": "data/scenes"
+    "scene_root": "data/scenes",
+    "color_mode": "HLSF32"
 }
