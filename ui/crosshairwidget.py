@@ -61,6 +61,8 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
             painter.drawText(5, 15, self.text)
 
     def hoverEnterEvent(self, event):
+        if self.hidden:
+            return
         self.setZValue(50)
 
     def hoverLeaveEvent(self, event):
@@ -69,6 +71,9 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
         self.update()
 
     def hoverMoveEvent(self, event):
+        if self.hidden:
+            return
+
         if self.shape().contains(event.pos()):
             self.hidden = False
             self.hovering = True
