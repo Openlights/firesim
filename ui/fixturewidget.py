@@ -14,7 +14,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton |
                                      QtCore.Qt.MouseButton.MiddleButton |
                                      QtCore.Qt.MouseButton.RightButton)
-        self.setAcceptsHoverEvents(True)
+        #self.setAcceptsHoverEvents(True)
+
         self.model = model
         self.about_to_delete = False
         self.setHeight(16)
@@ -82,6 +83,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         # FIXME: Coordinate scale doesn't work
         # width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
         width, height = (self.width, self.height)
+
         path = QtGui.QPainterPath()
         line = QtCore.QLineF(0, 0, width, height)
         offset1 = line.normalVector().unitVector()
@@ -105,6 +107,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         path.addPolygon(p)
         path.closeSubpath()
+
         return path
 
     def paint(self, painter, options, widget):
@@ -142,9 +145,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                                           QtCore.Qt.RoundJoin))
             painter.drawLine(0, 0, width, height)
 
-        #if self.bb_hovering:
-        #    painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
-        #    painter.drawPath(self.shape())
+        if self.bb_hovering:
+            painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
+            painter.drawPath(self.shape())
+        #painter.fillRect(self.boundingRect(), QtGui.QColor(255,0, 0, 25))
 
         if self.model.pixels() > 0:
             color_line = QtCore.QLineF(0, 0, width, height)
@@ -177,18 +181,23 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         #painter.fillRect(self.boundingRect(), QtGui.QColor(255, 255, 0, 255))
 
-    def hoverEnterEvent(self, event):
+    def hover_enter(self):
         if self.canvas.controller.scene.get("locked", False):
             return
 
-        self.bb_hovering = True
+        #self.bb_hovering = True
+        #print "event"
 
-        if self.shape().contains(event.pos()):
-            self.hovering = True
-            self.drag1.hovering = True
-            self.drag2.hovering = True
-            self.drag1.hidden = False
-            self.drag2.hidden = False
+        #if self.shape().contains(event.pos()):
+
+        self.hovering = True
+        self.setZValue(100)
+        self.drag1.setZValue(101)
+        self.drag2.setZValue(101)
+        self.drag1.hovering = True
+        self.drag2.hovering = True
+        self.drag1.hidden = False
+        self.drag2.hidden = False
         #else:
         #    self.hovering = False
         #    self.drag1.hovering = False
@@ -201,7 +210,8 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         self.update()
         #event.ignore()
 
-    def hoverLeaveEvent(self, event):
+
+    def hover_leave(self):
         if self.canvas.controller.scene.get("locked", False):
             return
 
@@ -231,7 +241,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         else:
             pos = self.mapFromScene(pos)
 
-        #self.bb_hovering = True
+        self.bb_hovering = True
         if self.shape().contains(pos):
             self.setZValue(50)
             self.drag1.setZValue(50)
@@ -330,9 +340,10 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.drag_pos = None
             self.model.fixture_move_callback(self)
         else:
-            if self.isSelected():
-                self.select(not self.isSelected())
-                self.model._controller.widget_selected(self.isSelected(), self.model, False)
+            self.canvas.deselect_all()
+            #if self.isSelected():
+            #    self.select(not self.isSelected())
+            #    self.model._controller.widget_selected(self.isSelected(), self.model, False)
 
     def mouseDoubleClickEvent(self, event):
         if self.shape().contains(event.pos()) and event.button() == QtCore.Qt.MouseButton.LeftButton:

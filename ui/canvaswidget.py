@@ -62,11 +62,19 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def get_next_new_fixture_pos_and_increment(self):
         x, y = self.next_new_fixture_pos
-        self.next_new_fixture_pos = (x + 25, y + 25)
+        self.next_new_fixture_pos = (x + 5, y + 5)
         return (x, y)
 
     def hoverMoveEvent(self, event):
-        pass
+        #print event.scenePos()
+        for fixture in self.fixture_list:
+            #print fixture.mapToParent(fixture.shape())
+            if fixture.mapToParent(fixture.shape()).contains(event.pos()):
+                fixture.hover_enter()
+            else:
+                fixture.hover_leave()
+            fixture.update()
+        #pass
         #self.propagate_hover_move(None, event)
 
     def mouseMoveEvent(self, event):
@@ -77,9 +85,12 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.MouseButton.LeftButton:
-            self.controller.widget_selected(False, None, False)
+            self.deselect_all()
         elif event.button() == QtCore.Qt.MouseButton.RightButton:
             self.generate_markup_color()
+
+    def deselect_all(self):
+        self.controller.widget_selected(False, None, False)
 
     def generate_markup_color(self):
         r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(random.random(), 1.0, 1.0)]
