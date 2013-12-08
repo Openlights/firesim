@@ -17,7 +17,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.rect = None
         self.stat_ups = 0.0
         self.controller = None
-        self.next_new_fixture_pos = (10, 10)
+        self.next_new_fixture_pos = (25, 25)
         self.markup_color = (255, 255, 0)
         self.coordinate_scale = 1.0
         self.x_offset = 0
@@ -29,12 +29,13 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
         if self.background_image is not None:
             img = self.background_image.scaled(self.rect.size(), QtCore.Qt.KeepAspectRatio)
-            if img.rect().width() != self.background_image.rect().width():
-                self.coordinate_scale = float(img.rect().width()) / self.background_image.rect().width()
-            if img.rect().width() < self.rect.width():
+            # FIXME
+            #if img.rect().width() != self.background_image.rect().width():
+            #    self.coordinate_scale = float(img.rect().width()) / self.background_image.rect().width()
+            if img.rect().width() <= self.rect.width():
                 self.x_offset = (self.rect.width() - img.rect().width()) / 2
                 painter.drawImage(self.x_offset, 0, img)
-            elif img.rect().height() < self.rect.height():
+            elif img.rect().height() <= self.rect.height():
                 self.y_offset = (self.rect.height() - img.rect().height()) / 2
                 painter.drawImage(0, self.y_offset, img)
 
@@ -61,7 +62,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def get_next_new_fixture_pos_and_increment(self):
         x, y = self.next_new_fixture_pos
-        self.next_new_fixture_pos = (x + 10, y + 10)
+        self.next_new_fixture_pos = (x + 25, y + 25)
         return (x, y)
 
     def hoverMoveEvent(self, event):
@@ -93,7 +94,14 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         """
         if b is None:
             a, b = a
-        return (self.coordinate_scale * (a + self.x_offset), self.coordinate_scale * (b + self.y_offset))
+        # FIXME: Coordinate scaling doesn't work
+        #return (self.coordinate_scale * (a + self.x_offset), self.coordinate_scale * (b + self.y_offset))
+        return (int(a + self.x_offset), int(b + self.y_offset))
+
+    def canvas_to_scene(self, a, b=None):
+        if b is None:
+            a, b = a
+        return (int(a - self.x_offset), int(b - self.y_offset))
 
     @QtCore.Slot()
     def propagate_hover_move(self, widget, scenepos):

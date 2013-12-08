@@ -27,7 +27,6 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
         if pos:
             self.scene_x, self.scene_y = pos
             x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
-            print x, y
             self.setPos(x, y)
 
     def boundingRect(self):

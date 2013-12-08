@@ -15,8 +15,8 @@ class Fixture:
         self._address = 0
         self._type = "linear"
         self._pixels = 32
-        self._pos1 = (10, 10)
-        self._pos2 = (50, 50)
+        self._pos1 = (-1, -1)
+        self._pos2 = (-1, -1)
         self._locked = False
 
         if data is not None:
@@ -70,7 +70,8 @@ class Fixture:
         if self._widget is None:
             self._widget = FixtureWidget(self._controller.get_canvas(), model=self)
             x, y = self._pos1[0], self._pos1[1]
-            self._widget.setPos(x, y)
+            cx, cy = self._controller.get_canvas().scene_to_canvas(x, y)
+            self._widget.setPos(cx, cy)
             #self._widget.setRotation(self.angle)
         return self._widget
 
@@ -93,8 +94,8 @@ class Fixture:
                 }
 
     def fixture_move_callback(self, fixture):
-        self._pos1 = map(int, fixture.drag1.pos().toTuple())
-        self._pos2 = map(int, fixture.drag2.pos().toTuple())
+        self._pos1 = map(int, (fixture.drag1.scene_x, fixture.drag1.scene_y))
+        self._pos2 = map(int, (fixture.drag2.scene_x, fixture.drag2.scene_y))
         fixture.update_geometry()
 
     def blackout(self):

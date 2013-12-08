@@ -51,11 +51,13 @@ class FireSimGUI(QtCore.QObject):
         self.item_frame = self.root.findChild(QtDeclarative.QDeclarativeItem)
         self.canvas = self.root.findChild(CanvasWidget)
 
-        self.scenecontroller.set_canvas(self.canvas)
-
         cw, ch = self.scenecontroller.scene.extents()
         self.canvas.setWidth(cw)
         self.canvas.setHeight(ch)
+
+        self.scenecontroller.set_canvas(self.canvas)
+
+
 
         self.root.backdrop_showhide_callback.connect(self.on_btn_backdrop_showhide)
         self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)

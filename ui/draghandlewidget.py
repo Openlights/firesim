@@ -57,19 +57,25 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         painter.drawEllipse(fixture_bg)
 
     def hoverEnterEvent(self, event):
-        if self.canvas.controller.scene.get("locked", False):
+        if (self.canvas.controller.scene.get("locked", False) or
+            (self.fixture.hovering is False and
+            self.fixture.isSelected() is False)):
             return
-        self.setZValue(50)
+        self.setZValue(150)
 
     def hoverLeaveEvent(self, event):
-        if self.canvas.controller.scene.get("locked", False):
+        if (self.canvas.controller.scene.get("locked", False) or
+            (self.fixture.hovering is False and
+            self.fixture.isSelected() is False)):
             return
         self.hovering = False
         #self.hidden = not self.fixture.isSelected()
         self.update()
 
     def hoverMoveEvent(self, event):
-        if self.canvas.controller.scene.get("locked", False):
+        if (self.canvas.controller.scene.get("locked", False) or
+            (self.fixture.hovering is False and
+            self.fixture.isSelected() is False)):
             return
         if self.shape().contains(event.pos()):
             self.hidden = False
@@ -83,8 +89,9 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
             self.dragging = True
             npos = (event.scenePos() - self.drag_pos)
             if self.canvas.sceneBoundingRect().contains(event.scenePos()):
-                self.moveBy(npos.x(), npos.y())
+                self.move_by(npos.x(), npos.y())
             self.drag_pos = event.scenePos()
+            #self.update_positions()
             self.fixture.handle_move_callback(self)
 
     def mousePressEvent(self, event):
@@ -95,7 +102,15 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.dragging = False
         self.mouse_down = False
         self.drag_pos = None
+        self.update_positions()
         self.fixture.handle_move_callback(self)
 
     def mouseDoubleClickEvent(self, event):
         pass
+
+    def update_positions(self):
+        self.scene_x, self.scene_y = self.canvas.canvas_to_scene(self.pos().x(), self.pos().y())
+
+    def move_by(self, x, y):
+        self.moveBy(x, y)
+        self.scene_x, self.scene_y = self.canvas.canvas_to_scene(self.pos().x(), self.pos().y())

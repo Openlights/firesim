@@ -28,9 +28,21 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
         if canvas:
             self.canvas = canvas
+
+        if self.model.pos1() == (-1, -1):
+
             x, y = canvas.get_next_new_fixture_pos_and_increment()
             self.setPos(x, y)
             self.canvas.hover_move_event.connect(self.hover_move_handler)
+
+            x, y = (int(self.pos().x()), int(self.pos().y()))
+
+            self.model.set_pos1(self.canvas.canvas_to_scene(x, y))
+            self.model.set_pos2(self.canvas.canvas_to_scene(x + 100, y + 100))
+        else:
+            x, y = canvas.scene_to_canvas(self.model.pos1())
+            self.setPos(x, y)
+
 
         self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1())
         self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2())
@@ -53,7 +65,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def boundingRect(self):
         """Defines an outer bounding rectangle, used for repaint only"""
-        width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
+        # FIXME: Coordinate scaling doesn't work
+        # width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
+        width, height = (self.width, self.height)
         if width >= 0 and height >= 0:
             return QtCore.QRectF(-8, -8, width + 16, height + 16)
         elif width >= 0 and height < 0:
@@ -65,11 +79,18 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
 
     def shape(self):
         """Defines a 4-gon for mouse selection/hovering, larger than the drawn fixture"""
-        width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
+        # FIXME: Coordinate scale doesn't work
+        # width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
+        width, height = (self.width, self.height)
         path = QtGui.QPainterPath()
         line = QtCore.QLineF(0, 0, width, height)
         offset1 = line.normalVector().unitVector()
-        offset1.setLength(7)
+
+        if self.isSelected():
+            offset1.setLength(11)
+        else:
+            offset1.setLength(9)
+
         ol1 = QtCore.QLineF(0, 0, width, height)
         ol1.translate(offset1.dx(), offset1.dy())
         ol2 = QtCore.QLineF(0, 0, width, height)
@@ -87,7 +108,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         return path
 
     def paint(self, painter, options, widget):
-        width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
+        # TODO: Fix the buggy scaling code
+        #width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
+        width, height = (self.width, self.height)
         if self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(200, 200, 255, 225),
                                       12,
@@ -109,7 +132,6 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 painter.setPen(QtGui.QPen(QtGui.QColor(255, 50, 50, 225),
                                           10,
                                           QtCore.Qt.SolidLine,
-                                          QtCore.Qt.RoundCap,
                                           QtCore.Qt.RoundCap,
                                           QtCore.Qt.RoundJoin))
             else:
@@ -153,12 +175,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             painter.setPen(QtGui.QColor(255, 255, 255, 255))
             painter.drawText(label_rect, QtCore.Qt.AlignCenter, "%d:%d" % (self.model.strand(), self.model.address()))
 
+        #painter.fillRect(self.boundingRect(), QtGui.QColor(255, 255, 0, 255))
+
     def hoverEnterEvent(self, event):
         if self.canvas.controller.scene.get("locked", False):
             return
 
         self.bb_hovering = True
-        #self.setZValue(1)
+
         if self.shape().contains(event.pos()):
             self.hovering = True
             self.drag1.hovering = True
@@ -240,8 +264,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             npos = (event.scenePos() - self.drag_pos)
             if self.parent().sceneBoundingRect().contains(event.scenePos()):
                 self.moveBy(npos.x(), npos.y())
-                self.drag1.moveBy(npos.x(), npos.y())
-                self.drag2.moveBy(npos.x(), npos.y())
+                self.drag1.move_by(npos.x(), npos.y())
+                self.drag2.move_by(npos.x(), npos.y())
+                self.update_handle_positions()
             self.drag_pos = event.scenePos()
             self.model.fixture_move_callback(self)
 
@@ -314,10 +339,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             self.model.set_all(self.canvas.markup_color)
 
     def update_handle_positions(self):
-        self.model.set_pos1([int(self.drag1.scene_x), int(self.drag1.scene_y)])
-        x, y = self.canvas.scene_to_canvas(self.drag1.scene_x, self.drag1.scene_y)
-        self.setPos(x, y)
-        self.model.set_pos2([int(self.drag2.scene_x), int(self.drag2.scene_y)])
+        x, y = self.drag1.scene_x, self.drag1.scene_y
+        self.model.set_pos1([int(x), int(y)])
+
+        cx, cy = self.canvas.scene_to_canvas(x, y)
+        self.setPos(cx, cy)
+
+        x, y = self.drag2.scene_x, self.drag2.scene_y
+        self.model.set_pos2([int(x), int(y)])
         self.update_geometry()
 
     def handle_move_callback(self, handle):
