@@ -1,7 +1,7 @@
 import logging as log
 import os.path
 
-from PySide import QtCore, QtGui, QtDeclarative, QtDeclarative
+from PySide import QtCore, QtGui, QtDeclarative
 
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget

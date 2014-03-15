@@ -78,6 +78,7 @@ class SceneController:
         log.info("Destroying fixture %s" % fixture)
         fixture.destroy()
         self.update_scene()
+        self.update_canvas()
         self.create_pixel_array()
 
     def clear_fixtures(self):
