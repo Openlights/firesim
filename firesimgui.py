@@ -20,6 +20,13 @@ class FireSimGUI(QtCore.QObject):
         self.args = args
         self.config = Config("data/config.json")
 
+        if self.args.profile:
+            try:
+                import yappi
+                yappi.start()
+            except ImportError:
+                log.error("Could not enable YaPPI profiling")
+
         self._selected_fixture_strand = 0
         self._selected_fixture_address = 0
         self._selected_fixture_pixels = 0
@@ -85,7 +92,12 @@ class FireSimGUI(QtCore.QObject):
         return self.app.exec_()
 
     def on_close(self, e):
-        pass
+        if self.args.profile:
+            try:
+                import yappi
+                yappi.get_func_stats().print_all()
+            except ImportError:
+                pass
 
     @QtCore.Slot()
     def update_ups(self):
