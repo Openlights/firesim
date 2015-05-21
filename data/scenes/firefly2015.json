@@ -16,90 +16,6 @@
   "file-type": "scene", 
   "fixtures": [
     {
-      "address": 0, 
-      "pixels": 120, 
-      "pos1": [
-        743, 
-        398
-      ], 
-      "pos2": [
-        550, 
-        114
-      ], 
-      "strand": 0, 
-      "type": "linear"
-    }, 
-    {
-      "address": 0, 
-      "pixels": 120, 
-      "pos1": [
-        223, 
-        111
-      ], 
-      "pos2": [
-        31, 
-        397
-      ], 
-      "strand": 0, 
-      "type": "linear"
-    }, 
-    {
-      "address": 0, 
-      "pixels": 120, 
-      "pos1": [
-        224, 
-        111
-      ], 
-      "pos2": [
-        555, 
-        113
-      ], 
-      "strand": 0, 
-      "type": "linear"
-    }, 
-    {
-      "address": 0, 
-      "pixels": 120, 
-      "pos1": [
-        34, 
-        400
-      ], 
-      "pos2": [
-        214, 
-        704
-      ], 
-      "strand": 0, 
-      "type": "linear"
-    }, 
-    {
-      "address": 0, 
-      "pixels": 120, 
-      "pos1": [
-        218, 
-        705
-      ], 
-      "pos2": [
-        569, 
-        709
-      ], 
-      "strand": 0, 
-      "type": "linear"
-    }, 
-    {
-      "address": 0, 
-      "pixels": 120, 
-      "pos1": [
-        746, 
-        399
-      ], 
-      "pos2": [
-        572, 
-        705
-      ], 
-      "strand": 0, 
-      "type": "linear"
-    }, 
-    {
       "address": 1, 
       "pixels": 120, 
       "pos1": [
@@ -117,12 +33,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        31, 
-        397
-      ], 
-      "pos2": [
         223, 
         111
+      ], 
+      "pos2": [
+        31, 
+        397
       ], 
       "strand": 0, 
       "type": "linear"
@@ -173,12 +89,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        572, 
-        705
-      ], 
-      "pos2": [
         746, 
         399
+      ], 
+      "pos2": [
+        572, 
+        705
       ], 
       "strand": 8, 
       "type": "linear"
@@ -187,11 +103,11 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        484, 
+        485, 
         389
       ], 
       "pos2": [
-        291, 
+        292, 
         105
       ], 
       "strand": 5, 
@@ -398,11 +314,11 @@
       "pixels": 120, 
       "pos1": [
         78, 
-        328
+        327
       ], 
       "pos2": [
         258, 
-        632
+        631
       ], 
       "strand": 10, 
       "type": "linear"
@@ -446,25 +362,25 @@
         396, 
         395
       ], 
-      "strand": 0, 
+      "strand": 13, 
       "type": "linear"
     }, 
     {
-      "address": 0, 
+      "address": 1, 
       "pixels": 120, 
       "pos1": [
-        742, 
+        397, 
         397
       ], 
       "pos2": [
-        396, 
-        398
+        743, 
+        396
       ], 
       "strand": 4, 
       "type": "linear"
     }, 
     {
-      "address": 1, 
+      "address": 0, 
       "pixels": 120, 
       "pos1": [
         213, 
@@ -516,71 +432,36 @@
       "color-mode": "BGR8", 
       "enabled": true, 
       "id": 6
-    }
-  ],
-  "labels_enable": false,
-  "locked": false,
-  "name": "Demo",
-  "strand-settings": [
+    }, 
     {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 0
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 1
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 2
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 3
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 4
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 5
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 6
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
+      "color-mode": "BGR8", 
+      "enabled": true, 
       "id": 8
-    },
+    }, 
     {
-      "color-mode": "BGR8",
-      "enabled": true,
+      "color-mode": "BGR8", 
+      "enabled": true, 
       "id": 9
-    },
+    }, 
     {
-      "color-mode": "BGR8",
-      "enabled": true,
+      "color-mode": "BGR8", 
+      "enabled": true, 
       "id": 10
-    },
+    }, 
     {
-      "color-mode": "BGR8",
-      "enabled": true,
+      "color-mode": "BGR8", 
+      "enabled": true, 
       "id": 11
-    },
+    }, 
     {
-      "color-mode": "BGR8",
-      "enabled": true,
+      "color-mode": "BGR8", 
+      "enabled": true, 
       "id": 12
+    }, 
+    {
+      "color-mode": "BGR8", 
+      "enabled": true, 
+      "id": 13
     }
   ]
 }
