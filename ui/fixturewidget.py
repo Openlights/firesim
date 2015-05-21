@@ -150,12 +150,13 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             painter.drawPath(self.shape())
         #painter.fillRect(self.boundingRect(), QtGui.QColor(255,0, 0, 25))
 
+        spacing = 1
         if self.model.pixels() > 0:
             color_line = QtCore.QLineF(0, 0, width, height)
             color_line.setLength(color_line.length() / self.model.pixels())
             painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
 
-            for pixel in self.model._pixel_data:
+            for pixel in self.model._pixel_data[::spacing]:
                 px, py = color_line.x1(), color_line.y1()
                 r, g, b = pixel[0], pixel[1], pixel[2]
                 painter.setBrush(QtGui.QColor(r, g, b, 255))
@@ -164,7 +165,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 #                          QtCore.Qt.SolidLine))
                 painter.drawEllipse(QtCore.QPointF(px, py), 1.2, 1.2)
                 #painter.drawLine(color_line.unitVector())
-                color_line.translate(color_line.dx(), color_line.dy())
+                color_line.translate(color_line.dx()*spacing, color_line.dy()*spacing)
 
         if self.hovering or self.isSelected() or self.model._controller.scene.get("labels_enable", False):
             x = width / 2 - 12
