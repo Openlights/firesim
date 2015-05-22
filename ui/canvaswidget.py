@@ -22,6 +22,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.coordinate_scale = 1.0
         self.x_offset = 0
         self.y_offset = 0
+        self.gui = None
 
     def paint(self, painter, options, widget):
         self.rect = QtCore.QRect(0, 0, self.width(), self.height())

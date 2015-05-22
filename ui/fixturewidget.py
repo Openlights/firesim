@@ -155,23 +155,26 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             color_line.setLength(color_line.length() / self.model.pixels())
             painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
 
-            spacing = 4
-            for pixel in self.model._pixel_data[::spacing]:
-                px, py = color_line.x1(), color_line.y1()
-                r, g, b = pixel[0], pixel[1], pixel[2]
-                painter.setBrush(QtGui.QColor(r, g, b, 50))
-                #painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 60),
-                #                          5,
-                #                          QtCore.Qt.SolidLine))
-                painter.drawEllipse(QtCore.QPointF(px, py), 16, 16)
-                #painter.drawLine(color_line.unitVector())
-                color_line.translate(color_line.dx()*spacing, color_line.dy()*spacing)
+            if self.canvas.gui.is_blurred:
+                spacing = 4
+                for pixel in self.model._pixel_data[::spacing]:
+                    px, py = color_line.x1(), color_line.y1()
+                    r, g, b = pixel[0], pixel[1], pixel[2]
+                    painter.setBrush(QtGui.QColor(r, g, b, 50))
+                    #painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 60),
+                    #                          5,
+                    #                          QtCore.Qt.SolidLine))
+                    painter.drawEllipse(QtCore.QPointF(px, py), 16, 16)
+                    #painter.drawLine(color_line.unitVector())
+                    color_line.translate(color_line.dx()*spacing, color_line.dy()*spacing)
 
-            color_line = QtCore.QLineF(0, 0, width, height)
-            color_line.setLength(color_line.length() / self.model.pixels())
-            painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
+                color_line = QtCore.QLineF(0, 0, width, height)
+                color_line.setLength(color_line.length() / self.model.pixels())
+                painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
+                spacing = 3
+            else:
+                spacing = 1
 
-            spacing = 3
             for pixel in self.model._pixel_data[::spacing]:
                 px, py = color_line.x1(), color_line.y1()
                 r, g, b = pixel[0], pixel[1], pixel[2]

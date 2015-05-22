@@ -11,6 +11,7 @@ Item {
     signal labels_showhide_callback(variant obj)
     signal lock_callback(variant obj)
     signal show_center_callback(variant obj)
+    signal toggle_blurred_callback(variant obj)
 
     MouseArea {
         anchors.fill: parent
@@ -84,6 +85,12 @@ Item {
                 id: btn_show_center
                 text: if(main.is_center_shown()) "Hide Center"; else "Show Center"
                 onClicked: show_center_callback(btn_show_center)
+            }
+
+            Button {
+                id: btn_toggle_blurred
+                text: "Blurred"
+                onClicked: toggle_blurred_callback(btn_toggle_blurred)
             }
 
             /*Button {

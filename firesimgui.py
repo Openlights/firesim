@@ -32,6 +32,7 @@ class FireSimGUI(QtCore.QObject):
         self._selected_fixture_pixels = 0
 
         self.selected_fixture = None
+        self.is_blurred = False
 
         self.scene = Scene(os.path.join(self.config.get("scene_root"), self.args.scene) + ".json")
         self.scenecontroller = SceneController(app=self, scene=self.scene)
@@ -57,6 +58,7 @@ class FireSimGUI(QtCore.QObject):
         self.root = self.view.rootObject()
         self.item_frame = self.root.findChild(QtDeclarative.QDeclarativeItem)
         self.canvas = self.root.findChild(CanvasWidget)
+        self.canvas.gui = self
 
         cw, ch = self.scenecontroller.scene.extents()
         self.canvas.setWidth(cw)
@@ -70,6 +72,7 @@ class FireSimGUI(QtCore.QObject):
         self.root.labels_showhide_callback.connect(self.on_btn_labels_showhide)
         self.root.lock_callback.connect(self.on_btn_lock)
         self.root.show_center_callback.connect(self.on_btn_show_center)
+        self.root.toggle_blurred_callback.connect(self.on_btn_toggle_blurred)
 
         self.netcontroller = NetController(self)
 
@@ -123,6 +126,10 @@ class FireSimGUI(QtCore.QObject):
     def is_center_shown(self):
         return self.scenecontroller.show_center
 
+    @QtCore.Slot(result=bool)
+    def is_blurred(self):
+        return self.is_blurred
+
     @QtCore.Slot()
     def on_btn_add_fixture(self):
         self.scenecontroller.add_fixture()
@@ -170,6 +177,15 @@ class FireSimGUI(QtCore.QObject):
         else:
             obj.setProperty("text", "Show Center")
         return show_center
+
+    @QtCore.Slot(result=bool)
+    def on_btn_toggle_blurred(self, obj):
+        self.is_blurred = not self.is_blurred
+        if self.is_blurred:
+            obj.setProperty("text", "In Focus")
+        else:
+            obj.setProperty("text", "Blurred")
+        return self.is_blurred
 
     def widget_selected(self, selected, fixture, multi):
         self.selected_fixture = None
