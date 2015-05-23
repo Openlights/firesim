@@ -1,6 +1,6 @@
 {
   "backdrop_enable": false, 
-  "backdrop_filename": "",
+  "backdrop_filename": "lights.png", 
   "bounding_box": [
     800, 
     800
@@ -19,12 +19,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        743, 
-        398
+        757, 
+        397
       ], 
       "pos2": [
-        550, 
-        114
+        580, 
+        92
       ], 
       "strand": 8, 
       "type": "linear"
@@ -33,12 +33,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        223, 
-        111
+        225, 
+        94
       ], 
       "pos2": [
-        31, 
-        397
+        49, 
+        396
       ], 
       "strand": 0, 
       "type": "linear"
@@ -47,12 +47,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        224, 
-        111
+        223, 
+        92
       ], 
       "pos2": [
-        555, 
-        113
+        580, 
+        92
       ], 
       "strand": 0, 
       "type": "linear"
@@ -61,11 +61,11 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        34, 
-        400
+        48, 
+        397
       ], 
       "pos2": [
-        214, 
+        226, 
         704
       ], 
       "strand": 9, 
@@ -75,12 +75,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        218, 
+        228, 
         705
       ], 
       "pos2": [
-        569, 
-        709
+        582, 
+        704
       ], 
       "strand": 9, 
       "type": "linear"
@@ -89,11 +89,11 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        746, 
-        399
+        755, 
+        400
       ], 
       "pos2": [
-        572, 
+        580, 
         705
       ], 
       "strand": 8, 
@@ -103,12 +103,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        485, 
-        389
+        491, 
+        398
       ], 
       "pos2": [
-        292, 
-        105
+        314, 
+        94
       ], 
       "strand": 5, 
       "type": "linear"
@@ -117,12 +117,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        158, 
-        611
+        181, 
+        628
       ], 
       "pos2": [
-        350, 
-        325
+        356, 
+        323
       ], 
       "strand": 3, 
       "type": "linear"
@@ -131,12 +131,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        360, 
-        325
+        359, 
+        321
       ], 
       "pos2": [
-        691, 
-        327
+        712, 
+        321
       ], 
       "strand": 3, 
       "type": "linear"
@@ -145,12 +145,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        166, 
-        191
+        184, 
+        171
       ], 
       "pos2": [
-        341, 
-        489
+        358, 
+        473
       ], 
       "strand": 12, 
       "type": "linear"
@@ -159,12 +159,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        339, 
-        486
+        358, 
+        474
       ], 
       "pos2": [
-        690, 
-        490
+        711, 
+        476
       ], 
       "strand": 12, 
       "type": "linear"
@@ -173,26 +173,26 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        297, 
-        703
+        313, 
+        704
       ], 
       "pos2": [
-        486, 
+        492, 
+        397
+      ], 
+      "strand": 5, 
+      "type": "linear"
+    }, 
+    {
+      "address": 1, 
+      "pixels": 120, 
+      "pos1": [
+        577, 
         396
       ], 
-      "strand": 5, 
-      "type": "linear"
-    }, 
-    {
-      "address": 1, 
-      "pixels": 120, 
-      "pos1": [
-        573, 
-        390
-      ], 
       "pos2": [
-        380, 
-        106
+        404, 
+        94
       ], 
       "strand": 6, 
       "type": "linear"
@@ -201,12 +201,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        112, 
-        542
+        136, 
+        551
       ], 
       "pos2": [
-        304, 
-        256
+        314, 
+        246
       ], 
       "strand": 2, 
       "type": "linear"
@@ -215,12 +215,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        269, 
-        185
+        271, 
+        168
       ], 
       "pos2": [
-        600, 
-        187
+        624, 
+        168
       ], 
       "strand": 1, 
       "type": "linear"
@@ -229,12 +229,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        122, 
-        264
+        135, 
+        247
       ], 
       "pos2": [
-        300, 
-        565
+        313, 
+        548
       ], 
       "strand": 11, 
       "type": "linear"
@@ -243,12 +243,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        296, 
-        565
+        316, 
+        550
       ], 
       "pos2": [
-        647, 
-        569
+        667, 
+        553
       ], 
       "strand": 11, 
       "type": "linear"
@@ -257,11 +257,11 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        398, 
-        702
+        405, 
+        704
       ], 
       "pos2": [
-        572, 
+        580, 
         396
       ], 
       "strand": 6, 
@@ -271,12 +271,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        663, 
-        391
+        669, 
+        396
       ], 
       "pos2": [
-        477, 
-        112
+        491, 
+        90
       ], 
       "strand": 7, 
       "type": "linear"
@@ -285,12 +285,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        76, 
+        91, 
         471
       ], 
       "pos2": [
         268, 
-        185
+        169
       ], 
       "strand": 1, 
       "type": "linear"
@@ -299,12 +299,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        308, 
-        253
+        316, 
+        245
       ], 
       "pos2": [
-        639, 
-        255
+        670, 
+        245
       ], 
       "strand": 2, 
       "type": "linear"
@@ -313,12 +313,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        78, 
-        327
+        92, 
+        323
       ], 
       "pos2": [
-        258, 
-        631
+        270, 
+        629
       ], 
       "strand": 10, 
       "type": "linear"
@@ -327,12 +327,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        257, 
-        634
+        271, 
+        629
       ], 
       "pos2": [
-        608, 
-        638
+        629, 
+        628
       ], 
       "strand": 10, 
       "type": "linear"
@@ -341,12 +341,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        488, 
-        703
+        495, 
+        701
       ], 
       "pos2": [
-        662, 
-        397
+        669, 
+        399
       ], 
       "strand": 7, 
       "type": "linear"
@@ -355,12 +355,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        223, 
-        113
+        226, 
+        94
       ], 
       "pos2": [
-        396, 
-        395
+        401, 
+        400
       ], 
       "strand": 13, 
       "type": "linear"
@@ -369,12 +369,12 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        397, 
-        397
+        399, 
+        399
       ], 
       "pos2": [
-        743, 
-        396
+        755, 
+        399
       ], 
       "strand": 14, 
       "type": "linear"
@@ -383,12 +383,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        213, 
-        700
+        225, 
+        704
       ], 
       "pos2": [
-        393, 
-        399
+        400, 
+        401
       ], 
       "strand": 4, 
       "type": "linear"
@@ -397,12 +397,12 @@
       "address": 0, 
       "pixels": 120, 
       "pos1": [
-        37, 
-        400
+        49, 
+        398
       ], 
       "pos2": [
         398, 
-        399
+        398
       ], 
       "strand": 14, 
       "type": "linear"
@@ -415,8 +415,8 @@
         400
       ], 
       "pos2": [
-        573, 
-        707
+        577, 
+        705
       ], 
       "strand": 13, 
       "type": "linear"
@@ -425,19 +425,19 @@
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        397, 
-        396
+        401, 
+        398
       ], 
       "pos2": [
-        549, 
-        115
+        580, 
+        94
       ], 
       "strand": 4, 
       "type": "linear"
     }
   ], 
   "labels_enable": false, 
-  "locked": false, 
+  "locked": true, 
   "name": "Demo", 
   "strand-settings": [
     {
@@ -504,10 +504,10 @@
       "color-mode": "BGR8", 
       "enabled": true, 
       "id": 13
-    },
+    }, 
     {
-      "color-mode": "BGR8",
-      "enabled": true,
+      "color-mode": "BGR8", 
+      "enabled": true, 
       "id": 14
     }
   ]
