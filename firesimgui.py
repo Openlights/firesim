@@ -74,12 +74,15 @@ class FireSimGUI(QtCore.QObject):
         self.root.show_center_callback.connect(self.on_btn_show_center)
         self.root.toggle_blurred_callback.connect(self.on_btn_toggle_blurred)
 
+        self.net_thread = QtCore.QThread()
+        self.net_thread.start()
         self.netcontroller = NetController(self)
+        self.netcontroller.moveToThread(self.net_thread)
 
-        self.ups_timer = QtCore.QTimer()
-        self.ups_timer.setInterval(1000)
-        self.ups_timer.timeout.connect(self.update_ups)
-        self.ups_timer.start()
+        self.net_stats_timer = QtCore.QTimer()
+        self.net_stats_timer.setInterval(1000)
+        self.net_stats_timer.timeout.connect(self.update_net_stats)
+        self.net_stats_timer.start()
 
         self.netcontroller.data_received.connect(self.on_network_event)
 
@@ -95,6 +98,8 @@ class FireSimGUI(QtCore.QObject):
         return self.app.exec_()
 
     def on_close(self, e):
+        self.net_thread.running = False
+        self.net_thread.quit()
         if self.args.profile:
             try:
                 import yappi
@@ -103,8 +108,8 @@ class FireSimGUI(QtCore.QObject):
                 pass
 
     @QtCore.Slot()
-    def update_ups(self):
-        self.canvas.stat_ups = self.netcontroller.get_ups()
+    def update_net_stats(self):
+        self.canvas.net_stats = self.netcontroller.get_stats()
 
     @QtCore.Slot()
     def on_network_event(self):

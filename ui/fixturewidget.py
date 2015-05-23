@@ -151,13 +151,14 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
         #painter.fillRect(self.boundingRect(), QtGui.QColor(255,0, 0, 25))
 
         if self.model.pixels() > 0:
+            data = self.model.pixel_data()
             color_line = QtCore.QLineF(0, 0, width, height)
             color_line.setLength(color_line.length() / self.model.pixels())
             painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
 
             if self.canvas.gui.is_blurred:
                 spacing = 4
-                for pixel in self.model._pixel_data[::spacing]:
+                for pixel in data[::spacing]:
                     px, py = color_line.x1(), color_line.y1()
                     r, g, b = pixel[0], pixel[1], pixel[2]
                     painter.setBrush(QtGui.QColor(r, g, b, 50))
@@ -175,12 +176,12 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
             else:
                 spacing = 1
 
-            for pixel in self.model._pixel_data[::spacing]:
+            for pixel in data[::spacing]:
                 px, py = color_line.x1(), color_line.y1()
                 r, g, b = pixel[0], pixel[1], pixel[2]
                 painter.setBrush(QtGui.QColor(r, g, b, 255))
                 #painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 60),
-                #                          5,
+                #                          5,200
                 #                          QtCore.Qt.SolidLine))
                 painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
                 #painter.drawLine(color_line.unitVector())

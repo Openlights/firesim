@@ -27,6 +27,7 @@ class SceneController:
         self._strand_keys = list()
         self._color_mode = self.app.config.get("color_mode")
         self._frame_data = {}
+        self.strand_data = {}
         if self.canvas is not None:
             self.init_view()
 
@@ -160,12 +161,16 @@ class SceneController:
         fh = self.scene.fixture_hierarchy()
         self._strand_keys = list()
         for strand in fh:
+
             self._strand_keys.append(strand)
             if len(fh[strand]) > self._max_fixtures:
                 self._max_fixtures = len(fh[strand])
+            strand_len = 0
             for fixture in fh[strand]:
+                strand_len += fh[strand][fixture].pixels()
                 if fh[strand][fixture].pixels() > self._max_pixels:
                     self._max_pixels = fh[strand][fixture].pixels()
+            self.strand_data[strand] = [(0, 0, 0)] * strand_len
         log.info("Scene has %d strands, creating array using %d fixtures by %d pixels." % (len(self._strand_keys), self._max_fixtures, self._max_pixels))
         self._output_buffer = np.zeros((len(self._strand_keys), self._max_fixtures, self._max_pixels, 3))
 
@@ -205,8 +210,10 @@ class SceneController:
 
             # end frame
             elif cmd == 0x02:
+                self.app.netcontroller.frame_complete()
                 for strand, data in self._frame_data.iteritems():
-                    self.set_strand(strand, data)
+                    data = [data[i:i+3] for i in xrange(0, len(data), 3)]
+                    self.strand_data[strand] = data
 
             if len(packet) > (4 + datalen):
                 packet = packet[4 + datalen:]

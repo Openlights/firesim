@@ -14,10 +14,11 @@ class Fixture:
         self._strand = 0
         self._address = 0
         self._type = "linear"
-        self._pixels = 32
+        self._num_pixels = 32
         self._pos1 = (-1, -1)
         self._pos2 = (-1, -1)
         self._locked = False
+        self._data_offset = 0
 
         if data is not None:
             self.unpack(data)
@@ -25,10 +26,10 @@ class Fixture:
         self._widget = None
         self._controller = controller
 
-        self._pixel_data = [(0, 0, 0)] * self._pixels
+        #self._pixel_data = [(0, 0, 0)] * self._pixels
 
     def __repr__(self):
-        return "[%d:%d]*%d" % (self._strand, self._address, self._pixels)
+        return "[%d:%d]*%d" % (self._strand, self._address, self._num_pixels)
 
     def strand(self):
         return self._strand
@@ -39,14 +40,19 @@ class Fixture:
     def address(self):
         return self._address
 
+    def update_offset(self):
+        #TODO: This assumes all fixtures are the same number of pixels, which is stupid!
+        self._data_offset = self._address * self._num_pixels
+
     def set_address(self, address):
         self._address = address
+        self.update_offset()
 
     def pixels(self):
-        return self._pixels
+        return self._num_pixels
 
     def set_pixels(self, pixels):
-        self._pixels = pixels
+        self._num_pixels = pixels
 
     def pos1(self):
         return self._pos1
@@ -75,20 +81,25 @@ class Fixture:
             #self._widget.setRotation(self.angle)
         return self._widget
 
+    def pixel_data(self):
+        data = self._controller.strand_data[self._strand][self._data_offset:self._data_offset+self._num_pixels]
+        return data
+
     def unpack(self, data):
         self._strand = data.get("strand", 0)
         self._address = data.get("address", 0)
         self._type = data.get("type", "")
-        self._pixels = data.get("pixels", 0)
+        self._num_pixels = data.get("pixels", 0)
         self._pos1 = data.get("pos1", [0, 0])
         self._pos2 = data.get("pos2", [0, 0])
+        self.update_offset()
 
     def pack(self):
         return {
                 'strand': self._strand,
                 'address': self._address,
                 'type': self._type,
-                'pixels': self._pixels,
+                'pixels': self._num_pixels,
                 'pos1': self._pos1,
                 'pos2': self._pos2
                 }
@@ -97,44 +108,6 @@ class Fixture:
         self._pos1 = map(int, (fixture.drag1.scene_x, fixture.drag1.scene_y))
         self._pos2 = map(int, (fixture.drag2.scene_x, fixture.drag2.scene_y))
         fixture.update_geometry()
-
-    def blackout(self):
-        self._pixel_data = [(0, 0, 0)] * self._pixels
-        self._widget.update()
-
-    def set(self, pixel, color):
-        assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
-        self._pixel_data[pixel] = color
-        self._widget.update()
-
-    def set_all(self, color):
-        assert isinstance(color, tuple), "Color must be a 3-tuple (R, G, B)"
-        self._pixel_data = [color] * self._pixels
-        self._widget.update()
-
-    def set_array(self, color_array):
-        if len(color_array) != self.pixels():
-            raise ValueError("set_array argument length must match fixture pixel count")
-        self._pixel_data = color_array
-        self._widget.update()
-
-    def set_flat_array(self, color_array, bgr=False, color_mode="RGB8"):
-        if len(color_array) != 3 * self.pixels():
-            print len(color_array)
-            raise ValueError("set_flat_array argument length must match fixture pixel count")
-        for i, _ in enumerate(self._pixel_data):
-            if color_mode == "HLSF32":
-                hls = color_array[i * 3], color_array[i * 3 + 1], color_array[i * 3 + 2]
-                rgb = colorsys.hls_to_rgb(*hls)
-                red, green, blue = tuple([int(clip(0.0, 255.0 * channel, 255.0)) for channel in rgb])
-            else:
-                red, green, blue = color_array[i * 3], color_array[i * 3 + 1], color_array[i * 3 + 2]
-
-            if bgr:
-                self._pixel_data[i] = (blue, green, red)
-            else:
-                self._pixel_data[i] = (red, green, blue)
-        self._widget.update()
 
     def random_color(self):
         r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(random.random(), 1.0, 1.0)]
