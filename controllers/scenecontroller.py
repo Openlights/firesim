@@ -26,6 +26,7 @@ class SceneController:
         self.show_center = False
         self._strand_keys = list()
         self._color_mode = self.app.config.get("color_mode")
+        self._frame_data = {}
         if self.canvas is not None:
             self.init_view()
 
@@ -168,31 +169,15 @@ class SceneController:
         log.info("Scene has %d strands, creating array using %d fixtures by %d pixels." % (len(self._strand_keys), self._max_fixtures, self._max_pixels))
         self._output_buffer = np.zeros((len(self._strand_keys), self._max_fixtures, self._max_pixels, 3))
 
-    def net_set(self, strand, address, color):
-        #start = time.time()
-        for f in self.fixtures:
-            if (strand == -1 or f.strand() == strand) and (address == -1 or f.address() == address):
-                if isinstance(color, tuple):
-                    f.set_all(color)
-                else:
-                    assert isinstance(color, list)
-                    f.set_array(color)
-        #dt = time.time() - start
-        #log.info("net_set completed in %0.2f ms" % (dt * 1000.0))
-
-    def set_strand(self, strand, pixels, bgr=False):
+    def set_strand(self, strand, pixels):
         start = 0
         strand_fixtures = [f for f in self.fixtures if (f.strand() == strand or strand == -1)]
         for f in sorted(strand_fixtures, key=lambda f: f.address()):
             if (strand == -1 or f.strand() == strand):
                 nd = 3 * f.pixels()
-                if self._color_mode == "HLSF32":
-                    nd *= 4
                 if len(pixels) >= (start + nd):
                     fixture_pixels = pixels[start:start + nd]
-                    if self._color_mode == "HLSF32":
-                        fixture_pixels = struct.unpack("%sf" % 3 * f.pixels(), array.array('B', fixture_pixels))
-                    f.set_flat_array(fixture_pixels, bgr=bgr, color_mode=self._color_mode)
+                    f.set_flat_array(fixture_pixels)
                 start += nd
 
     def process_command(self, packet):
@@ -204,52 +189,24 @@ class SceneController:
         self._num_packets += 1
 
         while True:
-            strand = packet[0]
-            cmd = packet[1]
-            datalen = (packet[3] << 8) + packet[2]
-            data = packet[4:]
+            cmd = packet[0]
+            datalen = 0
 
-            # Set All
-            if cmd == 0x21:
-                assert datalen == 3
-                for f in self.fixtures:
-                    f.set_all((data[0], data[1], data[2]))
+            # start frame
+            if cmd == 0x01:
+                self.app.netcontroller.frame_started()
 
-            # Set Strand
-            if cmd == 0x22:
-                assert datalen == 4
-                for f in self.fixtures:
-                    if f.strand == data[0]:
-                        f.set_all((data[1], data[2], data[3]))
+            # Unpack strand pixel data
+            elif cmd == 0x20:
+                strand = packet[1]
+                datalen = (packet[3] << 8) + packet[2]
+                data = packet[4:]
+                self._frame_data[strand] = data
 
-            # Set Fixture
-            if cmd == 0x23:
-                assert datalen == 5
-                for f in self.fixtures:
-                    if f.strand == data[0] and f.address == data[1]:
-                        f.set_all((data[2], data[3], data[4]))
-
-            # Set Pixel
-            if cmd == 0x24:
-                assert datalen == 6
-                for f in self.fixtures:
-                    if f.strand == data[0] and f.address == data[1]:
-                        f.set(data[2], (data[3], data[4], data[5]))
-
-            # Set Strand Pixels
-            if cmd == 0x25:
-                raise NotImplementedError
-
-            # Set Fixture Pixels
-            if cmd == 0x26:
-                raise NotImplementedError
-
-            # Bulk Strand Set
-            # TODO: This will break if the addressing is not continuous.
-            # TODO: Need to validate addressing in the GUI.  See #10
-            if cmd == 0x10 or cmd == 0x20:
-                self.set_strand(strand, data)
-
+            # end frame
+            elif cmd == 0x02:
+                for strand, data in self._frame_data.iteritems():
+                    self.set_strand(strand, data)
 
             if len(packet) > (4 + datalen):
                 packet = packet[4 + datalen:]

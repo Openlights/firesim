@@ -31,8 +31,10 @@ class NetController(QtCore.QObject):
             (datagram, sender, sport) = self.socket.readDatagram(datagram.size())
             packet = [ord(c) for c in datagram.data()]
             self.app.scenecontroller.process_command(packet)
-            self.updates += 1
         self.data_received.emit()
+
+    def frame_started(self):
+        self.updates += 1
 
     #@QtCore.Slot(result=float)
     def get_ups(self):
