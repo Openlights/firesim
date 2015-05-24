@@ -85,6 +85,8 @@ class FireSimGUI(QtCore.QObject):
         self.net_stats_timer.start()
 
         self.netcontroller.data_received.connect(self.on_network_event)
+        self.scenecontroller.new_frame.connect(self.netcontroller.frame_complete)
+        self.netcontroller.data_received.connect(self.scenecontroller.process_command)
 
         self.view.setFixedSize(max(640, cw + 130), max(480, ch))
 

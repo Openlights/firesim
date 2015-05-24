@@ -7,14 +7,17 @@ from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from ui.crosshairwidget import CrosshairWidget
 
-from PySide import QtGui
+from PySide import QtCore, QtGui
 
 
 from models.fixture import Fixture
 
-class SceneController:
+class SceneController(QtCore.QObject):
+
+    new_frame = QtCore.Signal()
 
     def __init__(self, app=None, canvas=None, scene=None):
+        super(SceneController, self).__init__()
         self.canvas = canvas
         self.scene = scene
         self.app = app
@@ -185,6 +188,7 @@ class SceneController:
                     f.set_flat_array(fixture_pixels)
                 start += nd
 
+    @QtCore.Slot(list)
     def process_command(self, packet):
         if len(packet) < 3:
             log.error("Malformed packet!")
@@ -210,7 +214,7 @@ class SceneController:
 
             # end frame
             elif cmd == 0x02:
-                self.app.netcontroller.frame_complete()
+                self.new_frame.emit()
                 for strand, data in self._frame_data.iteritems():
                     data = [data[i:i+3] for i in xrange(0, len(data), 3)]
                     self.strand_data[strand] = data
