@@ -22,7 +22,6 @@ class SceneController(QtCore.QObject):
         self.scene = scene
         self.app = app
         self.fixtures = []
-        self._num_packets = 0
         self._max_fixtures = 0
         self._max_pixels = 0
         self._output_buffer = None
@@ -190,37 +189,26 @@ class SceneController(QtCore.QObject):
 
     @QtCore.Slot(list)
     def process_command(self, packet):
-        if len(packet) < 3:
-            log.error("Malformed packet!")
-            print packet
-            return
+        cmd = packet[0]
+        datalen = 0
 
-        self._num_packets += 1
+        # begin frame
+        if cmd == 'B':
+            self.app.netcontroller.frame_started()
 
-        while True:
-            cmd = packet[0]
-            datalen = 0
+        # Unpack strand pixel data
+        elif cmd == 'S':
+            strand = ord(packet[1])
+            datalen = (ord(packet[3]) << 8) + ord(packet[2])
+            data = [ord(c) for c in packet[4:]]
+            self._frame_data[strand] = data
 
-            # start frame
-            if cmd == 0x01:
-                self.app.netcontroller.frame_started()
+        # end frame
+        elif cmd == 'E':
+            self.new_frame.emit()
+            for strand, data in self._frame_data.iteritems():
+                data = [data[i:i+3] for i in xrange(0, len(data), 3)]
+                self.strand_data[strand] = data
 
-            # Unpack strand pixel data
-            elif cmd == 0x20:
-                strand = packet[1]
-                datalen = (packet[3] << 8) + packet[2]
-                data = packet[4:]
-                self._frame_data[strand] = data
-
-            # end frame
-            elif cmd == 0x02:
-                self.new_frame.emit()
-                for strand, data in self._frame_data.iteritems():
-                    data = [data[i:i+3] for i in xrange(0, len(data), 3)]
-                    self.strand_data[strand] = data
-
-            if len(packet) > (4 + datalen):
-                packet = packet[4 + datalen:]
-                #print len(packet)
-            else:
-                break
+        else:
+            log.error("Malformed packet of length %d!" % len(packet))

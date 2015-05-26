@@ -78,6 +78,7 @@ class FireSimGUI(QtCore.QObject):
         self.net_thread.start()
         self.netcontroller = NetController(self)
         self.netcontroller.moveToThread(self.net_thread)
+        self.netcontroller.start.emit()
 
         self.net_stats_timer = QtCore.QTimer()
         self.net_stats_timer.setInterval(1000)
@@ -100,7 +101,7 @@ class FireSimGUI(QtCore.QObject):
         return self.app.exec_()
 
     def on_close(self, e):
-        self.net_thread.running = False
+        self.netcontroller.running = False
         self.net_thread.quit()
         if self.args.profile:
             try:
