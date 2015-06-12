@@ -32,9 +32,10 @@ class NetController(QtCore.QObject):
     @QtCore.Slot()
     def run(self):
         while self.running:
-            packet = self.socket.recv()
-            self.data_received.emit(packet)
-            self.packets += 1
+            packets = self.socket.recv_multipart()
+            for packet in packets:
+                self.data_received.emit(packet)
+                self.packets += 1
             QtCore.QCoreApplication.processEvents()
 
     def frame_started(self):
