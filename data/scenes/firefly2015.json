@@ -26,7 +26,7 @@
         757, 
         397
       ], 
-      "strand": 5, 
+      "strand": 10, 
       "type": "linear"
     }, 
     {
@@ -40,7 +40,7 @@
         49, 
         396
       ], 
-      "strand": 3, 
+      "strand": 8, 
       "type": "linear"
     }, 
     {
@@ -54,7 +54,7 @@
         223, 
         92
       ], 
-      "strand": 3, 
+      "strand": 8, 
       "type": "linear"
     }, 
     {
@@ -68,7 +68,7 @@
         226, 
         704
       ], 
-      "strand": 13, 
+      "strand": 0, 
       "type": "linear"
     }, 
     {
@@ -82,7 +82,7 @@
         582, 
         704
       ], 
-      "strand": 13, 
+      "strand": 0, 
       "type": "linear"
     }, 
     {
@@ -96,7 +96,7 @@
         580, 
         705
       ], 
-      "strand": 5, 
+      "strand": 10, 
       "type": "linear"
     }, 
     {
@@ -110,21 +110,21 @@
         491, 
         398
       ], 
-      "strand": 8, 
+      "strand": 5, 
       "type": "linear"
     }, 
     {
       "address": 1, 
       "pixels": 120, 
       "pos1": [
-        356, 
-        323
+        355, 
+        322
       ], 
       "pos2": [
-        181, 
-        628
+        180, 
+        627
       ], 
-      "strand": 0, 
+      "strand": 13, 
       "type": "linear"
     }, 
     {
@@ -138,7 +138,7 @@
         359, 
         321
       ], 
-      "strand": 0, 
+      "strand": 13, 
       "type": "linear"
     }, 
     {
@@ -152,7 +152,7 @@
         358, 
         473
       ], 
-      "strand": 10, 
+      "strand": 3, 
       "type": "linear"
     }, 
     {
@@ -166,7 +166,7 @@
         711, 
         476
       ], 
-      "strand": 10, 
+      "strand": 3, 
       "type": "linear"
     }, 
     {
@@ -180,7 +180,7 @@
         313, 
         704
       ], 
-      "strand": 8, 
+      "strand": 5, 
       "type": "linear"
     }, 
     {
@@ -194,7 +194,7 @@
         577, 
         396
       ], 
-      "strand": 7, 
+      "strand": 6, 
       "type": "linear"
     }, 
     {
@@ -208,7 +208,7 @@
         136, 
         551
       ], 
-      "strand": 1, 
+      "strand": 12, 
       "type": "linear"
     }, 
     {
@@ -222,7 +222,7 @@
         271, 
         168
       ], 
-      "strand": 2, 
+      "strand": 11, 
       "type": "linear"
     }, 
     {
@@ -236,7 +236,7 @@
         313, 
         548
       ], 
-      "strand": 11, 
+      "strand": 2, 
       "type": "linear"
     }, 
     {
@@ -250,7 +250,7 @@
         667, 
         553
       ], 
-      "strand": 11, 
+      "strand": 2, 
       "type": "linear"
     }, 
     {
@@ -264,7 +264,7 @@
         404, 
         704
       ], 
-      "strand": 7, 
+      "strand": 6, 
       "type": "linear"
     }, 
     {
@@ -278,7 +278,7 @@
         669, 
         396
       ], 
-      "strand": 6, 
+      "strand": 7, 
       "type": "linear"
     }, 
     {
@@ -292,7 +292,7 @@
         91, 
         471
       ], 
-      "strand": 2, 
+      "strand": 11, 
       "type": "linear"
     }, 
     {
@@ -306,7 +306,7 @@
         316, 
         245
       ], 
-      "strand": 1, 
+      "strand": 12, 
       "type": "linear"
     }, 
     {
@@ -320,7 +320,7 @@
         270, 
         629
       ], 
-      "strand": 12, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -334,7 +334,7 @@
         629, 
         628
       ], 
-      "strand": 12, 
+      "strand": 1, 
       "type": "linear"
     }, 
     {
@@ -348,7 +348,7 @@
         495, 
         701
       ], 
-      "strand": 6, 
+      "strand": 7, 
       "type": "linear"
     }, 
     {
@@ -362,18 +362,18 @@
         401, 
         400
       ], 
-      "strand": 9, 
+      "strand": 4, 
       "type": "linear"
     }, 
     {
-      "address": 1, 
+      "address": 0, 
       "pixels": 120, 
       "pos1": [
-        400, 
+        756, 
         399
       ], 
       "pos2": [
-        756, 
+        400, 
         399
       ], 
       "strand": 14, 
@@ -390,18 +390,18 @@
         225, 
         704
       ], 
-      "strand": 4, 
+      "strand": 9, 
       "type": "linear"
     }, 
     {
-      "address": 0, 
+      "address": 1, 
       "pixels": 120, 
       "pos1": [
-        49, 
+        398, 
         398
       ], 
       "pos2": [
-        398, 
+        49, 
         398
       ], 
       "strand": 14, 
@@ -418,7 +418,7 @@
         577, 
         705
       ], 
-      "strand": 9, 
+      "strand": 4, 
       "type": "linear"
     }, 
     {
@@ -432,12 +432,12 @@
         401, 
         398
       ], 
-      "strand": 4, 
+      "strand": 9, 
       "type": "linear"
     }
   ], 
   "labels_enable": false, 
-  "locked": false, 
+  "locked": true, 
   "name": "Demo", 
   "strand-settings": [
     {

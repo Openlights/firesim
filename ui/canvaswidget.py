@@ -47,6 +47,9 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         painter.drawText(8, 16, "%0.1f packets/sec" % self.net_stats['pps'])
         painter.drawText(8, 32, "%0.1f frames/sec" % self.net_stats['ups'])
 
+        #for i, time in enumerate(self.controller.times):
+        #    painter.drawLine(10 + i, 100, 10 + i, (100 - int(time * 3000.0)))
+
     def update_fixtures(self, fixture_list):
         self.fixture_list = fixture_list
         for fixture in fixture_list:

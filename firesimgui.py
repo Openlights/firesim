@@ -74,11 +74,11 @@ class FireSimGUI(QtCore.QObject):
         self.root.show_center_callback.connect(self.on_btn_show_center)
         self.root.toggle_blurred_callback.connect(self.on_btn_toggle_blurred)
 
-        self.net_thread = QtCore.QThread()
-        self.net_thread.start()
+        #self.net_thread = QtCore.QThread()
+        #self.net_thread.start()
         self.netcontroller = NetController(self)
-        self.netcontroller.moveToThread(self.net_thread)
-        self.netcontroller.start.emit()
+        #self.netcontroller.moveToThread(self.net_thread)
+        #self.netcontroller.start.emit()
 
         self.net_stats_timer = QtCore.QTimer()
         self.net_stats_timer.setInterval(1000)

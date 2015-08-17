@@ -4,6 +4,8 @@ import zmq
 
 from PySide import QtCore, QtNetwork
 
+USE_ZMQ = False
+
 
 class NetController(QtCore.QObject):
 
@@ -22,12 +24,26 @@ class NetController(QtCore.QObject):
         self.running = True
         self.last_time = time.clock()
 
-        self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.SUB)
-        self.socket.connect("tcp://localhost:3020")
-        self.socket.setsockopt_string(zmq.SUBSCRIBE, u"")
+        if USE_ZMQ:
+            self.context = zmq.Context()
+            self.socket = self.context.socket(zmq.SUB)
+            self.socket.connect("tcp://localhost:3020")
+            self.socket.setsockopt_string(zmq.SUBSCRIBE, u"")
+            self.start.connect(self.run)
+        else:
+            self.socket = QtNetwork.QUdpSocket(self)
+            self.socket.readyRead.connect(self.read_datagrams)
+            self.socket.bind(3020, QtNetwork.QUdpSocket.ShareAddress | QtNetwork.QUdpSocket.ReuseAddressHint)
 
-        self.start.connect(self.run)
+    @QtCore.Slot()
+    def read_datagrams(self):
+        while self.socket.hasPendingDatagrams():
+            datagram = QtCore.QByteArray()
+            datagram.resize(self.socket.pendingDatagramSize())
+            (datagram, sender, sport) = self.socket.readDatagram(datagram.size())
+            packet = [ord(c) for c in datagram.data()]
+            self.packets += 1
+            self.data_received.emit(packet)
 
     @QtCore.Slot()
     def run(self):

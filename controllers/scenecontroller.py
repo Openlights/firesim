@@ -2,6 +2,7 @@ import logging as log
 import struct
 import array
 import numpy as np
+import time
 
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
@@ -30,6 +31,8 @@ class SceneController(QtCore.QObject):
         self._color_mode = self.app.config.get("color_mode")
         self._frame_data = {}
         self.strand_data = {}
+        self.times = []
+        self.frame_start_time = 0.0
         if self.canvas is not None:
             self.init_view()
 
@@ -189,26 +192,30 @@ class SceneController(QtCore.QObject):
 
     @QtCore.Slot(list)
     def process_command(self, packet):
-        cmd = packet[0]
+        cmd = chr(packet[0])
         datalen = 0
 
         # begin frame
         if cmd == 'B':
+            self.frame_start_time = time.time()
             self.app.netcontroller.frame_started()
 
         # Unpack strand pixel data
         elif cmd == 'S':
-            strand = ord(packet[1])
-            datalen = (ord(packet[3]) << 8) + ord(packet[2])
-            data = [ord(c) for c in packet[4:]]
+            strand = packet[1]
+            datalen = (packet[3] << 8) + packet[2]
+            data = [c for c in packet[4:]]
             self._frame_data[strand] = data
 
         # end frame
         elif cmd == 'E':
-            self.new_frame.emit()
             for strand, data in self._frame_data.iteritems():
                 data = [data[i:i+3] for i in xrange(0, len(data), 3)]
                 self.strand_data[strand] = data
+            self.times.append((time.time() - self.frame_start_time))
+            if len(self.times) > 100:
+                self.times.pop(0)
+            self.new_frame.emit()
 
         else:
             log.error("Malformed packet of length %d!" % len(packet))
