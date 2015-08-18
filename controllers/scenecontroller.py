@@ -1,6 +1,7 @@
 import logging as log
 import struct
 import array
+import os
 import numpy as np
 import time
 
@@ -50,8 +51,13 @@ class SceneController(QtCore.QObject):
     def load_backdrop(self):
         if self.canvas is not None:
             if self.scene.get("backdrop_enable", False):
-                log.info("Loading backdrop from " + self.scene.get("backdrop_filename"))
-                self.canvas.set_background_image(QtGui.QImage(self.scene.get("backdrop_filename")))
+                image_filename = os.path.abspath(self.scene.get("backdrop_filename"))
+                log.info("Loading backdrop from " + image_filename)
+                img = QtGui.QImage(image_filename)
+                if img.isNull():
+                    log.error("Could not load background image: %s", image_filename)
+                else:
+                    self.canvas.set_background_image(img)
             else:
                 self.canvas.set_background_image(None)
             self.canvas.update()
