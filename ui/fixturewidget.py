@@ -174,7 +174,7 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
                 spacing = 3
             else:
-                spacing = 2
+                spacing = 1
 
             for pixel in data[::spacing]:
                 px, py = color_line.x1(), color_line.y1()
