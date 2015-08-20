@@ -219,10 +219,14 @@ class FireSimGUI(QtCore.QObject):
 
     def update_selected_fixture_properties(self):
         if self.selected_fixture is not None:
-            self.selected_fixture.set_strand(int(self.selected_fixture_strand))
-            self.selected_fixture.set_address(int(self.selected_fixture_address))
+            strand = int(self.selected_fixture_strand)
+            address = int(self.selected_fixture_address)
+
+            self.selected_fixture.set_strand(strand)
+            self.selected_fixture.set_address(address)
             self.selected_fixture.set_pixels(int(self.selected_fixture_pixels))
             self.selected_fixture.get_widget().update()
+            self.scene.update_address_cache(self.selected_fixture, strand, address)
             self.scenecontroller.update_scene()
             self.scenecontroller.create_pixel_array()
 

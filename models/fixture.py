@@ -40,9 +40,8 @@ class Fixture:
     def address(self):
         return self._address
 
-    def update_offset(self):
-        #TODO: This assumes all fixtures are the same number of pixels, which is stupid!
-        self._data_offset = self._address * self._num_pixels
+    def update_offset(self, offset):
+        self._data_offset = offset
 
     def set_address(self, address):
         self._address = address
@@ -92,7 +91,6 @@ class Fixture:
         self._num_pixels = data.get("pixels", 0)
         self._pos1 = data.get("pos1", [0, 0])
         self._pos2 = data.get("pos2", [0, 0])
-        self.update_offset()
 
     def pack(self):
         return {

@@ -24,7 +24,6 @@ class SceneController(QtCore.QObject):
         self.scene = scene
         self.app = app
         self.fixtures = []
-        self._max_fixtures = 0
         self._max_pixels = 0
         self._output_buffer = None
         self.show_center = False
@@ -37,15 +36,18 @@ class SceneController(QtCore.QObject):
         if self.canvas is not None:
             self.init_view()
 
+        self._fixture_lookup_cache = self.scene.fixture_hierarchy()
+        fixture_data = self.scene.get("fixtures", [])
+        for fixture_data_item in fixture_data:
+            f = Fixture(fixture_data_item, controller=self)
+            self._fixture_lookup_cache[f.strand()][f.address()] = f
+            self.fixtures.append(f)
+
         self.create_pixel_array()
 
     def init_view(self):
         self.center_widget = CrosshairWidget(self.canvas, self.scene.center(), "Center", callback=self.on_center_moved)
         self.load_backdrop()
-        self.fixtures = []
-        fixture_data = self.scene.get("fixtures", [])
-        for fixture_data_item in fixture_data:
-            self.fixtures.append(Fixture(fixture_data_item, controller=self))
         self.update_canvas()
 
     def load_backdrop(self):
@@ -165,6 +167,11 @@ class SceneController(QtCore.QObject):
         self.update_all()
         return self.show_center
 
+    def update_address_cache(self, fixture, strand, address):
+        for f in self.fixtures:
+            if fixture == f:
+                self._fixture_lookup_cache[strand][address] = f
+
     def create_pixel_array(self):
         """
         Initializes the array of colors used for displaying incoming data from the network.
@@ -176,27 +183,17 @@ class SceneController(QtCore.QObject):
         for strand in fh:
 
             self._strand_keys.append(strand)
-            if len(fh[strand]) > self._max_fixtures:
-                self._max_fixtures = len(fh[strand])
             strand_len = 0
             for fixture in fh[strand]:
+                self._fixture_lookup_cache[strand][fixture].update_offset(strand_len)
                 strand_len += fh[strand][fixture].pixels()
-                if fh[strand][fixture].pixels() > self._max_pixels:
-                    self._max_pixels = fh[strand][fixture].pixels()
-            self.strand_data[strand] = [(0, 0, 0)] * strand_len
-        log.info("Scene has %d strands, creating array using %d fixtures by %d pixels." % (len(self._strand_keys), self._max_fixtures, self._max_pixels))
-        self._output_buffer = np.zeros((len(self._strand_keys), self._max_fixtures, self._max_pixels, 3))
 
-    def set_strand(self, strand, pixels):
-        start = 0
-        strand_fixtures = [f for f in self.fixtures if (f.strand() == strand or strand == -1)]
-        for f in sorted(strand_fixtures, key=lambda f: f.address()):
-            if (strand == -1 or f.strand() == strand):
-                nd = 3 * f.pixels()
-                if len(pixels) >= (start + nd):
-                    fixture_pixels = pixels[start:start + nd]
-                    f.set_flat_array(fixture_pixels)
-                start += nd
+            self.strand_data[strand] = [(0, 0, 0)] * strand_len
+            if strand_len > self._max_pixels:
+                self._max_pixels = strand_len
+
+        log.info("Scene has %d strands, %d pixels." % (len(self._strand_keys), self._max_pixels))
+        self._output_buffer = np.zeros((len(self._strand_keys), self._max_pixels, 3))
 
     @QtCore.Slot(list)
     def process_command(self, packet):
