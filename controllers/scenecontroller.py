@@ -154,6 +154,8 @@ class SceneController(QtCore.QObject):
     def toggle_locked(self):
         locked = not self.scene.get("locked", False)
         self.scene.set("locked", locked)
+        if locked:
+            self.canvas.deselect_all()
         self.update_all()
         return locked
 

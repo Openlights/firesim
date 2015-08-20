@@ -1,4 +1,4 @@
-import QtQuick 1.0
+import QtQuick 1.1
 import FireSim 1.0
 import "widgets"
 
@@ -18,6 +18,15 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onClicked: {
             window.focus = false;
+        }
+    }
+
+    focus: true
+    Keys.enabled: true
+    Keys.priority: Keys.BeforeItem
+    Keys.onReleased: {
+        if (event.key == Qt.Key_Q && event.modifiers == Qt.ControlModifier) {
+            main.quit()
         }
     }
 
