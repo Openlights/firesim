@@ -183,7 +183,9 @@ class FixtureWidget(QtDeclarative.QDeclarativeItem):
                 #painter.setPen(QtGui.QPen(QtGui.QColor(r, g, b, 60),
                 #                          5,200
                 #                          QtCore.Qt.SolidLine))
-                painter.drawEllipse(QtCore.QPointF(px, py), 2, 2)
+                painter.drawEllipse(QtCore.QPointF(px, py), 3, 3)
+                painter.setBrush(QtGui.QColor(r, g, b, 50))
+                painter.drawEllipse(QtCore.QPointF(px, py), 6, 6)
                 #painter.drawLine(color_line.unitVector())
                 color_line.translate(color_line.dx()*spacing, color_line.dy()*spacing)
 
