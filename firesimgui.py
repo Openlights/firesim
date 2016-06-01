@@ -105,7 +105,7 @@ class FireSimGUI(QtCore.QObject):
 
     def on_close(self, e):
         self.netcontroller.running = False
-        self.net_thread.quit()
+        #self.net_thread.quit()
         if self.args.profile:
             try:
                 import yappi
