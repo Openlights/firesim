@@ -45,7 +45,7 @@ class Fixture:
 
     def set_address(self, address):
         self._address = address
-        self.update_offset()
+        # Offset will be updated from the SceneController
 
     def pixels(self):
         return self._num_pixels

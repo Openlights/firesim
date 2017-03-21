@@ -226,7 +226,7 @@ class FireSimGUI(QtCore.QObject):
             self.selected_fixture.set_address(address)
             self.selected_fixture.set_pixels(int(self.selected_fixture_pixels))
             self.selected_fixture.get_widget().update()
-            self.scene.update_address_cache(self.selected_fixture, strand, address)
+            self.scenecontroller.update_address_cache(self.selected_fixture, strand, address)
             self.scenecontroller.update_scene()
             self.scenecontroller.create_pixel_array()
 
