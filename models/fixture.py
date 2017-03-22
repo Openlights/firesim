@@ -66,6 +66,7 @@ class Fixture:
         self._pos2 = pos2
 
     def destroy(self):
+        log.info("Destroying fixture %s" % self)
         self._widget.deleteLater()
 
     def request_destruction(self):
