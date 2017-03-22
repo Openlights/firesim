@@ -23,10 +23,8 @@ class SceneController(QtCore.QObject):
         self.canvas = None
         self.scene = scene
         self.app = app
-        self._max_pixels = 0
         self._output_buffer = None
         self.show_center = False
-        self._strand_keys = list()
         self._color_mode = self.app.config.get("color_mode")
         self._frame_data = {}
         self.strand_data = {}
@@ -156,11 +154,10 @@ class SceneController(QtCore.QObject):
         Needs to be called when the shape of the scene has changed
         (fixtures added/removed, addresses changed, pixels per fixture changed)
         """
+        max_pixels = 0
         fh = self.scene.fixture_hierarchy()
-        self._strand_keys = list()
-        for strand in fh:
 
-            self._strand_keys.append(strand)
+        for strand in fh:
             strand_len = 0
             for address in fh[strand]:
                 fixture = self.scene.fixture(strand, address)
@@ -168,11 +165,10 @@ class SceneController(QtCore.QObject):
                 strand_len += fixture.pixels()
 
             self.strand_data[strand] = [(0, 0, 0)] * strand_len
-            if strand_len > self._max_pixels:
-                self._max_pixels = strand_len
+            max_pixels = max(max_pixels, strand_len)
 
-        log.info("Scene has %d strands, %d pixels." % (len(self._strand_keys), self._max_pixels))
-        self._output_buffer = np.zeros((len(self._strand_keys), self._max_pixels, 3))
+        log.info("Scene has %d strands, %d pixels." % (len(fh), max_pixels))
+        self._output_buffer = np.zeros((len(fh), max_pixels, 3))
 
     @QtCore.Slot(list)
     def process_command(self, packet):
