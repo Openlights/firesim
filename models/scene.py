@@ -5,6 +5,12 @@ from collections import defaultdict
 from models.fixture import Fixture
 from util.jsonloader import JSONLoader
 
+class FixtureIdError(Exception):
+    def __init__(self, msg, strand, address):
+        super(FixtureIdError, self).__init__(
+            "%s: [%d:%d]" % (msg, strand, address)
+        )
+
 class Scene(JSONLoader):
 
     def __init__(self, filename=None):
@@ -71,7 +77,9 @@ class Scene(JSONLoader):
         assert fixture not in self._fixtures
         if (fixture.strand() in self._fixture_hierarchy
             and fixture.address() in self._fixture_hierarchy[fixture.strand()]):
-            raise RuntimeError("Attempt to add a fixture with strand/address that already exists")
+            raise FixtureIdError("Attempt to add a fixture with "
+                                 "strand/address that already exists",
+                                 fixture.strand(), fixture.address())
 
         self._fixtures.append(fixture)
         self._fixture_hierarchy[fixture.strand()][fixture.address()] = fixture
@@ -93,12 +101,21 @@ class Scene(JSONLoader):
         self._fixture_hierarchy = defaultdict(dict)
         self._dirty = True
 
-    def update_fixture(self, fixture, old_strand, old_address):
-        assert fixture is self._fixture_hierarchy[old_strand][old_address]
+    def update_fixture(self, fixture, new_strand, new_address):
+        assert fixture in self._fixtures
+        if (new_strand in self._fixture_hierarchy
+            and new_address in self._fixture_hierarchy[new_strand]):
+            raise FixtureIdError("Attempt to use an existing strand/address",
+                                 new_strand, new_address)
+
+        old_strand = fixture.strand()
+        old_address = fixture.address()
         del self._fixture_hierarchy[old_strand][old_address]
         if not self._fixture_hierarchy[old_strand]:
             del self._fixture_hierarchy[old_strand]
-        self._fixture_hierarchy[fixture.strand()][fixture.address()] = fixture
+        fixture.set_strand(new_strand)
+        fixture.set_address(new_address)
+        self._fixture_hierarchy[new_strand][new_address] = fixture
         self._dirty = True
 
     def fixture_hierarchy(self):

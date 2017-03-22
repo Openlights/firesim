@@ -10,9 +10,9 @@ from ui.fixturewidget import FixtureWidget
 
 class Fixture:
 
-    def __init__(self, data=None, controller=None):
-        self._strand = 0
-        self._address = 0
+    def __init__(self, data=None, controller=None, strand=0, address=0):
+        self._strand = strand
+        self._address = address
         self._type = "linear"
         self._num_pixels = 32
         self._pos1 = (-1, -1)

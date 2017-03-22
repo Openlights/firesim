@@ -76,7 +76,15 @@ class SceneController(QtCore.QObject):
         self.scene.set_center(ipos)
 
     def add_fixture(self):
-        fixture = Fixture(controller=self)
+        fh = self.scene.fixture_hierarchy()
+        if fh:
+            new_strand = max(fh.keys())
+            new_address = max(fh[new_strand].keys()) + 1
+        else:
+            new_strand = 0
+            new_address = 0
+        fixture = Fixture(controller=self, strand=new_strand,
+                          address=new_address)
         self.scene.add_fixture(fixture)
         self.update_canvas()
         self.create_pixel_array()
@@ -138,8 +146,8 @@ class SceneController(QtCore.QObject):
         self.update_all()
         return self.show_center
 
-    def update_fixture(self, fixture, old_strand, old_address):
-        self.scene.update_fixture(fixture, old_strand, old_address)
+    def update_fixture(self, fixture, new_strand, new_address):
+        self.scene.update_fixture(fixture, new_strand, new_address)
         self.create_pixel_array()
 
     def create_pixel_array(self):
