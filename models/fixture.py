@@ -10,9 +10,9 @@ from ui.fixturewidget import FixtureWidget
 
 class Fixture:
 
-    def __init__(self, data=None, controller=None):
-        self._strand = 0
-        self._address = 0
+    def __init__(self, data=None, controller=None, strand=0, address=0):
+        self._strand = strand
+        self._address = address
         self._type = "linear"
         self._num_pixels = 32
         self._pos1 = (-1, -1)
@@ -45,7 +45,7 @@ class Fixture:
 
     def set_address(self, address):
         self._address = address
-        self.update_offset()
+        # Offset will be updated from the SceneController
 
     def pixels(self):
         return self._num_pixels
@@ -66,6 +66,7 @@ class Fixture:
         self._pos2 = pos2
 
     def destroy(self):
+        log.info("Destroying fixture %s" % self)
         self._widget.deleteLater()
 
     def request_destruction(self):

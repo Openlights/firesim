@@ -6,7 +6,7 @@ from PySide import QtCore, QtGui, QtDeclarative
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from util.config import Config
-from models.scene import Scene
+from models.scene import Scene, FixtureIdError
 from controllers.scenecontroller import SceneController
 from controllers.netcontroller import NetController
 
@@ -215,20 +215,22 @@ class FireSimGUI(QtCore.QObject):
 
         if selected:
             self.selected_fixture = fixture
-            self.update_selected_fixture_properties()
 
     def update_selected_fixture_properties(self):
         if self.selected_fixture is not None:
-            strand = int(self.selected_fixture_strand)
-            address = int(self.selected_fixture_address)
-
-            self.selected_fixture.set_strand(strand)
-            self.selected_fixture.set_address(address)
+            new_strand = int(self.selected_fixture_strand)
+            new_address = int(self.selected_fixture_address)
+            if (self.selected_fixture.strand() != new_strand
+                or self.selected_fixture.address() != new_address):
+                try:
+                    self.scenecontroller.update_fixture(
+                        self.selected_fixture, new_strand, new_address
+                    )
+                except FixtureIdError:
+                    log.exception("Error updating fixture properties")
+                    return
             self.selected_fixture.set_pixels(int(self.selected_fixture_pixels))
             self.selected_fixture.get_widget().update()
-            self.scene.update_address_cache(self.selected_fixture, strand, address)
-            self.scenecontroller.update_scene()
-            self.scenecontroller.create_pixel_array()
 
     def _get_selected_fixture_strand(self):
         return self._selected_fixture_strand

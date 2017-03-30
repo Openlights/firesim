@@ -18,16 +18,13 @@ class SceneController(QtCore.QObject):
 
     new_frame = QtCore.Signal()
 
-    def __init__(self, app=None, canvas=None, scene=None):
+    def __init__(self, app, scene):
         super(SceneController, self).__init__()
-        self.canvas = canvas
+        self.canvas = None
         self.scene = scene
         self.app = app
-        self.fixtures = []
-        self._max_pixels = 0
         self._output_buffer = None
         self.show_center = False
-        self._strand_keys = list()
         self._color_mode = self.app.config.get("color_mode")
         self._frame_data = {}
         self.strand_data = {}
@@ -36,13 +33,7 @@ class SceneController(QtCore.QObject):
         if self.canvas is not None:
             self.init_view()
 
-        self._fixture_lookup_cache = self.scene.fixture_hierarchy()
-        fixture_data = self.scene.get("fixtures", [])
-        for fixture_data_item in fixture_data:
-            f = Fixture(fixture_data_item, controller=self)
-            self._fixture_lookup_cache[f.strand()][f.address()] = f
-            self.fixtures.append(f)
-
+        self.scene.set_controller(self)
         self.create_pixel_array()
 
     def init_view(self):
@@ -74,7 +65,7 @@ class SceneController(QtCore.QObject):
 
     def update_canvas(self):
         if self.canvas is not None:
-            fl = [f.get_widget() for f in self.fixtures]
+            fl = [f.get_widget() for f in self.scene.fixtures()]
             self.canvas.update_fixtures(fl)
 
     def on_center_moved(self, pos):
@@ -83,56 +74,42 @@ class SceneController(QtCore.QObject):
         self.scene.set_center(ipos)
 
     def add_fixture(self):
-        self.fixtures.append(Fixture(controller=self))
+        fh = self.scene.fixture_hierarchy()
+        if fh:
+            new_strand = max(fh.keys())
+            new_address = max(fh[new_strand].keys()) + 1
+        else:
+            new_strand = 0
+            new_address = 0
+        fixture = Fixture(controller=self, strand=new_strand,
+                          address=new_address)
+        self.scene.add_fixture(fixture)
         self.update_canvas()
-        self.update_scene()
         self.create_pixel_array()
 
     def delete_fixture(self, fixture):
-        self.fixtures = [f for f in self.fixtures if f is not fixture]
-        log.info("Destroying fixture %s" % fixture)
-        fixture.destroy()
-        self.update_scene()
+        self.scene.delete_fixture(fixture)
         self.update_canvas()
         self.create_pixel_array()
 
     def clear_fixtures(self):
-        while len(self.fixtures) > 0:
-            fixture = self.fixtures.pop()
-            fixture.destroy()
-            del fixture
-        self.update_scene()
+        self.scene.clear_fixtures()
         self.create_pixel_array()
 
     def widget_selected(self, selected, fixture, multi):
         if multi:
             pass
         else:
-            for f in self.fixtures:
+            for f in self.scene.fixtures():
                 if f is not fixture:
                     f.get_widget().select(False)
         self.app.widget_selected(selected, fixture, multi)
 
-    def update_scene(self):
-        fd = []
-        for fixture in self.fixtures:
-            fd.append(fixture.pack())
-        self.scene.set_fixture_data(fd)
-
     def save_scene(self):
-        self.update_scene()
         self.scene.save()
 
-    def get_fixture(self, id):
-        for f in self.fixtures:
-            if f.id == id:
-                return f
-
-    def get_fixtures(self):
-        return self.fixtures
-
     def update_all(self):
-        for f in self.fixtures:
+        for f in self.scene.fixtures():
             f.get_widget().update()
         self.center_widget.update()
         self.canvas.update()
@@ -167,10 +144,9 @@ class SceneController(QtCore.QObject):
         self.update_all()
         return self.show_center
 
-    def update_address_cache(self, fixture, strand, address):
-        for f in self.fixtures:
-            if fixture == f:
-                self._fixture_lookup_cache[strand][address] = f
+    def update_fixture(self, fixture, new_strand, new_address):
+        self.scene.update_fixture(fixture, new_strand, new_address)
+        self.create_pixel_array()
 
     def create_pixel_array(self):
         """
@@ -178,22 +154,21 @@ class SceneController(QtCore.QObject):
         Needs to be called when the shape of the scene has changed
         (fixtures added/removed, addresses changed, pixels per fixture changed)
         """
+        max_pixels = 0
         fh = self.scene.fixture_hierarchy()
-        self._strand_keys = list()
-        for strand in fh:
 
-            self._strand_keys.append(strand)
+        for strand in fh:
             strand_len = 0
-            for fixture in fh[strand]:
-                self._fixture_lookup_cache[strand][fixture].update_offset(strand_len)
-                strand_len += fh[strand][fixture].pixels()
+            for address in fh[strand]:
+                fixture = self.scene.fixture(strand, address)
+                fixture.update_offset(strand_len)
+                strand_len += fixture.pixels()
 
             self.strand_data[strand] = [(0, 0, 0)] * strand_len
-            if strand_len > self._max_pixels:
-                self._max_pixels = strand_len
+            max_pixels = max(max_pixels, strand_len)
 
-        log.info("Scene has %d strands, %d pixels." % (len(self._strand_keys), self._max_pixels))
-        self._output_buffer = np.zeros((len(self._strand_keys), self._max_pixels, 3))
+        log.info("Scene has %d strands, %d pixels." % (len(fh), max_pixels))
+        self._output_buffer = np.zeros((len(fh), max_pixels, 3))
 
     @QtCore.Slot(list)
     def process_command(self, packet):
