@@ -1,2 +1,10 @@
 PySide>=1.1.2
 pyzmq>=14.6.0
+numpy
+appdirs==1.4.3
+numpy==1.12.1
+packaging==16.8
+pyparsing==2.2.0
+PySide==1.2.4
+pyzmq==16.0.2
+six==1.10.0
