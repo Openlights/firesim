@@ -1,14 +1,16 @@
+from builtins import map
+from builtins import object
 import logging as log
 import colorsys
 import random
 from util.clip import clip
 
-from PySide import QtCore
+from PyQt5 import QtCore
 
 from ui.fixturewidget import FixtureWidget
 
 
-class Fixture:
+class Fixture(object):
 
     def __init__(self, data=None, controller=None, strand=0, address=0):
         self._strand = strand
@@ -104,8 +106,8 @@ class Fixture:
                 }
 
     def fixture_move_callback(self, fixture):
-        self._pos1 = map(int, (fixture.drag1.scene_x, fixture.drag1.scene_y))
-        self._pos2 = map(int, (fixture.drag2.scene_x, fixture.drag2.scene_y))
+        self._pos1 = list(map(int, (fixture.drag1.scene_x, fixture.drag1.scene_y)))
+        self._pos2 = list(map(int, (fixture.drag2.scene_x, fixture.drag2.scene_y)))
         fixture.update_geometry()
 
     def random_color(self):

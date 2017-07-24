@@ -1,14 +1,16 @@
+from __future__ import print_function
+from builtins import range
 import msgpack
 import signal
 import colorsys
 import math
 
-from PySide import QtCore, QtNetwork
+from PyQt5 import QtCore, QtNetwork
 
 
 class TestServer(QtCore.QObject):
 
-    ready_to_read = QtCore.Signal()
+    ready_to_read = QtCore.pyqtSignal()
 
     def __init__(self):
         super(TestServer, self).__init__()
@@ -24,7 +26,7 @@ class TestServer(QtCore.QObject):
         self.timer.timeout.connect(self.demo_write)
         self.timer.start(10)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def read_datagrams(self):
         while self.socket.hasPendingDatagrams():
             datagram = QtCore.QByteArray()
@@ -37,7 +39,7 @@ class TestServer(QtCore.QObject):
         self.socket.writeDatagram(datagram, QtNetwork.QHostAddress.LocalHost, 3020)
         #print "wrote %d bytes" % datagram.size()
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def demo_write(self):
         for strand in range(5):
             r, g, b = [int(255.0 * c) for c in colorsys.hsv_to_rgb(math.fmod((self.h + (0.2 * strand)), 1.0), 1.0, 1.0)]
@@ -51,7 +53,7 @@ def sigint_handler(signal, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, sigint_handler)
     app = QtCore.QCoreApplication(["testserver"])
-    print "Press Ctrl-C to quit"
+    print("Press Ctrl-C to quit")
     nc = TestServer()
     nc.init_socket()
     app.exec_()

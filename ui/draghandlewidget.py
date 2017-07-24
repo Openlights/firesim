@@ -1,14 +1,14 @@
-from PySide import QtCore, QtGui, QtDeclarative
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtQuick import QQuickItem
 
 
-class DragHandleWidget(QtDeclarative.QDeclarativeItem):
+class DragHandleWidget(QQuickItem):
 
     def __init__(self, canvas=None, fixture=None, pos=None):
         super(DragHandleWidget, self).__init__(canvas)
-        self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
-        self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
-        self.setAcceptsHoverEvents(True)
+        self.setFlag(QQuickItem.ItemHasContents, True)
+        self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
+        self.setAcceptHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.canvas = canvas
         self.fixture = fixture
@@ -23,7 +23,8 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         if pos:
             self.scene_x, self.scene_y = pos
             x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
-            self.setPos(x, y)
+            self.setX(x)
+            self.setY(y)
 
     def boundingRect(self):
         # Bigger than the actual handle so that the text gets erased

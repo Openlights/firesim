@@ -1,16 +1,19 @@
+from __future__ import division
+from past.utils import old_div
 import colorsys
 import random
 
-from PySide import QtCore, QtGui, QtDeclarative
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtQuick import QQuickItem
+from PyQt5.QtWidgets import QWidget
 
 
-class CanvasWidget(QtDeclarative.QDeclarativeItem):
+class CanvasWidget(QQuickItem):
     def __init__(self, parent = None):
         super(CanvasWidget, self).__init__()
-        self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
-        self.setFlag(QtGui.QGraphicsItem.ItemClipsChildrenToShape, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton | QtCore.Qt.MouseButton.RightButton)
-        self.setAcceptsHoverEvents(True)
+        self.setFlag(QQuickItem.ItemClipsChildrenToShape, True)
+        self.setAcceptedMouseButtons(QtCore.Qt.LeftButton | QtCore.Qt.RightButton)
+        self.setAcceptHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.fixture_list = []
         self.background_image = None
@@ -34,10 +37,10 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
             #if img.rect().width() != self.background_image.rect().width():
             #    self.coordinate_scale = float(img.rect().width()) / self.background_image.rect().width()
             if img.rect().width() <= self.rect.width():
-                self.x_offset = (self.rect.width() - img.rect().width()) / 2
+                self.x_offset = old_div((self.rect.width() - img.rect().width()), 2)
                 painter.drawImage(self.x_offset, 0, img)
             elif img.rect().height() <= self.rect.height():
-                self.y_offset = (self.rect.height() - img.rect().height()) / 2
+                self.y_offset = old_div((self.rect.height() - img.rect().height()), 2)
                 painter.drawImage(0, self.y_offset, img)
 
         f = QtGui.QFont()
@@ -74,7 +77,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         #print event.scenePos()
         for fixture in self.fixture_list:
             #print fixture.mapToParent(fixture.shape())
-            if fixture.mapToParent(fixture.shape()).contains(event.pos()):
+            if fixture.mapToItem(fixture.parentItem(), fixture.shape()).contains(event.pos()):
                 fixture.hover_enter()
             else:
                 fixture.hover_leave()
@@ -119,8 +122,8 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
             a, b = a
         return (int(a - self.x_offset), int(b - self.y_offset))
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def propagate_hover_move(self, widget, scenepos):
         self.hover_move_event.emit(widget, scenepos)
 
-    hover_move_event = QtCore.Signal(QtGui.QWidget, QtCore.QEvent)
+    hover_move_event = QtCore.pyqtSignal(QWidget, QtCore.QEvent)

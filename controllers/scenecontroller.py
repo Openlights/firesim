@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import chr
+from builtins import range
 import logging as log
 import struct
 import array
@@ -9,14 +12,14 @@ from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from ui.crosshairwidget import CrosshairWidget
 
-from PySide import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 
 
 from models.fixture import Fixture
 
 class SceneController(QtCore.QObject):
 
-    new_frame = QtCore.Signal()
+    new_frame = QtCore.pyqtSignal()
 
     def __init__(self, app, scene):
         super(SceneController, self).__init__()
@@ -69,7 +72,7 @@ class SceneController(QtCore.QObject):
             self.canvas.update_fixtures(fl)
 
     def on_center_moved(self, pos):
-        print pos
+        print(pos)
         ipos = (int(pos.x()), int(pos.y()))
         self.scene.set_center(ipos)
 
@@ -170,7 +173,7 @@ class SceneController(QtCore.QObject):
         log.info("Scene has %d strands, %d pixels." % (len(fh), max_pixels))
         self._output_buffer = np.zeros((len(fh), max_pixels, 3))
 
-    @QtCore.Slot(list)
+    @QtCore.pyqtSlot(list)
     def process_command(self, packet):
         cmd = chr(packet[0])
         datalen = 0
@@ -189,8 +192,8 @@ class SceneController(QtCore.QObject):
 
         # end frame
         elif cmd == 'E':
-            for strand, data in self._frame_data.iteritems():
-                data = [data[i:i+3] for i in xrange(0, len(data), 3)]
+            for strand, data in self._frame_data.items():
+                data = [data[i:i+3] for i in range(0, len(data), 3)]
                 self.strand_data[strand] = data
             self.times.append((time.time() - self.frame_start_time))
             if len(self.times) > 100:

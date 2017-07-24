@@ -1,8 +1,9 @@
+from builtins import object
 import json
 import logging as log
 
 
-class JSONLoader:
+class JSONLoader(object):
 
     def __init__(self, filename=None):
         self._filename = filename

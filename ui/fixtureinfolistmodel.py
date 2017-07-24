@@ -1,8 +1,8 @@
 import sys
 
-from PySide import QtCore
-from PySide import QtGui
-from PySide import QtDeclarative
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5 import QtDeclarative
 
 
 class FixtureInfoListModel(QtCore.QAbstractListModel):

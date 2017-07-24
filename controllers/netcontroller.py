@@ -1,17 +1,19 @@
+from __future__ import division
+from past.utils import old_div
 import time
 import logging as log
 import zmq
 
-from PySide import QtCore, QtNetwork
+from PyQt5 import QtCore, QtNetwork
 
 USE_ZMQ = False
 
 
 class NetController(QtCore.QObject):
 
-    ready_to_read = QtCore.Signal()
-    data_received = QtCore.Signal(list)
-    start = QtCore.Signal()
+    ready_to_read = QtCore.pyqtSignal()
+    data_received = QtCore.pyqtSignal(list)
+    start = QtCore.pyqtSignal()
 
     def __init__(self, app):
         super(NetController, self).__init__()
@@ -35,7 +37,7 @@ class NetController(QtCore.QObject):
             self.socket.readyRead.connect(self.read_datagrams)
             self.socket.bind(3020, QtNetwork.QUdpSocket.ShareAddress | QtNetwork.QUdpSocket.ReuseAddressHint)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def read_datagrams(self):
         while self.socket.hasPendingDatagrams():
             datagram = QtCore.QByteArray()
@@ -45,7 +47,7 @@ class NetController(QtCore.QObject):
             self.packets += 1
             self.data_received.emit(packet)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def run(self):
         while self.running:
             packets = self.socket.recv_multipart()
@@ -57,7 +59,7 @@ class NetController(QtCore.QObject):
     def frame_started(self):
         self.in_frame = True
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def frame_complete(self):
         self.in_frame = False
         self.updates += 1
@@ -66,8 +68,8 @@ class NetController(QtCore.QObject):
         dt = time.clock() - self.last_time
         if dt == 0:
             return 0
-        ups = self.updates / dt
-        pps = self.packets / dt
+        ups = old_div(self.updates, dt)
+        pps = old_div(self.packets, dt)
         self.last_time = time.clock()
         self.updates = 0
         self.packets = 0
