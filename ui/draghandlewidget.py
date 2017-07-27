@@ -1,8 +1,8 @@
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtQuick import QQuickItem
+from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 
 
-class DragHandleWidget(QQuickItem):
+class DragHandleWidget(QQuickPaintedItem):
 
     def __init__(self, canvas=None, fixture=None, pos=None):
         super(DragHandleWidget, self).__init__(canvas)
@@ -35,7 +35,7 @@ class DragHandleWidget(QQuickItem):
         path.addEllipse(-6, -6, 12, 12)
         return path
 
-    def paint(self, painter, options, widget):
+    def paint(self, painter):
         if self.hidden:
             return
         #painter.setRenderHint(QtGui.QPainter.Antialiasing)

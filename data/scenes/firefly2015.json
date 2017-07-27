@@ -1,513 +1,513 @@
 {
-  "backdrop_enable": false, 
-  "backdrop_filename": "lights.png", 
-  "bounding_box": [
-    800, 
+  "backdrop-enable": false,
+  "backdrop-filename": "lights.png",
+  "bounding-box": [
+    800,
     800
-  ], 
+  ],
   "center": [
-    400, 
+    400,
     400
-  ], 
+  ],
   "extents": [
-    800, 
+    800,
     800
-  ], 
-  "file-type": "scene", 
+  ],
+  "file-type": "scene",
   "fixtures": [
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        580, 
+        580,
         92
-      ], 
+      ],
       "pos2": [
-        757, 
+        757,
         397
-      ], 
-      "strand": 10, 
+      ],
+      "strand": 10,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        225, 
+        225,
         94
-      ], 
+      ],
       "pos2": [
-        49, 
+        49,
         396
-      ], 
-      "strand": 8, 
+      ],
+      "strand": 8,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        580, 
+        580,
         92
-      ], 
+      ],
       "pos2": [
-        223, 
+        223,
         92
-      ], 
-      "strand": 8, 
+      ],
+      "strand": 8,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        48, 
+        48,
         397
-      ], 
+      ],
       "pos2": [
-        226, 
+        226,
         704
-      ], 
-      "strand": 0, 
+      ],
+      "strand": 0,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        228, 
+        228,
         705
-      ], 
+      ],
       "pos2": [
-        582, 
+        582,
         704
-      ], 
-      "strand": 0, 
+      ],
+      "strand": 0,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        755, 
+        755,
         400
-      ], 
+      ],
       "pos2": [
-        580, 
+        580,
         705
-      ], 
-      "strand": 10, 
+      ],
+      "strand": 10,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        314, 
+        314,
         94
-      ], 
+      ],
       "pos2": [
-        491, 
+        491,
         398
-      ], 
-      "strand": 5, 
+      ],
+      "strand": 5,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        355, 
+        355,
         322
-      ], 
+      ],
       "pos2": [
-        180, 
+        180,
         627
-      ], 
-      "strand": 13, 
+      ],
+      "strand": 13,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        712, 
+        712,
         321
-      ], 
+      ],
       "pos2": [
-        359, 
+        359,
         321
-      ], 
-      "strand": 13, 
+      ],
+      "strand": 13,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        184, 
+        184,
         171
-      ], 
+      ],
       "pos2": [
-        358, 
+        358,
         473
-      ], 
-      "strand": 3, 
+      ],
+      "strand": 3,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        358, 
+        358,
         474
-      ], 
+      ],
       "pos2": [
-        711, 
+        711,
         476
-      ], 
-      "strand": 3, 
+      ],
+      "strand": 3,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        492, 
+        492,
         397
-      ], 
+      ],
       "pos2": [
-        313, 
+        313,
         704
-      ], 
-      "strand": 5, 
+      ],
+      "strand": 5,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        404, 
+        404,
         94
-      ], 
+      ],
       "pos2": [
-        577, 
+        577,
         396
-      ], 
-      "strand": 6, 
+      ],
+      "strand": 6,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        314, 
+        314,
         246
-      ], 
+      ],
       "pos2": [
-        136, 
+        136,
         551
-      ], 
-      "strand": 12, 
+      ],
+      "strand": 12,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        624, 
+        624,
         168
-      ], 
+      ],
       "pos2": [
-        271, 
+        271,
         168
-      ], 
-      "strand": 11, 
+      ],
+      "strand": 11,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        135, 
+        135,
         247
-      ], 
+      ],
       "pos2": [
-        313, 
+        313,
         548
-      ], 
-      "strand": 2, 
+      ],
+      "strand": 2,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        316, 
+        316,
         550
-      ], 
+      ],
       "pos2": [
-        667, 
+        667,
         553
-      ], 
-      "strand": 2, 
+      ],
+      "strand": 2,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        579, 
+        579,
         396
-      ], 
+      ],
       "pos2": [
-        404, 
+        404,
         704
-      ], 
-      "strand": 6, 
+      ],
+      "strand": 6,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        491, 
+        491,
         90
-      ], 
+      ],
       "pos2": [
-        669, 
+        669,
         396
-      ], 
-      "strand": 7, 
+      ],
+      "strand": 7,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        268, 
+        268,
         169
-      ], 
+      ],
       "pos2": [
-        91, 
+        91,
         471
-      ], 
-      "strand": 11, 
+      ],
+      "strand": 11,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        670, 
+        670,
         245
-      ], 
+      ],
       "pos2": [
-        316, 
+        316,
         245
-      ], 
-      "strand": 12, 
+      ],
+      "strand": 12,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        92, 
+        92,
         323
-      ], 
+      ],
       "pos2": [
-        270, 
+        270,
         629
-      ], 
-      "strand": 1, 
+      ],
+      "strand": 1,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        271, 
+        271,
         629
-      ], 
+      ],
       "pos2": [
-        629, 
+        629,
         628
-      ], 
-      "strand": 1, 
+      ],
+      "strand": 1,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        669, 
+        669,
         399
-      ], 
+      ],
       "pos2": [
-        495, 
+        495,
         701
-      ], 
-      "strand": 7, 
+      ],
+      "strand": 7,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        226, 
+        226,
         94
-      ], 
+      ],
       "pos2": [
-        401, 
+        401,
         400
-      ], 
-      "strand": 4, 
+      ],
+      "strand": 4,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        756, 
+        756,
         399
-      ], 
+      ],
       "pos2": [
-        400, 
+        400,
         399
-      ], 
-      "strand": 14, 
+      ],
+      "strand": 14,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        400, 
+        400,
         401
-      ], 
+      ],
       "pos2": [
-        225, 
+        225,
         704
-      ], 
-      "strand": 9, 
+      ],
+      "strand": 9,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        398, 
+        398,
         398
-      ], 
+      ],
       "pos2": [
-        49, 
+        49,
         398
-      ], 
-      "strand": 14, 
+      ],
+      "strand": 14,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 1, 
-      "pixels": 120, 
+      "address": 1,
+      "pixels": 120,
       "pos1": [
-        398, 
+        398,
         400
-      ], 
+      ],
       "pos2": [
-        577, 
+        577,
         705
-      ], 
-      "strand": 4, 
+      ],
+      "strand": 4,
       "type": "linear"
-    }, 
+    },
     {
-      "address": 0, 
-      "pixels": 120, 
+      "address": 0,
+      "pixels": 120,
       "pos1": [
-        580, 
+        580,
         94
-      ], 
+      ],
       "pos2": [
-        401, 
+        401,
         398
-      ], 
-      "strand": 9, 
+      ],
+      "strand": 9,
       "type": "linear"
     }
-  ], 
-  "labels_enable": false, 
-  "locked": true, 
-  "name": "Demo", 
+  ],
+  "labels-visible": false,
+  "locked": true,
+  "name": "Demo",
   "strand-settings": [
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 0
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 1
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 2
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 3
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 4
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 5
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 6
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 8
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 9
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 10
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 11
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 12
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 13
-    }, 
+    },
     {
-      "color-mode": "BGR8", 
-      "enabled": true, 
+      "color-mode": "BGR8",
+      "enabled": true,
       "id": 14
     }
   ]

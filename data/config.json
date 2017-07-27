@@ -1,4 +1,4 @@
 {
-    "scene_root": "data/scenes",
-    "color_mode": "RGB8"
+    "scene-root": "data/scenes",
+    "color-mode": "RGB8"
 }

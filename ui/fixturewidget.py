@@ -3,12 +3,12 @@ from past.utils import old_div
 import logging as log
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtQuick import QQuickItem
+from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 
 from ui.draghandlewidget import DragHandleWidget
 
 
-class FixtureWidget(QQuickItem):
+class FixtureWidget(QQuickPaintedItem):
 
     def __init__(self, canvas=None, model=None):
         super(FixtureWidget, self).__init__(canvas)
@@ -115,7 +115,7 @@ class FixtureWidget(QQuickItem):
 
         return path
 
-    def paint(self, painter, options, widget):
+    def paint(self, painter):
         # TODO: Fix the buggy scaling code
         #width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
         width, height = (self.width, self.height)
@@ -161,7 +161,7 @@ class FixtureWidget(QQuickItem):
             color_line.setLength(old_div(color_line.length(), self.model.pixels()))
             painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 0), 0))
 
-            if self.canvas.gui.is_blurred:
+            if self.canvas.gui.state.blur_enable:
                 spacing = 4
                 for pixel in data[::spacing]:
                     px, py = color_line.x1(), color_line.y1()

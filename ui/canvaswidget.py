@@ -4,17 +4,21 @@ import colorsys
 import random
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtQuick import QQuickItem
+from PyQt5.QtGui import QColor
+from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 from PyQt5.QtWidgets import QWidget
 
 
-class CanvasWidget(QQuickItem):
+class CanvasWidget(QQuickPaintedItem):
     def __init__(self, parent = None):
         super(CanvasWidget, self).__init__()
         self.setFlag(QQuickItem.ItemClipsChildrenToShape, True)
         self.setAcceptedMouseButtons(QtCore.Qt.LeftButton | QtCore.Qt.RightButton)
         self.setAcceptHoverEvents(True)
-        self.color = QtGui.QColor(100, 100, 100)
+        self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
+        self.setFillColor(QColor(0, 0, 0))
+
+        self.color = QColor(100, 100, 100)
         self.fixture_list = []
         self.background_image = None
         self.rect = None
@@ -27,9 +31,9 @@ class CanvasWidget(QQuickItem):
         self.y_offset = 0
         self.gui = None
 
-    def paint(self, painter, options, widget):
+    def paint(self, painter):
         self.rect = QtCore.QRect(0, 0, self.width(), self.height())
-        painter.fillRect(self.rect, QtGui.QColor(0, 0, 0))
+        print("canvas repaint")
 
         if self.background_image is not None:
             img = self.background_image.scaled(self.rect.size(), QtCore.Qt.KeepAspectRatio)
@@ -46,7 +50,7 @@ class CanvasWidget(QQuickItem):
         f = QtGui.QFont()
         f.setPointSize(8)
         painter.setFont(f)
-        painter.setPen(QtGui.QColor(170, 170, 200, 255))
+        painter.setPen(QColor(170, 170, 200, 255))
         painter.drawText(8, 16, "%0.1f packets/sec" % self.net_stats['pps'])
         painter.drawText(8, 32, "%0.1f frames/sec" % self.net_stats['ups'])
 
@@ -74,16 +78,12 @@ class CanvasWidget(QQuickItem):
         return (x, y)
 
     def hoverMoveEvent(self, event):
-        #print event.scenePos()
         for fixture in self.fixture_list:
-            #print fixture.mapToParent(fixture.shape())
-            if fixture.mapToItem(fixture.parentItem(), fixture.shape()).contains(event.pos()):
+            if fixture.shape().contains(fixture.mapFromGlobal(event.pos())):
                 fixture.hover_enter()
             else:
                 fixture.hover_leave()
             fixture.update()
-        #pass
-        #self.propagate_hover_move(None, event)
 
     def mouseMoveEvent(self, event):
         pass
@@ -92,9 +92,9 @@ class CanvasWidget(QQuickItem):
         pass
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+        if event.button() == QtCore.Qt.LeftButton:
             self.deselect_all()
-        elif event.button() == QtCore.Qt.MouseButton.RightButton:
+        elif event.button() == QtCore.Qt.RightButton:
             self.generate_markup_color()
 
     def deselect_all(self):

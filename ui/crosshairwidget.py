@@ -2,10 +2,10 @@ from __future__ import division
 from past.utils import old_div
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtQuick import QQuickItem
+from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 
 
-class CrosshairWidget(QQuickItem):
+class CrosshairWidget(QQuickPaintedItem):
 
     size = 20
 
@@ -42,7 +42,7 @@ class CrosshairWidget(QQuickItem):
         path.addRect(-(old_div(self.size, 2)), -(old_div(self.size, 2)), self.size, self.size)
         return path
 
-    def paint(self, painter, options, widget):
+    def paint(self, painter):
         if self.hidden:
             return
 

@@ -43,7 +43,11 @@ class NetController(QtCore.QObject):
             datagram = QtCore.QByteArray()
             datagram.resize(self.socket.pendingDatagramSize())
             (datagram, sender, sport) = self.socket.readDatagram(datagram.size())
-            packet = [ord(c) for c in datagram.data()]
+            # TODO(JE): is this the best way for Py2/Py3 compatability?
+            if type(datagram) is bytes:
+                packet = [c for c in datagram]
+            else:
+                packet = [ord(c) for c in datagram.data()]
             self.packets += 1
             self.data_received.emit(packet)
 
