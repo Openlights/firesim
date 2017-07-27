@@ -15,6 +15,7 @@ class DragHandleWidget(QQuickPaintedItem):
         self.dragging = False
         self.mouse_down = False
         self.hovering = False
+        self.selected = False   # TODO(JE) can't this just look at the parent?
         self.hidden = True
         self.drag_pos = None
         self.scene_x = 0.0
@@ -62,7 +63,7 @@ class DragHandleWidget(QQuickPaintedItem):
             (self.fixture.hovering is False and
             self.fixture.isSelected() is False)):
             return
-        self.setZValue(150)
+        self.setZ(150)
 
     def hoverLeaveEvent(self, event):
         if (self.canvas.controller.scene.get("locked", False) or

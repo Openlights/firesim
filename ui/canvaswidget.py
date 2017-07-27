@@ -3,8 +3,8 @@ from past.utils import old_div
 import colorsys
 import random
 
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtGui import QColor
+from PyQt5 import QtCore
+from PyQt5.QtGui import QColor, QFont, QImage
 from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 from PyQt5.QtWidgets import QWidget
 
@@ -15,13 +15,14 @@ class CanvasWidget(QQuickPaintedItem):
         self.setFlag(QQuickItem.ItemClipsChildrenToShape, True)
         self.setAcceptedMouseButtons(QtCore.Qt.LeftButton | QtCore.Qt.RightButton)
         self.setAcceptHoverEvents(True)
-        self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
+        #self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
+        self.setMipmap(True)
+        #self.setAntialiasing(True)
         self.setFillColor(QColor(0, 0, 0))
 
         self.color = QColor(100, 100, 100)
         self.fixture_list = []
         self.background_image = None
-        self.rect = None
         self.net_stats = {'pps': 0, 'ups': 0}
         self.controller = None
         self.next_new_fixture_pos = (25, 25)
@@ -32,22 +33,21 @@ class CanvasWidget(QQuickPaintedItem):
         self.gui = None
 
     def paint(self, painter):
-        self.rect = QtCore.QRect(0, 0, self.width(), self.height())
-        print("canvas repaint")
 
         if self.background_image is not None:
-            img = self.background_image.scaled(self.rect.size(), QtCore.Qt.KeepAspectRatio)
+            rect = QtCore.QRect(0, 0, self.width(), self.height())
+            img = self.background_image.scaled(rect.size(), QtCore.Qt.KeepAspectRatio)
             # FIXME
             #if img.rect().width() != self.background_image.rect().width():
             #    self.coordinate_scale = float(img.rect().width()) / self.background_image.rect().width()
-            if img.rect().width() <= self.rect.width():
-                self.x_offset = old_div((self.rect.width() - img.rect().width()), 2)
+            if img.rect().width() <= rect.width():
+                self.x_offset = old_div((rect.width() - img.rect().width()), 2)
                 painter.drawImage(self.x_offset, 0, img)
-            elif img.rect().height() <= self.rect.height():
-                self.y_offset = old_div((self.rect.height() - img.rect().height()), 2)
+            elif img.rect().height() <= rect.height():
+                self.y_offset = old_div((rect.height() - img.rect().height()), 2)
                 painter.drawImage(0, self.y_offset, img)
 
-        f = QtGui.QFont()
+        f = QFont()
         f.setPointSize(8)
         painter.setFont(f)
         painter.setPen(QColor(170, 170, 200, 255))
@@ -65,7 +65,7 @@ class CanvasWidget(QQuickPaintedItem):
 
     def set_background_image(self, image):
         if image is not None:
-            assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
+            assert isinstance(image, QImage), "You must pass a QImage to set_background_image()"
             # self.w = image.width()
             # self.h = image.height()
             # self.setWidth(self.w/2)
@@ -78,6 +78,11 @@ class CanvasWidget(QQuickPaintedItem):
         return (x, y)
 
     def hoverMoveEvent(self, event):
+        f = self.childAt(event.pos().x(), event.pos().y())
+        if f is not None:
+            f.hover_enter()
+            f.update()
+
         for fixture in self.fixture_list:
             if fixture.shape().contains(fixture.mapFromGlobal(event.pos())):
                 fixture.hover_enter()

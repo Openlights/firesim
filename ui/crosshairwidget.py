@@ -30,6 +30,7 @@ class CrosshairWidget(QQuickPaintedItem):
         if pos:
             self.scene_x, self.scene_y = pos
             x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
+            print(x, y)
             self.setX(x)
             self.setY(y)
 
@@ -43,6 +44,7 @@ class CrosshairWidget(QQuickPaintedItem):
         return path
 
     def paint(self, painter):
+        print("crosshair paint")
         if self.hidden:
             return
 
@@ -66,7 +68,7 @@ class CrosshairWidget(QQuickPaintedItem):
     def hoverEnterEvent(self, event):
         if self.hidden:
             return
-        self.setZValue(50)
+        self.setZ(50)
 
     def hoverLeaveEvent(self, event):
         self.hovering = False
