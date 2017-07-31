@@ -3,6 +3,7 @@ from past.utils import old_div
 import logging as log
 
 from PyQt5 import QtCore
+from PyQt5.QtCore import QPoint, QPointF, QSizeF
 from PyQt5.QtGui import QColor, QPainter, QPainterPath, QPen, QPolygonF, QFont
 from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 
@@ -11,6 +12,9 @@ from ui.draghandlewidget import DragHandleWidget
 
 class FixtureWidget(QQuickPaintedItem):
 
+    # Margin, in pixels, of the drawing rectangle
+    SHAPE_MARGIN = 16
+
     def __init__(self, canvas=None, model=None):
         super(FixtureWidget, self).__init__(canvas)
         #self.setFlag(QQuickItem.ItemIsSelectable, True)
@@ -18,7 +22,7 @@ class FixtureWidget(QQuickPaintedItem):
                                      QtCore.Qt.MiddleButton |
                                      QtCore.Qt.RightButton)
         #self.setAcceptsHoverEvents(True)
-        self.setFillColor(QColor(255, 100, 100, 20))
+        self.setFillColor(QColor(0, 0, 0, 0))
 
         self.model = model
         self.about_to_delete = False
@@ -40,7 +44,7 @@ class FixtureWidget(QQuickPaintedItem):
             self.setPos(x, y)
             self.canvas.hover_move_event.connect(self.hover_move_handler)
 
-            x, y = (int(self.pos().x()), int(self.pos().y()))
+            x, y = (int(self.x()), int(self.y()))
 
             self.model.set_pos1(self.canvas.canvas_to_scene(x, y))
             self.model.set_pos2(self.canvas.canvas_to_scene(x + 100, y + 100))
@@ -54,8 +58,8 @@ class FixtureWidget(QQuickPaintedItem):
         self.update_geometry()
 
     def setPos(self, x, y):
-        self.setX(x)
-        self.setY(y)
+        self.setX(x - self.SHAPE_MARGIN)
+        self.setY(y - self.SHAPE_MARGIN)
 
     def deleteLater(self):
         self.drag1.deleteLater()
@@ -63,20 +67,25 @@ class FixtureWidget(QQuickPaintedItem):
         super(FixtureWidget, self).deleteLater()
 
     def update_geometry(self):
+        """
+        The width and height properties determine the paintable area,
+        so they need to include margin for the fixture border and selection hover graphics.
+        """
         p1 = self.canvas.scene_to_canvas(self.model.pos1())
         p2 = self.canvas.scene_to_canvas(self.model.pos2())
-        self.setWidth(abs(p2[0] - p1[0]))
-        self.setHeight(abs(p2[1] - p1[1]))
+        self.setWidth(abs(p2[0] - p1[0]) + 2 * self.SHAPE_MARGIN)
+        self.setHeight(abs(p2[1] - p1[1]) + 2 * self.SHAPE_MARGIN)
         self.update()
 
     def shape(self):
         """Defines a 4-gon for mouse selection/hovering, larger than the drawn fixture"""
         # FIXME: Coordinate scale doesn't work
         # width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
-        width, height = self.width(), self.height()
+        p1 = QPointF(self.SHAPE_MARGIN, self.SHAPE_MARGIN)
+        p2 = QPointF(self.width() - self.SHAPE_MARGIN, self.height() - self.SHAPE_MARGIN)
 
         path = QPainterPath()
-        line = QtCore.QLineF(0, 0, width, height)
+        line = QtCore.QLineF(p1, p2)
         offset1 = line.normalVector().unitVector()
 
         if self.selected:
@@ -84,9 +93,9 @@ class FixtureWidget(QQuickPaintedItem):
         else:
             offset1.setLength(9)
 
-        ol1 = QtCore.QLineF(0, 0, width, height)
+        ol1 = QtCore.QLineF(p1, p2)
         ol1.translate(offset1.dx(), offset1.dy())
-        ol2 = QtCore.QLineF(0, 0, width, height)
+        ol2 = QtCore.QLineF(p1, p2)
         ol2.translate(-offset1.dx(), -offset1.dy())
 
         p = QPolygonF([
@@ -104,14 +113,23 @@ class FixtureWidget(QQuickPaintedItem):
     def paint(self, painter):
         # TODO: Fix the buggy scaling code c
         #width, height = (self.canvas.coordinate_scale * self.width, self.canvas.coordinate_scale * self.height)
-        width, height = self.width(), self.height()
-        if self.hovering:
+        painter.setPen(QPen(QColor(255, 255, 0, 225),
+                                  1,
+                                  QtCore.Qt.SolidLine,
+                                  QtCore.Qt.RoundCap,
+                                  QtCore.Qt.RoundJoin))
+        painter.drawRect(0, 0, self.width(), self.height())
+
+        p1 = QPointF(self.SHAPE_MARGIN, self.SHAPE_MARGIN)
+        p2 = QPointF(self.width() - self.SHAPE_MARGIN, self.height() - self.SHAPE_MARGIN)
+
+        if self.hovering or True:
             painter.setPen(QPen(QColor(200, 200, 255, 225),
                                       12,
                                       QtCore.Qt.SolidLine,
                                       QtCore.Qt.RoundCap,
                                       QtCore.Qt.RoundJoin))
-            painter.drawLine(0, 0, width, height)
+            painter.drawLine(p1, p2)
 
         painter.setBrush(QColor(0, 0, 0, 0))
         painter.setRenderHint(QPainter.Antialiasing)
@@ -120,7 +138,7 @@ class FixtureWidget(QQuickPaintedItem):
                                   QtCore.Qt.SolidLine,
                                   QtCore.Qt.RoundCap,
                                   QtCore.Qt.RoundJoin))
-        painter.drawLine(0, 0, width, height)
+        painter.drawLine(p1, p2)
         if self.selected:
             if self.about_to_delete:
                 painter.setPen(QPen(QColor(255, 50, 50, 225),
@@ -134,7 +152,7 @@ class FixtureWidget(QQuickPaintedItem):
                                           QtCore.Qt.SolidLine,
                                           QtCore.Qt.RoundCap,
                                           QtCore.Qt.RoundJoin))
-            painter.drawLine(0, 0, width, height)
+            painter.drawLine(p1, p2)
 
         if self.bb_hovering:
             painter.setPen(QPen(QColor(255, 255, 0, 255), 1, QtCore.Qt.DashLine))
@@ -143,7 +161,7 @@ class FixtureWidget(QQuickPaintedItem):
 
         if self.model.pixels() > 0:
             data = self.model.pixel_data()
-            color_line = QtCore.QLineF(0, 0, width, height)
+            color_line = QtCore.QLineF(p1, p2)
             color_line.setLength(old_div(color_line.length(), self.model.pixels()))
             painter.setPen(QPen(QColor(0, 0, 0, 0), 0))
 
@@ -160,7 +178,7 @@ class FixtureWidget(QQuickPaintedItem):
                     #painter.drawLine(color_line.unitVector())
                     color_line.translate(color_line.dx()*spacing, color_line.dy()*spacing)
 
-                color_line = QtCore.QLineF(0, 0, width, height)
+                color_line = QtCore.QLineF(p1, p2)
                 color_line.setLength(old_div(color_line.length(), self.model.pixels()))
                 painter.setPen(QPen(QColor(0, 0, 0, 0), 0))
                 spacing = 3
@@ -180,13 +198,12 @@ class FixtureWidget(QQuickPaintedItem):
                 #painter.drawLine(color_line.unitVector())
                 color_line.translate(color_line.dx()*spacing, color_line.dy()*spacing)
 
-        if self.hovering or self.selected or self.model._controller.scene.get("labels_enable", False):
-            x = old_div(width, 2) - 12
-            y = old_div(height, 2) - 7
+        if self.hovering or self.selected or self.canvas.gui.state.labels_visible:
+            label_pos = (p1 + p2) / 2
             label_font = QFont()
             label_font.setPointSize(8)
             painter.setFont(label_font)
-            label_rect = QtCore.QRectF(x, y, 24, 14)
+            label_rect = QtCore.QRectF(label_pos - QPointF(12, 7), QSizeF(24, 14))
             painter.setBrush(QColor(128, 64, 128, 220))
             painter.setPen(QColor(100, 100, 100, 100))
             painter.drawRoundedRect(label_rect, 5, 5)
@@ -326,14 +343,14 @@ class FixtureWidget(QQuickPaintedItem):
     def mouseReleaseEvent(self, event):
         if self.shape().contains(event.pos()):
             if not self.dragging:
-                if event.button() == QtCore.Qt.MouseButton.LeftButton and self.shape().contains(event.pos()):
+                if event.button() == QtCore.Qt.LeftButton and self.shape().contains(event.pos()):
                     self.select(not self.selected)
                     # TODO: Implement multi-select with control or shift key
                     multi = False
                     self.model._controller.widget_selected(self.selected, self.model, multi)
                     self.canvas.on_fixture_click(self)
 
-            if event.button() == QtCore.Qt.MouseButton.MiddleButton:
+            if event.button() == QtCore.Qt.MiddleButton:
                 if not self.about_to_delete:
                     self.about_to_delete = True
                 else:
@@ -341,7 +358,7 @@ class FixtureWidget(QQuickPaintedItem):
             else:
                 self.about_to_delete = False
 
-            if event.button() == QtCore.Qt.MouseButton.RightButton and self.selected and not self.model._controller.scene.get("locked", False):
+            if event.button() == QtCore.Qt.RightButton and self.selected and not self.model._controller.scene.get("locked", False):
                 temp = self.drag1
                 self.drag1 = self.drag2
                 self.drag2 = temp
