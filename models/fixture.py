@@ -31,7 +31,8 @@ class Fixture(object):
         #self._pixel_data = [(0, 0, 0)] * self._pixels
 
     def __repr__(self):
-        return "[%d:%d]*%d" % (self._strand, self._address, self._num_pixels)
+        return "[%d:%d]*%d  P1: %s  P2: %s" % (self._strand, self._address, self._num_pixels,
+                                               self._pos1, self._pos2)
 
     def strand(self):
         return self._strand
@@ -77,10 +78,6 @@ class Fixture(object):
     def get_widget(self):
         if self._widget is None:
             self._widget = FixtureWidget(self._controller.get_canvas(), model=self)
-            x, y = self._pos1[0], self._pos1[1]
-            cx, cy = self._controller.get_canvas().scene_to_canvas(x, y)
-            self._widget.setPos(cx, cy)
-            #self._widget.setRotation(self.angle)
         return self._widget
 
     def pixel_data(self):

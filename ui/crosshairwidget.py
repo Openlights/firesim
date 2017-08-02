@@ -27,12 +27,14 @@ class CrosshairWidget(QQuickPaintedItem):
         self.callback = callback
         self.setZ(110)
 
+        self.setWidth(self.size + 4)
+        self.setHeight(self.size + 4)
+
         if pos:
             self.scene_x, self.scene_y = pos
             x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
-            print(x, y)
-            self.setX(x)
-            self.setY(y)
+            self.setX(100)
+            self.setY(100)
 
     def boundingRect(self):
         # Bigger than the actual handle so that the text gets erased
@@ -44,7 +46,6 @@ class CrosshairWidget(QQuickPaintedItem):
         return path
 
     def paint(self, painter):
-        print("crosshair paint")
         if self.hidden:
             return
 

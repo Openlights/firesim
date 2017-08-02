@@ -72,7 +72,6 @@ class SceneController(QObject):
             self.canvas.update_fixtures(fl)
 
     def on_center_moved(self, pos):
-        print(pos)
         ipos = (int(pos.x()), int(pos.y()))
         self.scene.set_center(ipos)
 
@@ -111,6 +110,7 @@ class SceneController(QObject):
     def save_scene(self):
         self.scene.save()
 
+    @pyqtSlot()
     def update_all(self):
         for f in self.scene.fixtures():
             f.get_widget().update()

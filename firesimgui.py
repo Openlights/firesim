@@ -157,6 +157,11 @@ class FireSimGUI(QObject):
         self.net_stats_timer.timeout.connect(self.update_net_stats)
         self.net_stats_timer.start()
 
+        self.redraw_timer = QTimer()
+        self.redraw_timer.setInterval(33)
+        self.redraw_timer.timeout.connect(self.scenecontroller.update_all)
+        self.redraw_timer.start()
+
         self.netcontroller.data_received.connect(self.on_network_event)
         self.scenecontroller.new_frame.connect(self.netcontroller.frame_complete)
         self.netcontroller.data_received.connect(self.scenecontroller.process_command)

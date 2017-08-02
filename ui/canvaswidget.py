@@ -14,7 +14,7 @@ class CanvasWidget(QQuickPaintedItem):
         super(CanvasWidget, self).__init__()
         self.setFlag(QQuickItem.ItemClipsChildrenToShape, True)
         self.setAcceptedMouseButtons(QtCore.Qt.LeftButton | QtCore.Qt.RightButton)
-        self.setAcceptHoverEvents(True)
+        self.setAcceptHoverEvents(False)
         #self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
         self.setMipmap(True)
         #self.setAntialiasing(True)
@@ -32,8 +32,14 @@ class CanvasWidget(QQuickPaintedItem):
         self.y_offset = 0
         self.gui = None
 
-    def paint(self, painter):
+    def contains(self, point):
+        if point.x() < 0 or point.y() < 0:
+            return False
+        if point.x() > self.width() or point.y() > self.height():
+            return False
+        return True
 
+    def paint(self, painter):
         if self.background_image is not None:
             rect = QtCore.QRect(0, 0, self.width(), self.height())
             img = self.background_image.scaled(rect.size(), QtCore.Qt.KeepAspectRatio)
@@ -78,17 +84,11 @@ class CanvasWidget(QQuickPaintedItem):
         return (x, y)
 
     def hoverMoveEvent(self, event):
-        f = self.childAt(event.pos().x(), event.pos().y())
-        if f is not None:
-            f.hover_enter()
-            f.update()
-
         for fixture in self.fixture_list:
-            if fixture.shape().contains(fixture.mapFromGlobal(event.pos())):
+            if fixture.shape().contains(event.pos()):
                 fixture.hover_enter()
             else:
                 fixture.hover_leave()
-            fixture.update()
 
     def mouseMoveEvent(self, event):
         pass
@@ -127,8 +127,3 @@ class CanvasWidget(QQuickPaintedItem):
             a, b = a
         return (int(a - self.x_offset), int(b - self.y_offset))
 
-    @QtCore.pyqtSlot()
-    def propagate_hover_move(self, widget, scenepos):
-        self.hover_move_event.emit(widget, scenepos)
-
-    hover_move_event = QtCore.pyqtSignal(QWidget, QtCore.QEvent)

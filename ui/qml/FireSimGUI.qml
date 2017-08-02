@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0
 import FireSim 1.0
 import "widgets"
 
@@ -28,6 +29,16 @@ Item {
         id: sim
         anchors {left: toolbox.right; top: parent.top; bottom: parent.bottom; right: parent.right}
     }
+
+    // This is neat, but to use it, we'd need to render the LEDs on a different canvas
+    // than the helpers (labels, center, FPS display, drag handles, etc)
+    /*FastBlur {
+        anchors.fill: sim
+        source: sim
+        transparentBorder: true
+        radius: 48
+        visible: App.blur_enable
+    }*/
 
     SystemPalette { id: activePalette }
 
