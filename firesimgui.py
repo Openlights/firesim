@@ -1,6 +1,11 @@
 import logging as log
 import os.path
 
+# This is a workaround for a Linux + NVIDIA + PyQt5 bug causing no graphics to be rendered
+# because PyQt5 is linking to the wrong libGL.so / NVIDIA isn't overriding the MESA one.
+# See: https://bugs.launchpad.net/ubuntu/+source/python-qt4/+bug/941826
+from OpenGL import GL
+
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, QUrl, QTimer, QSize
 from PyQt5.QtQml import qmlRegisterType, QQmlComponent
 from PyQt5.QtQuick import QQuickView
