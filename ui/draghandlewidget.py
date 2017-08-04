@@ -46,20 +46,19 @@ class DragHandleWidget(QQuickPaintedItem):
 
         origin = self.fixture.SHAPE_MARGIN
 
-        painter.setPen(QPen(QColor(255, 255, 0, 225),
-                                  1,
-                                  Qt.SolidLine,
-                                  Qt.RoundCap,
-                                  Qt.RoundJoin))
-        if self.hovering:
-            painter.setPen(QPen(QColor(255, 0, 255, 225),
-                                  1,
-                                  Qt.SolidLine,
-                                  Qt.RoundCap,
-                                  Qt.RoundJoin))
-        painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
+        # painter.setPen(QPen(QColor(255, 255, 0, 225),
+        #                           1,
+        #                           Qt.SolidLine,
+        #                           Qt.RoundCap,
+        #                           Qt.RoundJoin))
+        # if self.hovering:
+        #     painter.setPen(QPen(QColor(255, 0, 255, 225),
+        #                           1,
+        #                           Qt.SolidLine,
+        #                           Qt.RoundCap,
+        #                           Qt.RoundJoin))
+        # painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
 
-        #painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(QPen(QColor(50, 100, 255, 255), 2, Qt.SolidLine))
         if self.hovering:
             painter.setBrush(QColor(50, 100, 255, 255))
@@ -68,12 +67,12 @@ class DragHandleWidget(QQuickPaintedItem):
         if self.fixture.selected:
             painter.setBrush(QColor(0, 0, 0, 180))
             painter.setPen(QColor(100, 100, 100, 100))
-            painter.drawRoundedRect(20, 20, 15, 18, 5, 5)
+            painter.drawRoundedRect(24, 8, 15, 18, 5, 5)
             painter.setPen(QColor(255, 255, 255, 255))
             if self == self.fixture.drag1:
-                painter.drawText(-10, -12, "1")
+                painter.drawText(26, 22, "1")
             else:
-                painter.drawText(-10, -12, "2")
+                painter.drawText(26, 22, "2")
         fixture_bg = QRect(origin - 4, origin - 4, 8, 8)
         painter.setBrush(QColor(50, 50, 100, 127))
         painter.drawEllipse(fixture_bg)

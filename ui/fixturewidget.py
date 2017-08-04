@@ -51,6 +51,7 @@ class FixtureWidget(QQuickPaintedItem):
         x1, y1 = canvas.scene_to_canvas(self.model.pos1())
         x2, y2 = canvas.scene_to_canvas(self.model.pos2())
         self.setPos(min(x1, x2), min(y1, y2))
+        self.update_geometry()
 
         self.drag1 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos1())
         self.drag2 = DragHandleWidget(canvas=canvas, fixture=self, pos=self.model.pos2())
@@ -58,7 +59,6 @@ class FixtureWidget(QQuickPaintedItem):
     def setPos(self, x, y):
         self.setX(x - self.SHAPE_MARGIN)
         self.setY(y - self.SHAPE_MARGIN)
-        self.update_geometry()
 
     def deleteLater(self):
         self.drag1.deleteLater()
@@ -113,18 +113,13 @@ class FixtureWidget(QQuickPaintedItem):
         return self._shape
 
     def paint(self, painter):
-        # painter.setPen(QPen(QColor(255, 255, 0, 225),
+        # if self.selected:
+        #     painter.setPen(QPen(QColor(255, 0, 255, 225),
         #                           1,
         #                           QtCore.Qt.SolidLine,
         #                           QtCore.Qt.RoundCap,
         #                           QtCore.Qt.RoundJoin))
-        if self.selected:
-            painter.setPen(QPen(QColor(255, 0, 255, 225),
-                                  1,
-                                  QtCore.Qt.SolidLine,
-                                  QtCore.Qt.RoundCap,
-                                  QtCore.Qt.RoundJoin))
-            painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
+        #     painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
 
         x1, y1 = self.model.pos1()
         x2, y2 = self.model.pos2()
@@ -240,8 +235,6 @@ class FixtureWidget(QQuickPaintedItem):
         self.drag1.update()
         self.drag2.update()
         self.update()
-        #event.ignore()
-
 
     def hover_leave(self):
         if self.canvas.gui.state.locked:
@@ -255,14 +248,23 @@ class FixtureWidget(QQuickPaintedItem):
         self.drag2.hidden = not self.selected
         self.drag1.update()
         self.drag2.update()
-        #event.ignore()
+
+    def hoverEnterEvent(self, event):
+        event.accept()
+
+    def hoverLeaveEvent(self, event):
+        event.ignore()
 
     def hoverMoveEvent(self, event):
         if self.canvas.gui.state.locked:
             event.ignore()
             return
 
-        if self.shape().contains(event.pos()):
+        if self.check_hover(event.pos()):
+            event.accept()
+
+    def check_hover(self, pos):
+        if self.shape().contains(pos):
             self.setZ(50)
             self.drag1.setZ(60)
             self.drag2.setZ(60)
@@ -270,7 +272,6 @@ class FixtureWidget(QQuickPaintedItem):
             self.drag1.hidden = False
             self.drag2.hidden = False
         else:
-            event.ignore()
             self.hovering = False
             if not self.selected:
                 self.setZ(0)
@@ -282,35 +283,45 @@ class FixtureWidget(QQuickPaintedItem):
         self.drag1.update()
         self.drag2.update()
         self.update()
+        return self.hovering
 
     def mouseMoveEvent(self, event):
-        if self.hovering and self.mouse_down and not self.canvas.gui.state.locked:
-            self.dragging = True
-            npos = (event.globalPos() - self.drag_pos)
-            if self.parent().sceneBoundingRect().contains(event.globalPos()):
-                self.moveBy(npos.x(), npos.y())
-                self.drag1.move_by(npos.x(), npos.y())
-                self.drag2.move_by(npos.x(), npos.y())
-                self.update_handle_positions()
-            self.drag_pos = event.globalPos()
-            self.model.fixture_move_callback(self)
 
-        event.ignore()
-        #super(FixtureWidget, self).mouseMoveEvent(event)
+        DRAG_THRESHOLD = 4  # pixels
+
+        if self.selected and self.mouse_down and not self.canvas.gui.state.locked:
+            event.accept()
+
+            delta_pos = event.globalPos() - self.drag_pos
+
+            if self.dragging or max(delta_pos) > DRAG_THRESHOLD:
+                self.dragging = True
+
+                if self.canvas.contains(self.canvas.mapFromGlobal(event.globalPos())):
+                    self.moveBy(npos.x(), npos.y())
+                    self.drag1.move_by(npos.x(), npos.y())
+                    self.drag2.move_by(npos.x(), npos.y())
+                    self.update_handle_positions()
+
+                self.model.fixture_move_callback(self)
+        else:
+            event.ignore()
 
     def mousePressEvent(self, event):
         if self.canvas.gui.state.locked:
             return
 
         if self.shape().contains(event.pos()):
+            event.accept()
             self.mouse_down = True
             self.drag_pos = event.globalPos()
-        #super(FixtureWidget, self).mousePressEvent(event)
+        else:
+            event.ignore()
 
     def select(self, selected, multi=False):
-        if selected:
-            print("Selected: ", repr(self.model), "X", self.x(), "Y", self.y(),
-                  "Width", self.width(), "Height", self.height())
+        # if selected:
+        #     print("Selected: ", repr(self.model), "X", self.x(), "Y", self.y(),
+        #           "Width", self.width(), "Height", self.height())
         self.drag1.selected = selected
         self.drag2.selected = selected
         self.selected = selected
@@ -326,6 +337,7 @@ class FixtureWidget(QQuickPaintedItem):
             self.drag2.setZ(0)
             self.drag1.hidden = True
             self.drag2.hidden = True
+            self.hovering = False
         self.drag1.update()
         self.drag2.update()
 
@@ -354,16 +366,18 @@ class FixtureWidget(QQuickPaintedItem):
                 self.drag1 = self.drag2
                 self.drag2 = temp
                 self.update_handle_positions()
+                self.drag1.update()
+                self.drag2.update()
 
             self.dragging = False
             self.mouse_down = False
             self.drag_pos = None
             self.model.fixture_move_callback(self)
         else:
-            self.canvas.deselect_all()
-            #if self.selected:
-            #    self.select(not self.selected)
-            #    self.model._controller.widget_selected(self.selected, self.model, False)
+            if not self.dragging:
+                self.select(False)
+            else:
+                self.dragging = False
 
     def mouseDoubleClickEvent(self, event):
         pass
