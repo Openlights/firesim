@@ -53,7 +53,7 @@ class Scene(JSONLoader):
         return tuple(self._data.get("extents", (100, 100)))
 
     def bounding_box(self):
-        return tuple(self._data.get("bounding_box", self.extents()))
+        return tuple(self._data.get("bounding-box", self.extents()))
 
     def center(self):
         return tuple(self._data.get("center", (50, 50)))

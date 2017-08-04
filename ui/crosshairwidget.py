@@ -1,16 +1,19 @@
-from PySide import QtCore, QtGui, QtDeclarative
+from __future__ import division
+from past.utils import old_div
+
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 
 
-class CrosshairWidget(QtDeclarative.QDeclarativeItem):
+class CrosshairWidget(QQuickPaintedItem):
 
     size = 20
 
     def __init__(self, canvas=None, pos=None, text=None, callback=None):
         super(CrosshairWidget, self).__init__(canvas)
-        self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
-        self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
-        self.setAcceptsHoverEvents(True)
+        #self.setFlag(QQuickItem.ItemIsSelectable, True)
+        self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
+        self.setAcceptHoverEvents(True)
         self.color = QtGui.QColor(100, 100, 100)
         self.canvas = canvas
         self.dragging = False
@@ -22,39 +25,43 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
         self.scene_y = 0.0
         self.text = text
         self.callback = callback
-        self.setZValue(110)
+        self.setZ(110)
+
+        self.setWidth(self.size + 4)
+        self.setHeight(self.size + 4)
 
         if pos:
             self.scene_x, self.scene_y = pos
             x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
-            self.setPos(x, y)
+            self.setX(100)
+            self.setY(100)
 
     def boundingRect(self):
         # Bigger than the actual handle so that the text gets erased
-        return QtCore.QRectF(-((self.size + 4) / 2), -((self.size + 4) / 2), self.size + 50, self.size + 20)
+        return QtCore.QRectF(-(old_div((self.size + 4), 2)), -(old_div((self.size + 4), 2)), self.size + 50, self.size + 20)
 
     def shape(self):
         path = QtGui.QPainterPath()
-        path.addRect(-(self.size / 2), -(self.size / 2), self.size, self.size)
+        path.addRect(-(old_div(self.size, 2)), -(old_div(self.size, 2)), self.size, self.size)
         return path
 
-    def paint(self, painter, options, widget):
+    def paint(self, painter):
         if self.hidden:
             return
 
         if self.hovering:
             painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 200, 255), 4, QtCore.Qt.SolidLine))
-            painter.drawLine (0, self.size / 2, 0, -(self.size / 2))
-            painter.drawLine(-(self.size / 2), 0, self.size / 2, 0)
+            painter.drawLine (0, old_div(self.size, 2), 0, -(old_div(self.size, 2)))
+            painter.drawLine(-(old_div(self.size, 2)), 0, old_div(self.size, 2), 0)
 
         if self.isSelected() or self.mouse_down:
             painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 180), 6, QtCore.Qt.SolidLine))
-            painter.drawLine (0, self.size / 2, 0, -(self.size / 2))
-            painter.drawLine(-(self.size / 2), 0, self.size / 2, 0)
+            painter.drawLine (0, old_div(self.size, 2), 0, -(old_div(self.size, 2)))
+            painter.drawLine(-(old_div(self.size, 2)), 0, old_div(self.size, 2), 0)
 
         painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 50, 255), 2, QtCore.Qt.SolidLine))
-        painter.drawLine (0, self.size / 2, 0, -(self.size / 2))
-        painter.drawLine(-(self.size / 2), 0, self.size / 2, 0)
+        painter.drawLine (0, old_div(self.size, 2), 0, -(old_div(self.size, 2)))
+        painter.drawLine(-(old_div(self.size, 2)), 0, old_div(self.size, 2), 0)
 
         if self.text:
             painter.drawText(5, 15, self.text)
@@ -62,7 +69,7 @@ class CrosshairWidget(QtDeclarative.QDeclarativeItem):
     def hoverEnterEvent(self, event):
         if self.hidden:
             return
-        self.setZValue(50)
+        self.setZ(50)
 
     def hoverLeaveEvent(self, event):
         self.hovering = False

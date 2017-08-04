@@ -1,20 +1,28 @@
+from __future__ import division
+from past.utils import old_div
 import colorsys
 import random
 
-from PySide import QtCore, QtGui, QtDeclarative
+from PyQt5 import QtCore
+from PyQt5.QtGui import QColor, QFont, QImage
+from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
+from PyQt5.QtWidgets import QWidget
 
 
-class CanvasWidget(QtDeclarative.QDeclarativeItem):
+class CanvasWidget(QQuickPaintedItem):
     def __init__(self, parent = None):
         super(CanvasWidget, self).__init__()
-        self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
-        self.setFlag(QtGui.QGraphicsItem.ItemClipsChildrenToShape, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton | QtCore.Qt.MouseButton.RightButton)
-        self.setAcceptsHoverEvents(True)
-        self.color = QtGui.QColor(100, 100, 100)
+        self.setFlag(QQuickItem.ItemClipsChildrenToShape, True)
+        self.setAcceptedMouseButtons(QtCore.Qt.LeftButton | QtCore.Qt.RightButton)
+        self.setAcceptHoverEvents(False)
+        #self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
+        self.setMipmap(True)
+        #self.setAntialiasing(True)
+        self.setFillColor(QColor(0, 0, 0))
+
+        self.color = QColor(100, 100, 100)
         self.fixture_list = []
         self.background_image = None
-        self.rect = None
         self.net_stats = {'pps': 0, 'ups': 0}
         self.controller = None
         self.next_new_fixture_pos = (25, 25)
@@ -24,26 +32,31 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         self.y_offset = 0
         self.gui = None
 
-    def paint(self, painter, options, widget):
-        self.rect = QtCore.QRect(0, 0, self.width(), self.height())
-        painter.fillRect(self.rect, QtGui.QColor(0, 0, 0))
+    def contains(self, point):
+        if point.x() < 0 or point.y() < 0:
+            return False
+        if point.x() > self.width() or point.y() > self.height():
+            return False
+        return True
 
+    def paint(self, painter):
         if self.background_image is not None:
-            img = self.background_image.scaled(self.rect.size(), QtCore.Qt.KeepAspectRatio)
+            rect = QtCore.QRect(0, 0, self.width(), self.height())
+            img = self.background_image.scaled(rect.size(), QtCore.Qt.KeepAspectRatio)
             # FIXME
             #if img.rect().width() != self.background_image.rect().width():
             #    self.coordinate_scale = float(img.rect().width()) / self.background_image.rect().width()
-            if img.rect().width() <= self.rect.width():
-                self.x_offset = (self.rect.width() - img.rect().width()) / 2
+            if img.rect().width() <= rect.width():
+                self.x_offset = old_div((rect.width() - img.rect().width()), 2)
                 painter.drawImage(self.x_offset, 0, img)
-            elif img.rect().height() <= self.rect.height():
-                self.y_offset = (self.rect.height() - img.rect().height()) / 2
+            elif img.rect().height() <= rect.height():
+                self.y_offset = old_div((rect.height() - img.rect().height()), 2)
                 painter.drawImage(0, self.y_offset, img)
 
-        f = QtGui.QFont()
+        f = QFont()
         f.setPointSize(8)
         painter.setFont(f)
-        painter.setPen(QtGui.QColor(170, 170, 200, 255))
+        painter.setPen(QColor(170, 170, 200, 255))
         painter.drawText(8, 16, "%0.1f packets/sec" % self.net_stats['pps'])
         painter.drawText(8, 32, "%0.1f frames/sec" % self.net_stats['ups'])
 
@@ -58,7 +71,7 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
 
     def set_background_image(self, image):
         if image is not None:
-            assert isinstance(image, QtGui.QImage), "You must pass a QtGui.QImage to set_background_image()"
+            assert isinstance(image, QImage), "You must pass a QImage to set_background_image()"
             # self.w = image.width()
             # self.h = image.height()
             # self.setWidth(self.w/2)
@@ -71,16 +84,11 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         return (x, y)
 
     def hoverMoveEvent(self, event):
-        #print event.scenePos()
         for fixture in self.fixture_list:
-            #print fixture.mapToParent(fixture.shape())
-            if fixture.mapToParent(fixture.shape()).contains(event.pos()):
+            if fixture.shape().contains(event.pos()):
                 fixture.hover_enter()
             else:
                 fixture.hover_leave()
-            fixture.update()
-        #pass
-        #self.propagate_hover_move(None, event)
 
     def mouseMoveEvent(self, event):
         pass
@@ -89,9 +97,9 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
         pass
 
     def mouseReleaseEvent(self, event):
-        if event.button() == QtCore.Qt.MouseButton.LeftButton:
+        if event.button() == QtCore.Qt.LeftButton:
             self.deselect_all()
-        elif event.button() == QtCore.Qt.MouseButton.RightButton:
+        elif event.button() == QtCore.Qt.RightButton:
             self.generate_markup_color()
 
     def deselect_all(self):
@@ -119,8 +127,3 @@ class CanvasWidget(QtDeclarative.QDeclarativeItem):
             a, b = a
         return (int(a - self.x_offset), int(b - self.y_offset))
 
-    @QtCore.Slot()
-    def propagate_hover_move(self, widget, scenepos):
-        self.hover_move_event.emit(widget, scenepos)
-
-    hover_move_event = QtCore.Signal(QtGui.QWidget, QtCore.QEvent)

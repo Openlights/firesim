@@ -1,17 +1,19 @@
-from PySide import QtCore, QtGui, QtDeclarative
+from PyQt5.QtCore import Qt, QPoint, QPointF, QSizeF, QRect
+from PyQt5.QtGui import QColor, QPainter, QPainterPath, QPen, QPolygonF, QFont
+from PyQt5.QtQuick import QQuickItem, QQuickPaintedItem
 
 
-class DragHandleWidget(QtDeclarative.QDeclarativeItem):
+class DragHandleWidget(QQuickPaintedItem):
 
-    def __init__(self, canvas=None, fixture=None, pos=None):
+    def __init__(self, canvas, fixture, pos=None):
         super(DragHandleWidget, self).__init__(canvas)
-        self.setFlag(QtGui.QGraphicsItem.ItemHasNoContents, False)
-        self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-        self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.LeftButton)
-        self.setAcceptsHoverEvents(True)
-        self.color = QtGui.QColor(100, 100, 100)
+        self.setFlag(QQuickItem.ItemHasContents, True)
+        self.setAcceptedMouseButtons(Qt.LeftButton)
+        self.setAcceptHoverEvents(True)
+        self.color = QColor(100, 100, 100)
         self.canvas = canvas
         self.fixture = fixture
+        self.setParent(fixture)
         self.dragging = False
         self.mouse_down = False
         self.hovering = False
@@ -19,63 +21,80 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.drag_pos = None
         self.scene_x = 0.0
         self.scene_y = 0.0
-        #self.rect = QtCore.QRect(0, 0, 16, 16)
+        self._shape = None
+
+        self.setWidth(48)
+        self.setHeight(48)
+
         if pos:
             self.scene_x, self.scene_y = pos
             x, y = self.canvas.scene_to_canvas(pos[0], pos[1])
-            self.setPos(x, y)
-
-    def boundingRect(self):
-        # Bigger than the actual handle so that the text gets erased
-        return QtCore.QRectF(-20, -26, 40, 40)
+            self.setX(x)
+            self.setY(y)
 
     def shape(self):
-        path = QtGui.QPainterPath()
-        path.addEllipse(-6, -6, 12, 12)
-        return path
+        if self._shape is None:
+            origin = self.fixture.SHAPE_MARGIN
+            path = QPainterPath()
+            path.addEllipse(origin - 7, origin - 7, 14, 14)
+            self._shape = path
+        return self._shape
 
-    def paint(self, painter, options, widget):
+    def paint(self, painter):
         if self.hidden:
             return
-        #painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.setPen(QtGui.QPen(QtGui.QColor(50, 100, 255, 255), 2, QtCore.Qt.SolidLine))
+
+        origin = self.fixture.SHAPE_MARGIN
+
+        # painter.setPen(QPen(QColor(255, 255, 0, 225),
+        #                           1,
+        #                           Qt.SolidLine,
+        #                           Qt.RoundCap,
+        #                           Qt.RoundJoin))
+        # if self.hovering:
+        #     painter.setPen(QPen(QColor(255, 0, 255, 225),
+        #                           1,
+        #                           Qt.SolidLine,
+        #                           Qt.RoundCap,
+        #                           Qt.RoundJoin))
+        # painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
+
+        painter.setPen(QPen(QColor(50, 100, 255, 255), 2, Qt.SolidLine))
         if self.hovering:
-            painter.setBrush(QtGui.QColor(50, 100, 255, 255))
-            hover_rect = QtCore.QRect(-6, -6, 12, 12)
+            painter.setBrush(QColor(50, 100, 255, 255))
+            hover_rect = QRect(origin - 6, origin - 6, 12, 12)
             painter.drawEllipse(hover_rect)
-        if self.isSelected():
-            painter.setBrush(QtGui.QColor(0, 0, 0, 180))
-            painter.setPen(QtGui.QColor(100, 100, 100, 100))
-            painter.drawRoundedRect(-14, -26, 15, 18, 5, 5)
-            painter.setPen(QtGui.QColor(255, 255, 255, 255))
+        if self.fixture.selected:
+            painter.setBrush(QColor(0, 0, 0, 180))
+            painter.setPen(QColor(100, 100, 100, 100))
+            painter.drawRoundedRect(24, 8, 15, 18, 5, 5)
+            painter.setPen(QColor(255, 255, 255, 255))
             if self == self.fixture.drag1:
-                painter.drawText(-10, -12, "1")
+                painter.drawText(26, 22, "1")
             else:
-                painter.drawText(-10, -12, "2")
-        fixture_bg = QtCore.QRect(-4, -4, 8, 8)
-        painter.setBrush(QtGui.QColor(100, 100, 100, 200))
+                painter.drawText(26, 22, "2")
+        fixture_bg = QRect(origin - 4, origin - 4, 8, 8)
+        painter.setBrush(QColor(50, 50, 100, 127))
         painter.drawEllipse(fixture_bg)
 
     def hoverEnterEvent(self, event):
-        if (self.canvas.controller.scene.get("locked", False) or
-            (self.fixture.hovering is False and
-            self.fixture.isSelected() is False)):
+        if (self.canvas.gui.state.locked or
+            (not self.fixture.hovering and
+            not self.fixture.selected)):
             return
-        self.setZValue(150)
+        self.hovering = True
+        self.setZ(150)
 
     def hoverLeaveEvent(self, event):
-        if (self.canvas.controller.scene.get("locked", False) or
-            (self.fixture.hovering is False and
-            self.fixture.isSelected() is False)):
-            return
-        self.hovering = False
-        #self.hidden = not self.fixture.isSelected()
-        self.update()
+        if self.hovering:
+            self.hovering = False
+            #self.hidden = not self.fixture.isSelected()
+            self.update()
 
     def hoverMoveEvent(self, event):
-        if (self.canvas.controller.scene.get("locked", False) or
-            (self.fixture.hovering is False and
-            self.fixture.isSelected() is False)):
+        if (self.canvas.gui.state.locked or
+            (not self.fixture.hovering and
+            not self.fixture.selected)):
             return
         if self.shape().contains(event.pos()):
             self.hidden = False
@@ -85,18 +104,18 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         self.update()
 
     def mouseMoveEvent(self, event):
-        if self.mouse_down and not self.fixture.model._controller.scene.get("locked", False):
+        if self.mouse_down and not self.canvas.gui.state.locked:
             self.dragging = True
-            npos = (event.scenePos() - self.drag_pos)
-            if self.canvas.sceneBoundingRect().contains(event.scenePos()):
+            npos = (event.globalPos() - self.drag_pos)
+            if self.canvas.contains(event.globalPos()):
                 self.move_by(npos.x(), npos.y())
-            self.drag_pos = event.scenePos()
+            self.drag_pos = event.globalPos()
             #self.update_positions()
             self.fixture.handle_move_callback(self)
 
     def mousePressEvent(self, event):
         self.mouse_down = True
-        self.drag_pos = event.scenePos()
+        self.drag_pos = event.globalPos()
 
     def mouseReleaseEvent(self, event):
         self.dragging = False
@@ -109,8 +128,8 @@ class DragHandleWidget(QtDeclarative.QDeclarativeItem):
         pass
 
     def update_positions(self):
-        self.scene_x, self.scene_y = self.canvas.canvas_to_scene(self.pos().x(), self.pos().y())
+        self.scene_x, self.scene_y = self.canvas.canvas_to_scene(self.x(), self.y())
 
     def move_by(self, x, y):
         self.moveBy(x, y)
-        self.scene_x, self.scene_y = self.canvas.canvas_to_scene(self.pos().x(), self.pos().y())
+        self.scene_x, self.scene_y = self.canvas.canvas_to_scene(self.x(), self.y())

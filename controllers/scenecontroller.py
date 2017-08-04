@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import chr
+from builtins import range
 import logging as log
 import struct
 import array
@@ -5,18 +8,18 @@ import os
 import numpy as np
 import time
 
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtGui import QImage
+
 from ui.canvaswidget import CanvasWidget
 from ui.fixturewidget import FixtureWidget
 from ui.crosshairwidget import CrosshairWidget
 
-from PySide import QtCore, QtGui
-
-
 from models.fixture import Fixture
 
-class SceneController(QtCore.QObject):
+class SceneController(QObject):
 
-    new_frame = QtCore.Signal()
+    new_frame = pyqtSignal()
 
     def __init__(self, app, scene):
         super(SceneController, self).__init__()
@@ -25,7 +28,7 @@ class SceneController(QtCore.QObject):
         self.app = app
         self._output_buffer = None
         self.show_center = False
-        self._color_mode = self.app.config.get("color_mode")
+        self._color_mode = self.app.config.get("color-mode")
         self._frame_data = {}
         self.strand_data = {}
         self.times = []
@@ -43,10 +46,10 @@ class SceneController(QtCore.QObject):
 
     def load_backdrop(self):
         if self.canvas is not None:
-            if self.scene.get("backdrop_enable", False):
-                image_filename = os.path.abspath(self.scene.get("backdrop_filename"))
+            if self.scene.get("backdrop-enable", False):
+                image_filename = os.path.abspath(self.scene.get("backdrop-filename"))
                 log.info("Loading backdrop from " + image_filename)
-                img = QtGui.QImage(image_filename)
+                img = QImage(image_filename)
                 if img.isNull():
                     log.error("Could not load background image: %s", image_filename)
                 else:
@@ -69,7 +72,6 @@ class SceneController(QtCore.QObject):
             self.canvas.update_fixtures(fl)
 
     def on_center_moved(self, pos):
-        print pos
         ipos = (int(pos.x()), int(pos.y()))
         self.scene.set_center(ipos)
 
@@ -108,41 +110,46 @@ class SceneController(QtCore.QObject):
     def save_scene(self):
         self.scene.save()
 
+    @pyqtSlot()
     def update_all(self):
         for f in self.scene.fixtures():
             f.get_widget().update()
         self.center_widget.update()
         self.canvas.update()
 
-    def toggle_background_enable(self):
-        if self.scene.get("backdrop_enable", False):
-            self.scene.set("backdrop_enable", False)
-            self.load_backdrop()
-            return False
-        else:
-            self.scene.set("backdrop_enable", True)
-            self.load_backdrop()
-            return True
+    @pyqtSlot()
+    def on_backdrop_enable_changed(self):
+        self.backdrop_enable(self.app.state.backdrop_enable)
 
-    def toggle_labels_enable(self):
-        enabled = not self.scene.get("labels_enable", False)
-        self.scene.set("labels_enable", enabled)
+    def backdrop_enable(self, en):
+        self.scene.set("backdrop-enable", en)
+        self.load_backdrop()
+
+    @pyqtSlot()
+    def on_labels_visible_changed(self):
+        self.labels_visible(self.app.state.labels_visible)
+
+    def labels_visible(self, visible):
+        self.scene.set("labels-visible", visible)
         self.update_all()
-        return enabled
 
-    def toggle_locked(self):
-        locked = not self.scene.get("locked", False)
-        self.scene.set("locked", locked)
-        if locked:
+    @pyqtSlot()
+    def on_locked_changed(self):
+        self.locked(self.app.state.locked)
+
+    def locked(self, is_locked):
+        self.scene.set("locked", is_locked)
+        if is_locked:
             self.canvas.deselect_all()
         self.update_all()
-        return locked
 
-    def toggle_show_center(self):
-        self.show_center = not self.show_center
-        self.center_widget.hidden = not self.show_center
+    @pyqtSlot()
+    def on_center_visible_changed(self):
+        self.center_visible(self.app.state.center_visible)
+
+    def center_visible(self, visible):
+        self.center_widget.hidden = not visible
         self.update_all()
-        return self.show_center
 
     def update_fixture(self, fixture, new_strand, new_address):
         self.scene.update_fixture(fixture, new_strand, new_address)
@@ -170,7 +177,7 @@ class SceneController(QtCore.QObject):
         log.info("Scene has %d strands, %d pixels." % (len(fh), max_pixels))
         self._output_buffer = np.zeros((len(fh), max_pixels, 3))
 
-    @QtCore.Slot(list)
+    @pyqtSlot(list)
     def process_command(self, packet):
         cmd = chr(packet[0])
         datalen = 0
@@ -189,8 +196,8 @@ class SceneController(QtCore.QObject):
 
         # end frame
         elif cmd == 'E':
-            for strand, data in self._frame_data.iteritems():
-                data = [data[i:i+3] for i in xrange(0, len(data), 3)]
+            for strand, data in self._frame_data.items():
+                data = [data[i:i+3] for i in range(0, len(data), 3)]
                 self.strand_data[strand] = data
             self.times.append((time.time() - self.frame_start_time))
             if len(self.times) > 100:

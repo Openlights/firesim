@@ -1,4 +1,5 @@
-import QtQuick 1.1
+import QtQuick 2.0
+import QtGraphicalEffects 1.0
 import FireSim 1.0
 import "widgets"
 
@@ -6,12 +7,6 @@ Item {
     id: window
     width: 100 //640
     height: 100 //480
-
-    signal backdrop_showhide_callback(variant obj)
-    signal labels_showhide_callback(variant obj)
-    signal lock_callback(variant obj)
-    signal show_center_callback(variant obj)
-    signal toggle_blurred_callback(variant obj)
 
     MouseArea {
         anchors.fill: parent
@@ -34,6 +29,16 @@ Item {
         id: sim
         anchors {left: toolbox.right; top: parent.top; bottom: parent.bottom; right: parent.right}
     }
+
+    // This is neat, but to use it, we'd need to render the LEDs on a different canvas
+    // than the helpers (labels, center, FPS display, drag handles, etc)
+    /*FastBlur {
+        anchors.fill: sim
+        source: sim
+        transparentBorder: true
+        radius: 48
+        visible: App.blur_enable
+    }*/
 
     SystemPalette { id: activePalette }
 
@@ -73,33 +78,28 @@ Item {
             }
 
             Button {
-                id: btn_backdrop_showhide
-                text: if(main.is_backdrop_enabled()) "Hide Backdrop"; else "Show Backdrop"
-                onClicked: backdrop_showhide_callback(btn_backdrop_showhide)
+                text: App.backdrop_enable ? "Hide Backdrop" : "Show Backdrop"
+                onClicked: App.backdrop_enable = !App.backdrop_enable
             }
 
             Button {
-                id: btn_labels_showhide
-                text: if(main.are_labels_enabled()) "Hide Labels"; else "Show Labels"
-                onClicked: labels_showhide_callback(btn_labels_showhide)
+                text: App.labels_visible ? "Hide Labels" : "Show Labels"
+                onClicked: App.labels_visible = !App.labels_visible
             }
 
             Button {
-                id: btn_lock
-                text: if(main.is_locked()) "Unlock Scene"; else "Lock Scene"
-                onClicked: lock_callback(btn_lock)
+                text: App.locked ? "Unlock Scene" : "Lock Scene"
+                onClicked: App.locked = !App.locked
             }
 
             Button {
-                id: btn_show_center
-                text: if(main.is_center_shown()) "Hide Center"; else "Show Center"
-                onClicked: show_center_callback(btn_show_center)
+                text: App.center_visible ? "Hide Center" : "Show Center"
+                onClicked: App.center_visible = !App.center_visible
             }
 
             Button {
-                id: btn_toggle_blurred
-                text: "Blurred"
-                onClicked: toggle_blurred_callback(btn_toggle_blurred)
+                text: App.blur_enable ? "Unblurred" : "Blurred"
+                onClicked: App.blur_enable = !App.blur_enable
             }
 
             /*Button {

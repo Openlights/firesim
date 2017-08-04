@@ -1,14 +1,16 @@
+from builtins import map
+from builtins import object
 import logging as log
 import colorsys
 import random
 from util.clip import clip
 
-from PySide import QtCore
+from PyQt5 import QtCore
 
 from ui.fixturewidget import FixtureWidget
 
 
-class Fixture:
+class Fixture(object):
 
     def __init__(self, data=None, controller=None, strand=0, address=0):
         self._strand = strand
@@ -29,7 +31,8 @@ class Fixture:
         #self._pixel_data = [(0, 0, 0)] * self._pixels
 
     def __repr__(self):
-        return "[%d:%d]*%d" % (self._strand, self._address, self._num_pixels)
+        return "[%d:%d]*%d  P1: %s  P2: %s" % (self._strand, self._address, self._num_pixels,
+                                               self._pos1, self._pos2)
 
     def strand(self):
         return self._strand
@@ -75,10 +78,6 @@ class Fixture:
     def get_widget(self):
         if self._widget is None:
             self._widget = FixtureWidget(self._controller.get_canvas(), model=self)
-            x, y = self._pos1[0], self._pos1[1]
-            cx, cy = self._controller.get_canvas().scene_to_canvas(x, y)
-            self._widget.setPos(cx, cy)
-            #self._widget.setRotation(self.angle)
         return self._widget
 
     def pixel_data(self):
@@ -104,8 +103,8 @@ class Fixture:
                 }
 
     def fixture_move_callback(self, fixture):
-        self._pos1 = map(int, (fixture.drag1.scene_x, fixture.drag1.scene_y))
-        self._pos2 = map(int, (fixture.drag2.scene_x, fixture.drag2.scene_y))
+        self._pos1 = list(map(int, (fixture.drag1.scene_x, fixture.drag1.scene_y)))
+        self._pos2 = list(map(int, (fixture.drag2.scene_x, fixture.drag2.scene_y)))
         fixture.update_geometry()
 
     def random_color(self):
