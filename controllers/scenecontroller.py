@@ -29,10 +29,8 @@ class SceneController(QObject):
         self._output_buffer = None
         self.show_center = False
         self._color_mode = self.app.config.get("color-mode")
-        self._frame_data = {}
+
         self.strand_data = {}
-        self.times = []
-        self.frame_start_time = 0.0
         if self.canvas is not None:
             self.init_view()
 
@@ -40,40 +38,29 @@ class SceneController(QObject):
         self.create_pixel_array()
 
     def init_view(self):
-        self.center_widget = CrosshairWidget(self.canvas, self.scene.center(), "Center", callback=self.on_center_moved)
         self.load_backdrop()
-        self.update_canvas()
 
     def load_backdrop(self):
         if self.canvas is not None:
-            if self.scene.get("backdrop-enable", False):
-                image_filename = os.path.abspath(self.scene.get("backdrop-filename"))
-                log.info("Loading backdrop from " + image_filename)
-                img = QImage(image_filename)
-                if img.isNull():
-                    log.error("Could not load background image: %s", image_filename)
-                else:
-                    self.canvas.set_background_image(img)
-            else:
-                self.canvas.set_background_image(None)
+            # if self.scene.get("backdrop-enable", False):
+            #     image_filename = os.path.abspath(self.scene.get("backdrop-filename"))
+            #     log.info("Loading backdrop from " + image_filename)
+            #     img = QImage(image_filename)
+            #     if img.isNull():
+            #         log.error("Could not load background image: %s", image_filename)
+            #     else:
+            #         self.canvas.set_background_image(img)
+            # else:
+            #     self.canvas.set_background_image(None)
             self.canvas.update()
 
     def set_canvas(self, canvas):
         self.canvas = canvas
-        canvas.controller = self
+        canvas.scene_controller = self
         self.init_view()
 
     def get_canvas(self):
         return self.canvas
-
-    def update_canvas(self):
-        if self.canvas is not None:
-            fl = [f.get_widget() for f in self.scene.fixtures()]
-            self.canvas.update_fixtures(fl)
-
-    def on_center_moved(self, pos):
-        ipos = (int(pos.x()), int(pos.y()))
-        self.scene.set_center(ipos)
 
     def add_fixture(self):
         fh = self.scene.fixture_hierarchy()
@@ -112,9 +99,6 @@ class SceneController(QObject):
 
     @pyqtSlot()
     def update_all(self):
-        for f in self.scene.fixtures():
-            f.get_widget().update()
-        self.center_widget.update()
         self.canvas.update()
 
     @pyqtSlot()
@@ -176,33 +160,3 @@ class SceneController(QObject):
 
         log.info("Scene has %d strands, %d pixels." % (len(fh), max_pixels))
         self._output_buffer = np.zeros((len(fh), max_pixels, 3))
-
-    @pyqtSlot(list)
-    def process_command(self, packet):
-        cmd = chr(packet[0])
-        datalen = 0
-
-        # begin frame
-        if cmd == 'B':
-            self.frame_start_time = time.time()
-            self.app.netcontroller.frame_started()
-
-        # Unpack strand pixel data
-        elif cmd == 'S':
-            strand = packet[1]
-            datalen = (packet[3] << 8) + packet[2]
-            data = [c for c in packet[4:]]
-            self._frame_data[strand] = data
-
-        # end frame
-        elif cmd == 'E':
-            for strand, data in self._frame_data.items():
-                data = [data[i:i+3] for i in range(0, len(data), 3)]
-                self.strand_data[strand] = data
-            self.times.append((time.time() - self.frame_start_time))
-            if len(self.times) > 100:
-                self.times.pop(0)
-            self.new_frame.emit()
-
-        else:
-            log.error("Malformed packet of length %d!" % len(packet))

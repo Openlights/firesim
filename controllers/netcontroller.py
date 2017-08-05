@@ -11,9 +11,9 @@ USE_ZMQ = False
 
 class NetController(QtCore.QObject):
 
-    ready_to_read = QtCore.pyqtSignal()
     data_received = QtCore.pyqtSignal(list)
     start = QtCore.pyqtSignal()
+    new_frame = QtCore.pyqtSignal(dict)
 
     def __init__(self, app):
         super(NetController, self).__init__()
@@ -25,6 +25,9 @@ class NetController(QtCore.QObject):
         self.in_frame = False
         self.running = True
         self.last_time = time.clock()
+        self.times = []
+        self.frame_start_time = 0.0
+        self._frame_data = {}
 
         if USE_ZMQ:
             self.context = zmq.Context()
@@ -49,7 +52,7 @@ class NetController(QtCore.QObject):
             else:
                 packet = [ord(c) for c in datagram.data()]
             self.packets += 1
-            self.data_received.emit(packet)
+            self.process_packet(packet)
 
     @QtCore.pyqtSlot()
     def run(self):
@@ -78,3 +81,29 @@ class NetController(QtCore.QObject):
         self.updates = 0
         self.packets = 0
         return {'pps': pps, 'ups': ups}
+
+    def process_packet(self, packet):
+        cmd = chr(packet[0])
+        datalen = 0
+
+        # Begin frame
+        if cmd == 'B':
+            self.frame_start_time = time.time()
+            self.frame_started()
+
+        # Unpack strand pixel data
+        elif cmd == 'S':
+            strand = packet[1]
+            datalen = (packet[3] << 8) + packet[2]
+            data = [c for c in packet[4:]]
+            self._frame_data[strand] = data
+
+        # End frame
+        elif cmd == 'E':
+            self.times.append((time.time() - self.frame_start_time))
+            if len(self.times) > 100:
+                self.times.pop(0)
+            self.new_frame.emit(self._frame_data)
+
+        else:
+            log.error("Malformed packet of length %d!" % len(packet))

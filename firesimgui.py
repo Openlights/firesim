@@ -11,7 +11,7 @@ from PyQt5.QtQml import qmlRegisterType, QQmlComponent
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtWidgets import QApplication
 
-from ui.canvaswidget import CanvasWidget
+from ui.canvasview import CanvasView
 from ui.fixturewidget import FixtureWidget
 from util.config import Config
 from models.scene import Scene, FixtureIdError
@@ -112,7 +112,7 @@ class FireSimGUI(QObject):
         self.scene = Scene(os.path.join(self.config.get("scene-root"), self.args.scene) + ".json")
         self.scenecontroller = SceneController(app=self, scene=self.scene)
 
-        qmlRegisterType(CanvasWidget, "FireSim", 1, 0, "SimCanvas")
+        qmlRegisterType(CanvasView, "FireSim", 1, 0, "Canvas")
         qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
 
         self.view = QQuickView()
@@ -137,7 +137,7 @@ class FireSimGUI(QObject):
         self.view.setSource(QUrl('ui/qml/FireSimGUI.qml'))
 
         self.root = self.view.rootObject()
-        self.canvas = self.root.findChild(CanvasWidget)
+        self.canvas = self.root.findChild(CanvasView)
         self.canvas.gui = self
 
         cw, ch = self.scenecontroller.scene.extents()
@@ -162,13 +162,11 @@ class FireSimGUI(QObject):
         self.redraw_timer.timeout.connect(self.scenecontroller.update_all)
         self.redraw_timer.start()
 
-        self.netcontroller.data_received.connect(self.on_network_event)
-        self.scenecontroller.new_frame.connect(self.netcontroller.frame_complete)
-        self.netcontroller.data_received.connect(self.scenecontroller.process_command)
+        self.netcontroller.new_frame.connect(self.canvas.controller.on_new_frame)
 
-        self.view.setMaximumSize(QSize(max(640, cw + 130), max(480, ch)))
-        self.view.setMinimumSize(self.view.maximumSize())
-        self.view.resize(self.view.maximumSize())
+        #self.view.setMaximumSize(QSize(max(640, cw + 130), max(480, ch)))
+        self.view.setMinimumSize(QSize(640, 480))
+        #self.view.resize(self.view.maximumSize())
 
         self.view.show()
         #self.view.showFullScreen()
