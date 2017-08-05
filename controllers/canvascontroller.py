@@ -18,6 +18,7 @@ class CanvasController(QObject):
 
         self.selected = []
         self.selection_candidates = []
+        self.hovering = []
 
     @pyqtSlot(dict)
     def on_new_frame(self, frame):
@@ -30,28 +31,36 @@ class CanvasController(QObject):
         Right now this is done in a naive way.  There are more advanced
         algorithms that could be put in place if performance is an issue.
         """
-        pos = self.view.canvas_to_scene((pos.x(), pos.y()))
-
-        candidates = [pg for pg in self.model.pixel_groups
-                      if hit_test_rect(pg.bounding_box(), pos)]
-
-        if len(candidates) == 0 and len(self.selected) > 0:
+        self.selection_candidates = self.get_objects_under_cursor(pos)
+        if len(self.selection_candidates) == 0:
             self.deselect_all()
             return
-
-        e = self.view.canvas_to_scene((20, 20))[0]
-
-        tested = [(c, c.hit_test(pos, e)) for c in candidates]
-        tested = [c for c, d in sorted(tested, key=lambda x: x[1]) if d > 0]
-        self.selection_candidates = tested
-
-        #print("candidates", tested)
 
         if len(self.selection_candidates) > 0:
             for pg in self.selected:
                 if pg is not self.selection_candidates[0]:
                     self.select(pg, False)
             self.select(self.selection_candidates[0], True)
+
+    def get_objects_under_cursor(self, pos):
+        """
+        Returns a list of all objects somewhat close to the cursor
+        Pos is in canvas space.
+        """
+        pos = self.view.canvas_to_scene((pos.x(), pos.y()))
+
+        candidates = [pg for pg in self.model.pixel_groups
+                      if hit_test_rect(pg.bounding_box(), pos)]
+
+        if len(candidates) == 0:
+            return []
+
+        e = self.view.canvas_to_scene((20, 20))[0]
+
+        tested = [(c, c.hit_test(pos, e)) for c in candidates]
+        tested = [c for c, d in sorted(tested, key=lambda x: x[1]) if d > 0]
+
+        return tested
 
 
     def select(self, pixel_group, select):
@@ -71,7 +80,21 @@ class CanvasController(QObject):
         self.selection_candidates.clear()
 
     def on_hover_move(self, event):
-        pass
+        under_cursor = self.get_objects_under_cursor(event.pos())
+        for pg in self.hovering:
+            if pg not in under_cursor:
+                pg.hovering = False
+                self.hovering.remove(pg)
+            else:
+                under_cursor.remove(pg)
+        for pg in under_cursor:
+            pg.hovering = True
+            self.hovering.append(pg)
+
+    def unhover_all(self):
+        for pg in self.hovering:
+            pg.hovering = False
+        self.hovering.clear()
 
     def on_mouse_move(self, event):
         pass
@@ -80,6 +103,7 @@ class CanvasController(QObject):
         pass
 
     def on_mouse_release(self, event):
+        self.unhover_all()
         self.try_select_under_cursor(event.localPos())
 
     def import_legacy_scene(self, scene):

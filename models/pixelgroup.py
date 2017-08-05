@@ -37,6 +37,7 @@ class PixelGroup:
         # GUI-related
         self.selected = False
         self.draw_bb = False
+        self.hovering = False
 
     def __repr__(self):
         return "PixelGroup address (%d, %d)" % (self.address[0],
