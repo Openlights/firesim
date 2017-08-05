@@ -2,11 +2,11 @@ import numpy as np
 
 from PyQt5.QtCore import QObject, pyqtSlot
 
-from models.pixelgroup import PixelGroup
+from models.pixelgroup import *
 from models.canvas import Canvas
 
 from lib.dtypes import rgb888_color
-from lib.geometry import hit_test_rect
+from lib.geometry import hit_test_rect, inflate_rect
 
 
 class CanvasController(QObject):
@@ -17,7 +17,7 @@ class CanvasController(QObject):
         self.model = Canvas()
 
         self.selected = []
-        self.candidates_for_selection = []
+        self.selection_candidates = []
 
     @pyqtSlot(dict)
     def on_new_frame(self, frame):
@@ -37,10 +37,22 @@ class CanvasController(QObject):
 
         if len(candidates) == 0 and len(self.selected) > 0:
             self.deselect_all()
+            return
 
-        self.candidates_for_selection = candidates
-        for c in candidates:
-            self.select(c, c.hit_test(pos))
+        e = self.view.canvas_to_scene((20, 20))[0]
+
+        tested = [(c, c.hit_test(pos, e)) for c in candidates]
+        tested = [c for c, d in sorted(tested, key=lambda x: x[1]) if d > 0]
+        self.selection_candidates = tested
+
+        #print("candidates", tested)
+
+        if len(self.selection_candidates) > 0:
+            for pg in self.selected:
+                if pg is not self.selection_candidates[0]:
+                    self.select(pg, False)
+            self.select(self.selection_candidates[0], True)
+
 
     def select(self, pixel_group, select):
         if select:
@@ -56,6 +68,7 @@ class CanvasController(QObject):
         for pg in self.selected:
             pg.selected = False
         self.selected.clear()
+        self.selection_candidates.clear()
 
     def on_hover_move(self, event):
         pass
@@ -68,3 +81,12 @@ class CanvasController(QObject):
 
     def on_mouse_release(self, event):
         self.try_select_under_cursor(event.localPos())
+
+    def import_legacy_scene(self, scene):
+        self.model.size = scene.extents()
+        self.model.center = scene.center()
+        for fixture in scene.fixtures():
+            self.model.pixel_groups.append(LinearPixelGroup(
+                fixture.pos1(), fixture.pos2(), fixture.pixels(),
+                (fixture.strand(), fixture._data_offset)
+            ))

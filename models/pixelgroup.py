@@ -2,7 +2,7 @@ import json
 import numpy as np
 
 from lib.dtypes import pixel_color, pixel_location
-from lib.geometry import distance, distance_point_to_line
+from lib.geometry import distance, distance_point_to_line, inflate_rect
 
 __all__ = [
     "PixelGroup", "LinearPixelGroup", "RectangularPixelGroup",
@@ -36,6 +36,11 @@ class PixelGroup:
 
         # GUI-related
         self.selected = False
+        self.draw_bb = False
+
+    def __repr__(self):
+        return "PixelGroup address (%d, %d)" % (self.address[0],
+                                                self.address[1])
 
     def bounding_box(self):
         """
@@ -65,6 +70,7 @@ class LinearPixelGroup(PixelGroup):
         super(LinearPixelGroup, self).__init__(count, address)
         self.start = start
         self.end = end
+        self._bounding_box = None
 
         ox = (end[0] - start[0]) / count
         oy = (end[1] - start[1]) / count
@@ -74,13 +80,23 @@ class LinearPixelGroup(PixelGroup):
             px += ox
             py += oy
 
-    def bounding_box(self):
-        return (self.start[0], self.start[1],
-                self.end[0] - self.start[0], self.end[1] - self.start[1])
+    def __repr__(self):
+        return ("LinearPixelGroup address (%s) start (%s) end (%s) count %d" %
+                (self.address, self.start, self.end, self.count))
 
-    def hit_test(self, pos):
-        # TODO: Magic number here -- is this okay?
-        return (distance_point_to_line(self.start, self.end, pos) <= 8)
+    def bounding_box(self):
+        if self._bounding_box is None:
+            x1, y1 = self.start
+            x2, y2 = self.end
+            x, y = (min(x1, x2), min(y1, y2))
+            self._bounding_box = (x, y, abs(x2 - x1), abs(y2 - y1))
+            self._bounding_box = inflate_rect(self._bounding_box, 50)
+        return self._bounding_box
+
+    def hit_test(self, pos, epsilon=10):
+        dist = distance_point_to_line(self.start, self.end, pos)
+        #print(repr(self), "pos", pos, "e", epsilon, "distance", dist)
+        return 0 if (dist > epsilon) else dist
 
 
 class RectangularPixelGroup(PixelGroup):

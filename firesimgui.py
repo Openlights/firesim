@@ -145,6 +145,7 @@ class FireSimGUI(QObject):
         self.canvas.setHeight(ch)
 
         self.scenecontroller.set_canvas(self.canvas)
+        self.canvas.controller.import_legacy_scene(self.scene)
 
         #self.net_thread = QThread()
         #self.net_thread.start()

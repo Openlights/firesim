@@ -67,15 +67,16 @@ class CanvasView(QQuickPaintedItem):
         bx, by = max(x1, x2), max(y1, y2)
 
         # Bounding box (debug)
-        c = QColor(255, 0, 255, 50) if pg.selected else QColor(255, 255, 0, 50)
+        c = QColor(255, 0, 255, 250) if pg.selected else QColor(255, 255, 0, 250)
+        painter.setBrush(QColor(0, 0, 0, 0))
         painter.setPen(QPen(c, 1, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        painter.drawRect(ax, ay, bx - ax, by - ay)
+        if pg.selected:
+            painter.drawRect(ax, ay, bx - ax, by - ay)
 
         # Pixel colors (maybe move to a separate render pass)
         colors = self.model.color_data.get(pg.address[0], None)
         if colors is not None:
-            colors = colors[:,pg.address[1]:pg.address[1] + pg.count]
-            #print(colors)
+            colors = colors[pg.address[1]:pg.address[1] + pg.count]
 
             painter.setPen(QColor(0, 0, 0, 0))
             for i, loc in enumerate(pg.pixel_locations):
@@ -84,7 +85,20 @@ class CanvasView(QQuickPaintedItem):
                 painter.setBrush(QColor(r, g, b, 50))
                 # TODO: probably want a better LED scaling than this.
                 rx, ry = self.scene_to_canvas((8, 8))
+                #painter.drawEllipse(QPointF(px, py), rx, ry)
+
+                rx, ry = self.scene_to_canvas((3, 3))
+                painter.setBrush(QColor(r, g, b, 255))
                 painter.drawEllipse(QPointF(px, py), rx, ry)
+
+        # Overlay
+        if pg.selected:
+            painter.setPen(QPen(QColor(200, 200, 255, 100),
+                                      12,
+                                      Qt.SolidLine,
+                                      Qt.RoundCap,
+                                      Qt.RoundJoin))
+            painter.drawLine(QPointF(x1, y1),QPointF(x2, y2))
 
     painters = {
         LinearPixelGroup: _paint_linear_pixel_group
