@@ -18,10 +18,14 @@ class CanvasController(QObject):
         self.view = view
         self.model = Canvas()
 
+        self.mouse_down_pos = None
+
         self.selected = []
         self.selection_candidates = []
         self.selection_index = 0
         self.hovering = []
+        self.dragging = False
+        self.drag_delta = None
 
     @pyqtSlot(dict)
     def on_new_frame(self, frame):
@@ -114,13 +118,32 @@ class CanvasController(QObject):
     def on_mouse_move(self, event):
         self.view.cursor_loc = event.localPos()
 
+        if self.model.design_mode and len(self.selected) > 0:
+
+            delta = event.localPos() - self.mouse_down_pos
+
+            # TODO: Detect if we are starting a drag over a drag handle,
+            # and behave differently.
+
+            if delta.manhattanLength() > 5:
+                self.dragging = True
+
+            if self.dragging:
+                self.drag_delta = delta
+
     def on_mouse_press(self, event):
-        pass
+        self.mouse_down_pos = event.localPos()
 
     def on_mouse_release(self, event):
         if self.model.design_mode:
-            self.unhover_all()
-            self.try_select_under_cursor(event.localPos())
+
+            if self.dragging:
+                self.dragging = False
+                # Handle drag end
+
+            if (event.localPos() - self.mouse_down_pos).manhattanLength() <= 5:
+                self.unhover_all()
+                self.try_select_under_cursor(event.localPos())
 
     def on_key_press(self, event):
         pass
@@ -135,6 +158,14 @@ class CanvasController(QObject):
                 self.selection_index = \
                     (self.selection_index + 1) % len(self.selection_candidates)
                 self.select(self.selection_candidates[self.selection_index], True)
+
+        elif event.key() == Qt.Key_Escape:
+            if self.model.design_mode:
+                if self.dragging:
+                    # Cancel drag
+                    self.dragging = False
+                else:
+                    self.deselect_all()
 
     def import_legacy_scene(self, scene):
         self.model.size = scene.extents()

@@ -105,6 +105,19 @@ class CanvasView(QQuickPaintedItem):
     def _paint_linear_pixel_group(self, painter, pg):
         x1, y1 = self.scene_to_canvas(pg.start)
         x2, y2 = self.scene_to_canvas(pg.end)
+
+        if self.controller.dragging and pg.selected:
+            dx = self.controller.drag_delta.x()
+            dy = self.controller.drag_delta.y()
+        else:
+            dx = 0
+            dy = 0
+
+        x1 += dx
+        x2 += dx
+        y1 += dy
+        y2 += dy
+
         ax, ay = min(x1, x2), min(y1, y2)
         bx, by = max(x1, x2), max(y1, y2)
 
@@ -120,6 +133,8 @@ class CanvasView(QQuickPaintedItem):
                 spacing = 4
                 for i, loc in enumerate(pg.pixel_locations[::spacing]):
                     px, py = self.scene_to_canvas(loc)
+                    px += dx
+                    py += dy
                     r, g, b = colors[i]
                     painter.setBrush(QColor(r, g, b, 50))
                     # TODO: probably want a better LED scaling than this.
@@ -134,6 +149,8 @@ class CanvasView(QQuickPaintedItem):
 
             for i, loc in enumerate(pg.pixel_locations[::spacing]):
                 px, py = self.scene_to_canvas(loc)
+                px += dx
+                py += dy
                 r, g, b = colors[i]
                 painter.setBrush(QColor(r, g, b, 50))
                 # TODO: probably want a better LED scaling than this.
@@ -170,7 +187,7 @@ class CanvasView(QQuickPaintedItem):
             if pg.selected:
                 self._draw_drag_handle(painter, (x1, y1), False, False)
                 self._draw_drag_handle(painter, (x2, y2), False, False)
-                self._draw_address(painter, pg)
+                self._draw_address(painter, pg, (dx, dy))
 
     painters = {
         LinearPixelGroup: _paint_linear_pixel_group
@@ -195,10 +212,10 @@ class CanvasView(QQuickPaintedItem):
         rect = QRectF(x - 4, y - 4, 8, 8)
         painter.drawRoundedRect(rect, 1, 1)
 
-    def _draw_address(self, painter, pg):
+    def _draw_address(self, painter, pg, offset):
         x1, y1 = self.scene_to_canvas(pg.start)
         x2, y2 = self.scene_to_canvas(pg.end)
-        label_pos = QPoint((x1 + x2) / 2, (y1 + y2) / 2)
+        label_pos = QPoint((x1 + x2) / 2 + offset[0], (y1 + y2) / 2 + offset[1])
 
         label_font = QFont()
         label_font.setPointSize(8)
