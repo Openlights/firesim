@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtProperty, QObject
+from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 
 from models.pixelgroup import LinearPixelGroup
 
@@ -16,6 +16,8 @@ test_pg_list = [
 
 class Canvas(QObject):
 
+    changed = pyqtSignal()
+
     def __init__(self):
         super(Canvas, self).__init__()
 
@@ -29,6 +31,8 @@ class Canvas(QObject):
         # is allowed.  In sim mode, only pixel colors are drawn.
         self._design_mode = False
 
+        self._blurred = False
+
     @pyqtProperty(bool)
     def design_mode(self):
         return self._design_mode
@@ -37,3 +41,14 @@ class Canvas(QObject):
     def design_mode(self, val):
         if self._design_mode != val:
             self._design_mode = val
+
+    @pyqtProperty(bool, notify=changed)
+    def blurred(self):
+        return self._blurred
+
+    @blurred.setter
+    def blurred(self, val):
+        if self._blurred != val:
+            self._blurred = val
+            self.changed.emit()
+

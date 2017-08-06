@@ -27,8 +27,9 @@ class CanvasView(QQuickPaintedItem):
         self.cursor_loc = None
 
     selection_changed = pyqtSignal()
+    model_changed = pyqtSignal()
 
-    @pyqtProperty(QObject)
+    @pyqtProperty(QObject, notify=model_changed)
     def model(self):
         return self._model
 
@@ -109,10 +110,28 @@ class CanvasView(QQuickPaintedItem):
         # Pixel colors (maybe move to a separate render pass)
         colors = self.model.color_data.get(pg.address[0], None)
         if colors is not None:
+            painter.setCompositionMode(QPainter.CompositionMode_Lighten)
             colors = colors[pg.address[1]:pg.address[1] + pg.count]
 
             painter.setPen(QColor(0, 0, 0, 0))
-            for i, loc in enumerate(pg.pixel_locations):
+
+            if self.model.blurred:
+                spacing = 4
+                for i, loc in enumerate(pg.pixel_locations[::spacing]):
+                    px, py = self.scene_to_canvas(loc)
+                    r, g, b = colors[i]
+                    painter.setBrush(QColor(r, g, b, 50))
+                    # TODO: probably want a better LED scaling than this.
+                    rx, ry = self.scene_to_canvas((8, 8))
+
+                    painter.setBrush(QColor(r, g, b, 50))
+                    painter.drawEllipse(QPointF(px, py), 16, 16)
+
+                spacing = 3
+            else:
+                spacing = 1
+
+            for i, loc in enumerate(pg.pixel_locations[::spacing]):
                 px, py = self.scene_to_canvas(loc)
                 r, g, b = colors[i]
                 painter.setBrush(QColor(r, g, b, 50))
@@ -123,6 +142,8 @@ class CanvasView(QQuickPaintedItem):
                 rx, ry = self.scene_to_canvas((3, 3))
                 painter.setBrush(QColor(r, g, b, 255))
                 painter.drawEllipse(QPointF(px, py), rx, ry)
+
+            painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
 
         if self.model.design_mode:
             # Bounding box (debug)

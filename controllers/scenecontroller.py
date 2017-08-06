@@ -11,10 +11,6 @@ import time
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QImage
 
-from ui.canvaswidget import CanvasWidget
-from ui.fixturewidget import FixtureWidget
-from ui.crosshairwidget import CrosshairWidget
-
 from models.fixture import Fixture
 
 class SceneController(QObject):

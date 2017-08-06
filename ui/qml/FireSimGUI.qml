@@ -102,8 +102,8 @@ Item {
             }
 
             Button {
-                text: App.blur_enable ? "Unblurred" : "Blurred"
-                onClicked: App.blur_enable = !App.blur_enable
+                text: canvas.model.blurred ? "Unblurred" : "Blurred"
+                onClicked: canvas.model.blurred = !canvas.model.blurred
             }
 
             Rectangle {

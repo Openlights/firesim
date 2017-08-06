@@ -7,8 +7,6 @@ from util.clip import clip
 
 from PyQt5 import QtCore
 
-from ui.fixturewidget import FixtureWidget
-
 
 class Fixture(object):
 
@@ -74,11 +72,6 @@ class Fixture(object):
 
     def request_destruction(self):
         self._controller.delete_fixture(self)
-
-    def get_widget(self):
-        if self._widget is None:
-            self._widget = FixtureWidget(self._controller.get_canvas(), model=self)
-        return self._widget
 
     def pixel_data(self):
         data = self._controller.strand_data[self._strand][self._data_offset:self._data_offset+self._num_pixels]

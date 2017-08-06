@@ -39,8 +39,10 @@ class CanvasController(QObject):
         remove_selection = (mods == (Qt.ControlModifier | Qt.ShiftModifier))
 
         self.selection_candidates = self.get_objects_under_cursor(pos)
+
         if len(self.selection_candidates) == 0:
-            self.deselect_all()
+            if not add_selection and not remove_selection:
+                self.deselect_all()
             return
 
         if not add_selection and not remove_selection:

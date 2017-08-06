@@ -12,7 +12,7 @@ from PyQt5.QtQuick import QQuickView
 from PyQt5.QtWidgets import QApplication
 
 from ui.canvasview import CanvasView
-from ui.fixturewidget import FixtureWidget
+
 from util.config import Config
 from models.scene import Scene, FixtureIdError
 from controllers.scenecontroller import SceneController
@@ -113,7 +113,6 @@ class FireSimGUI(QObject):
         self.scenecontroller = SceneController(app=self, scene=self.scene)
 
         qmlRegisterType(CanvasView, "FireSim", 1, 0, "Canvas")
-        qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
 
         self.view = QQuickView()
 
