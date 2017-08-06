@@ -1,6 +1,7 @@
-from PyQt5.QtCore import QObject, Qt, QPoint, QPointF, QRect, QRectF, QSizeF, \
-                         QMargins, pyqtSignal, pyqtSlot, pyqtProperty
-from PyQt5.QtGui import QPainter, QColor, QFont, QPen, QFontMetrics
+from PyQt5.QtCore import (QObject, Qt, QPoint, QPointF, QRect, QRectF, QSizeF,
+                          QMargins, pyqtSignal, pyqtSlot, pyqtProperty)
+from PyQt5.QtGui import (QPainter, QColor, QFont, QPen, QFontMetrics,
+                         QOpenGLVersionProfile, QSurfaceFormat)
 from PyQt5.QtQuick import QQuickPaintedItem
 from PyQt5.QtQml import QQmlListProperty
 
@@ -20,12 +21,19 @@ class CanvasView(QQuickPaintedItem):
         self.controller = CanvasController(self)
         self._model = self.controller.model
 
-        self.setFillColor(QColor(0, 0, 0))
+        self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
+        self.setFillColor(QColor(0, 0, 0, 0))
         self.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
         self.setAcceptHoverEvents(True)
         self.forceActiveFocus()
 
+        #self.renderer = CanvasRenderer()
+
         self.cursor_loc = None
+
+        self.gl = None
+
+        self.windowChanged.connect(self.on_window_changed)
 
     selection_changed = pyqtSignal()
     model_changed = pyqtSignal()
@@ -44,6 +52,18 @@ class CanvasView(QQuickPaintedItem):
 
     def geometryChanged(self, old_rect, new_rect):
         pass
+
+    def on_window_changed(self, window):
+        init_opengl()
+
+    def init_opengl(self):
+        ctx = self.window().openglContext()
+        if ctx is not None:
+            self.gl = ctx.versionFunctions(
+                          QOpenGLVersionProfile(QSurfaceFormat()))
+            self.gl.initializeOpenGLFunctions()
+        else:
+            print("No opengl context")
 
     def scene_to_canvas(self, coord):
         """
@@ -70,6 +90,45 @@ class CanvasView(QQuickPaintedItem):
         return scaled
 
     def paint(self, painter):
+
+        if self.gl is not None:
+            painter.beginNativePainting()
+
+            gl = self.gl
+
+            gl.glEnable(gl.GL_SCISSOR_TEST);
+            gl.glScissor(0, 0, self.width(), self.height());
+
+            gl.glClearColor(1.0, 0.0, 1.0, 1.0)
+            gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+
+            gl.glEnableClientState(gl.GL_VERTEX_ARRAY);
+            gl.glEnableClientState(gl.GL_COLOR_ARRAY);
+
+            triangle_vertex = [
+                0,0,
+                800,400,
+                0,800
+            ]
+            triangle_color = [
+
+                1,0,0,
+                0,1,0,
+                0,0,1
+            ]
+            gl.glVertexPointer(2, gl.GL_FLOAT, 0, triangle_vertex)
+            gl.glColorPointer(3, gl.GL_FLOAT, 0, triangle_color)
+            gl.glDrawArrays(gl.GL_TRIANGLES, 0, 3)
+
+            gl.glDisableClientState(gl.GL_VERTEX_ARRAY)
+            gl.glDisableClientState(gl.GL_COLOR_ARRAY)
+
+            gl.glDisable(gl.GL_SCISSOR_TEST);
+
+            painter.endNativePainting()
+        else:
+            if self.window().openglContext() is not None:
+                self.init_opengl()
 
         painter.setRenderHint(QPainter.Antialiasing)
 
@@ -124,7 +183,7 @@ class CanvasView(QQuickPaintedItem):
         # Pixel colors (maybe move to a separate render pass)
         colors = self.model.color_data.get(pg.strand, None)
         if colors is not None:
-            painter.setCompositionMode(QPainter.CompositionMode_Lighten)
+
             colors = colors[pg.offset:pg.offset + pg.count]
 
             painter.setPen(QColor(0, 0, 0, 0))
@@ -160,8 +219,6 @@ class CanvasView(QQuickPaintedItem):
                 rx, ry = self.scene_to_canvas((3, 3))
                 painter.setBrush(QColor(r, g, b, 255))
                 painter.drawEllipse(QPointF(px, py), rx, ry)
-
-            painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
 
         if self.model.design_mode:
             # Bounding box (debug)
@@ -252,3 +309,13 @@ class CanvasView(QQuickPaintedItem):
     def keyReleaseEvent(self, event):
         event.accept()
         self.controller.on_key_release(event)
+
+
+class CanvasRenderer(QObject):
+
+    def __init__(self):
+        super(QObject, self).__init__()
+
+    @pyqtSlot()
+    def paint(self):
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
