@@ -1,7 +1,11 @@
+import array
+import time
+
 from PyQt5.QtCore import (QObject, Qt, QPoint, QPointF, QRect, QRectF, QSizeF,
                           QMargins, pyqtSignal, pyqtSlot, pyqtProperty)
 from PyQt5.QtGui import (QPainter, QColor, QFont, QPen, QFontMetrics,
-                         QOpenGLVersionProfile, QSurfaceFormat)
+                         QOpenGLVersionProfile, QSurfaceFormat,
+                         QOpenGLShader, QOpenGLShaderProgram)
 from PyQt5.QtQuick import QQuickPaintedItem
 from PyQt5.QtQml import QQmlListProperty
 
@@ -15,6 +19,8 @@ class CanvasView(QQuickPaintedItem):
     chrome related to manipulating the scene.
     """
 
+    ENABLE_OPENGL = False
+
     def __init__(self, parent):
         super(CanvasView, self).__init__()
         self.parent = parent
@@ -22,7 +28,7 @@ class CanvasView(QQuickPaintedItem):
         self._model = self.controller.model
 
         self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
-        self.setFillColor(QColor(0, 0, 0, 0))
+        self.setFillColor(QColor(0, 0, 0, 255))
         self.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
         self.setAcceptHoverEvents(True)
         self.forceActiveFocus()
@@ -32,6 +38,9 @@ class CanvasView(QQuickPaintedItem):
         self.cursor_loc = None
 
         self.gl = None
+
+        self._last_render_times = []
+        self._fps = 0
 
         self.windowChanged.connect(self.on_window_changed)
 
@@ -54,7 +63,7 @@ class CanvasView(QQuickPaintedItem):
         pass
 
     def on_window_changed(self, window):
-        init_opengl()
+        self.init_opengl()
 
     def init_opengl(self):
         ctx = self.window().openglContext()
@@ -64,6 +73,24 @@ class CanvasView(QQuickPaintedItem):
             self.gl.initializeOpenGLFunctions()
         else:
             print("No opengl context")
+            return
+
+        pixel_shader_src = '''
+void main() {
+    vec2 pos = mod(gl_FragCoord.xy, vec2(50.0)) - vec2(25.0);
+    float dist_squared = dot(pos, pos);
+
+    gl_FragColor = mix(vec4(.90, .90, .90, 1.0), vec4(.20, .20, .40, 1.0),
+                       smoothstep(380.25, 420.25, dist_squared));
+}
+ '''
+
+        self.program = QOpenGLShaderProgram(self)
+
+        self.program.addShaderFromSourceCode(QOpenGLShader.Fragment,
+                pixel_shader_src)
+
+        self.program.link()
 
     def scene_to_canvas(self, coord):
         """
@@ -91,44 +118,54 @@ class CanvasView(QQuickPaintedItem):
 
     def paint(self, painter):
 
-        if self.gl is not None:
-            painter.beginNativePainting()
+        start = time.time()
 
-            gl = self.gl
+        if self.ENABLE_OPENGL:
+            if self.gl is not None:
+                painter.beginNativePainting()
 
-            gl.glEnable(gl.GL_SCISSOR_TEST);
-            gl.glScissor(0, 0, self.width(), self.height());
+                gl = self.gl
 
-            gl.glClearColor(1.0, 0.0, 1.0, 1.0)
-            gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+                gl.glEnable(gl.GL_SCISSOR_TEST);
+                gl.glScissor(0, 0, self.width(), self.height());
 
-            gl.glEnableClientState(gl.GL_VERTEX_ARRAY);
-            gl.glEnableClientState(gl.GL_COLOR_ARRAY);
+                gl.glClearColor(1.0, 0.0, 1.0, 1.0)
+                gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
-            triangle_vertex = [
-                0,0,
-                800,400,
-                0,800
-            ]
-            triangle_color = [
+                self.program.bind()
 
-                1,0,0,
-                0,1,0,
-                0,0,1
-            ]
-            gl.glVertexPointer(2, gl.GL_FLOAT, 0, triangle_vertex)
-            gl.glColorPointer(3, gl.GL_FLOAT, 0, triangle_color)
-            gl.glDrawArrays(gl.GL_TRIANGLES, 0, 3)
+                vertices = array.array("f", [
+                    0, 0,
+                    400, 400,
+                    800, 800,
+                    200, 200
+                ])
 
-            gl.glDisableClientState(gl.GL_VERTEX_ARRAY)
-            gl.glDisableClientState(gl.GL_COLOR_ARRAY)
+                indices = array.array("B", [0,1,2,0,2,3])
 
-            gl.glDisable(gl.GL_SCISSOR_TEST);
+                #gl.glEnableVertexAttribArray(self.vAttr)
 
-            painter.endNativePainting()
-        else:
-            if self.window().openglContext() is not None:
-                self.init_opengl()
+                # gl.glVertexAttribPointer(self.vAttr,
+                #     2,
+                #     gl.GL_FLOAT,
+                #     gl.GL_FALSE,
+                #     0,
+                #     vertices)
+
+                #gl.glDrawArrays(gl.GL_TRIANGLES, 0, 4)
+                gl.glDrawElements(gl.GL_TRIANGLES, 6, gl.GL_UNSIGNED_BYTE, indices)
+
+                #gl.glDisableVertexAttribArray(self.vAttr)
+
+                self.program.release()
+
+                gl.glDisable(gl.GL_SCISSOR_TEST);
+
+                painter.endNativePainting()
+            else:
+                if self.window().openglContext() is not None:
+                    # TODO: Re-init OpenGL but on the right thread
+                    self.init_opengl()
 
         painter.setRenderHint(QPainter.Antialiasing)
 
@@ -142,6 +179,8 @@ class CanvasView(QQuickPaintedItem):
         for pg in selected:
             self.painters[pg.__class__](self, painter, pg)
 
+        self._render_pixels_this_frame = False
+
         # Debug - cursor drawing
         # if self.cursor_loc is not None:
         #     x, y = self.cursor_loc.x(), self.cursor_loc.y()
@@ -153,13 +192,21 @@ class CanvasView(QQuickPaintedItem):
         #     painter.drawLine(QPointF(x - 5, y),QPointF(x + 5, y))
         #     painter.drawLine(QPointF(x, y - 5),QPointF(x, y + 5))
 
+        frame_time = 1.0 / (time.time() - start)
+
+        if len(self._last_render_times) < 5:
+            self._last_render_times.append(frame_time)
+        else:
+            self._fps = sum(self._last_render_times) / 5
+            self._last_render_times.clear()
+
         # Stats
-        # f = QFont()
-        # f.setPointSize(8)
-        # painter.setFont(f)
-        # painter.setPen(QColor(170, 170, 200, 255))
-        # painter.drawText(8, 16, "%0.1f packets/sec" % self.net_stats['pps'])
-        # painter.drawText(8, 32, "%0.1f frames/sec" % self.net_stats['ups'])
+        f = QFont()
+        f.setPointSize(8)
+        painter.setFont(f)
+        painter.setPen(QColor(170, 170, 200, 255))
+        #painter.drawText(8, 16, "%0.1f packets/sec" % self.net_stats['pps'])
+        painter.drawText(8, 32, "%d fps" % self._fps)
 
     def _paint_linear_pixel_group(self, painter, pg):
         x1, y1 = self.scene_to_canvas(pg.start)
