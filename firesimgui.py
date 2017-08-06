@@ -102,10 +102,6 @@ class FireSimGUI(QObject):
             except ImportError:
                 log.error("Could not enable YaPPI profiling")
 
-        self._selected_fixture_strand = 0
-        self._selected_fixture_address = 0
-        self._selected_fixture_pixels = 0
-
         self.selected_fixture = None
         self.is_blurred = False
 
@@ -240,42 +236,3 @@ class FireSimGUI(QObject):
                     return
             self.selected_fixture.set_pixels(int(self.selected_fixture_pixels))
             self.selected_fixture.get_widget().update()
-
-    def _get_selected_fixture_strand(self):
-        return self._selected_fixture_strand
-
-    def _set_selected_fixture_strand(self, strand):
-        if self._selected_fixture_strand == strand:
-            return
-        self._selected_fixture_strand = strand
-        self.update_selected_fixture_properties()
-        self.on_selected_fixture_strand.emit()
-
-    def _get_selected_fixture_address(self):
-        return self._selected_fixture_address
-
-    def _set_selected_fixture_address(self, address):
-        if self._selected_fixture_address == address:
-            return
-        self._selected_fixture_address = address
-        self.update_selected_fixture_properties()
-        self.on_selected_fixture_address.emit()
-
-    def _get_selected_fixture_pixels(self):
-        return self._selected_fixture_pixels
-
-    def _set_selected_fixture_pixels(self, pixels):
-        if self._selected_fixture_pixels == pixels:
-            return
-        self._selected_fixture_pixels = pixels
-        self.update_selected_fixture_properties()
-        self.on_selected_fixture_pixels.emit()
-
-    on_selected_fixture_strand = pyqtSignal()
-    on_selected_fixture_address = pyqtSignal()
-    on_selected_fixture_pixels = pyqtSignal()
-
-    selected_fixture_strand = pyqtProperty(int, _get_selected_fixture_strand, _set_selected_fixture_strand, notify=on_selected_fixture_strand)
-    selected_fixture_address = pyqtProperty(int, _get_selected_fixture_address, _set_selected_fixture_address, notify=on_selected_fixture_address)
-    selected_fixture_pixels = pyqtProperty(int, _get_selected_fixture_pixels, _set_selected_fixture_pixels, notify=on_selected_fixture_pixels)
-

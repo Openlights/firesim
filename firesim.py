@@ -14,7 +14,7 @@ def sig_handler(app, sig, frame):
         log.exception("Ignoring exception during shutdown request")
 
 def main():
-    log.basicConfig(level=log.DEBUG)
+    log.basicConfig(level=log.WARN)
     log.info("Booting FireSim...")
     args = parse_args()
     sim = FireSimGUI(args)

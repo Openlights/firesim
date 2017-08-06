@@ -1,6 +1,8 @@
 import json
 import numpy as np
 
+from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
+
 from lib.dtypes import pixel_color, pixel_location
 from lib.geometry import distance, distance_point_to_line, inflate_rect
 
@@ -10,7 +12,7 @@ __all__ = [
 ]
 
 
-class PixelGroup:
+class PixelGroup(QObject):
     """
     A PixelGroup is a set of pixels that have some internal geometric ordering.
     For example, a linear array (LED strip), square array, or circular array.
@@ -29,19 +31,51 @@ class PixelGroup:
     """
 
     def __init__(self, count, address=None):
-        self.count = count
+        super(PixelGroup, self).__init__()
         self.pixel_locations = np.zeros(count, dtype=pixel_location)
         self.pixel_colors = np.zeros(count, dtype=pixel_color)
-        self.address = address
+
+        # Properties accessible from QML
+        self._count = count
+        self._strand = address[0]
+        self._offset = address[1]
 
         # GUI-related
         self.selected = False
         self.draw_bb = False
         self.hovering = False
 
+    changed = pyqtSignal()
+
     def __repr__(self):
         return "PixelGroup address (%d, %d)" % (self.address[0],
                                                 self.address[1])
+    @pyqtProperty(int, notify=changed)
+    def count(self):
+        return self._count
+
+    @count.setter
+    def count(self, val):
+        if self._count != val:
+            self._count = val
+
+    @pyqtProperty(int, notify=changed)
+    def strand(self):
+        return self._strand
+
+    @strand.setter
+    def strand(self, val):
+        if self._strand != val:
+            self._strand = val
+
+    @pyqtProperty(int, notify=changed)
+    def offset(self):
+        return self._offset
+
+    @offset.setter
+    def offset(self, val):
+        if self._offset != val:
+            self._offset = val
 
     def bounding_box(self):
         """

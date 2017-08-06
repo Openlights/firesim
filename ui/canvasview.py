@@ -1,5 +1,6 @@
-from PyQt5.QtCore import QObject, Qt, QPointF, QRectF, pyqtSignal, pyqtSlot, pyqtProperty
-from PyQt5.QtGui import QPainter, QColor, QFont, QPen
+from PyQt5.QtCore import QObject, Qt, QPoint, QPointF, QRect, QRectF, QSizeF, \
+                         QMargins, pyqtSignal, pyqtSlot, pyqtProperty
+from PyQt5.QtGui import QPainter, QColor, QFont, QPen, QFontMetrics
 from PyQt5.QtQuick import QQuickPaintedItem
 from PyQt5.QtQml import QQmlListProperty
 
@@ -108,10 +109,10 @@ class CanvasView(QQuickPaintedItem):
         bx, by = max(x1, x2), max(y1, y2)
 
         # Pixel colors (maybe move to a separate render pass)
-        colors = self.model.color_data.get(pg.address[0], None)
+        colors = self.model.color_data.get(pg.strand, None)
         if colors is not None:
             painter.setCompositionMode(QPainter.CompositionMode_Lighten)
-            colors = colors[pg.address[1]:pg.address[1] + pg.count]
+            colors = colors[pg.offset:pg.offset + pg.count]
 
             painter.setPen(QColor(0, 0, 0, 0))
 
@@ -169,6 +170,7 @@ class CanvasView(QQuickPaintedItem):
             if pg.selected:
                 self._draw_drag_handle(painter, (x1, y1), False, False)
                 self._draw_drag_handle(painter, (x2, y2), False, False)
+                self._draw_address(painter, pg)
 
     painters = {
         LinearPixelGroup: _paint_linear_pixel_group
@@ -192,6 +194,27 @@ class CanvasView(QQuickPaintedItem):
         painter.setBrush(QColor(0, 0, 0, 0))
         rect = QRectF(x - 4, y - 4, 8, 8)
         painter.drawRoundedRect(rect, 1, 1)
+
+    def _draw_address(self, painter, pg):
+        x1, y1 = self.scene_to_canvas(pg.start)
+        x2, y2 = self.scene_to_canvas(pg.end)
+        label_pos = QPoint((x1 + x2) / 2, (y1 + y2) / 2)
+
+        label_font = QFont()
+        label_font.setPointSize(8)
+        painter.setFont(label_font)
+
+        label_string = "%d:%d" % (pg.strand, pg.offset)
+        fm = QFontMetrics(label_font)
+        text_rect = fm.boundingRect(label_string)
+        text_rect += QMargins(5, 2, 5, 2)
+        label_rect = QRect(label_pos - QPoint(12, 7), text_rect.size())
+
+        painter.setBrush(QColor(128, 64, 128, 220))
+        painter.setPen(QColor(100, 100, 100, 100))
+        painter.drawRoundedRect(label_rect, 5, 5)
+        painter.setPen(QColor(255, 255, 255, 255))
+        painter.drawText(label_rect, Qt.AlignCenter, label_string)
 
     def hoverMoveEvent(self, event):
         self.controller.on_hover_move(event)

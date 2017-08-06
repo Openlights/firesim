@@ -149,35 +149,20 @@ Item {
 
                     LabeledInput {
                         id: input_fixture_strand
-                        key: "strand"
-                        value: main.selected_fixture_strand
-                        Binding {
-                            target: main
-                            property: "selected_fixture_strand"
-                            value: input_fixture_strand.value
-                        }
+                        key: "Strand ID"
+                        value: canvas.selection.length == 1 ? canvas.selection[0].strand : ""
                     }
 
                     LabeledInput {
                         id: input_fixture_address
-                        key: "address"
-                        value: main.selected_fixture_address
-                        Binding {
-                            target: main
-                            property: "selected_fixture_address"
-                            value: input_fixture_address.value
-                        }
+                        key: "Offset"
+                        value: canvas.selection.length == 1 ? canvas.selection[0].offset : ""
                     }
 
                     LabeledInput {
                         id: input_fixture_pixels
-                        key: "pixels"
-                        value: main.selected_fixture_pixels
-                        Binding {
-                            target: main
-                            property: "selected_fixture_pixels"
-                            value: input_fixture_pixels.value
-                        }
+                        key: "Pixel Count"
+                        value: canvas.selection.length == 1 ? canvas.selection[0].count : ""
                     }
                 }
             }
