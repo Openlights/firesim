@@ -1,6 +1,8 @@
 import numpy as np
+from copy import copy
 
-from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtCore import Qt, QObject, pyqtSlot
+from PyQt5.QtGui import QGuiApplication
 
 from models.pixelgroup import *
 from models.canvas import Canvas
@@ -18,6 +20,7 @@ class CanvasController(QObject):
 
         self.selected = []
         self.selection_candidates = []
+        self.selection_index = 0
         self.hovering = []
 
     @pyqtSlot(dict)
@@ -31,16 +34,20 @@ class CanvasController(QObject):
         Right now this is done in a naive way.  There are more advanced
         algorithms that could be put in place if performance is an issue.
         """
+        mods = QGuiApplication.keyboardModifiers()
+        add_selection = (mods == Qt.ControlModifier)
+        remove_selection = (mods == (Qt.ControlModifier | Qt.ShiftModifier))
+
         self.selection_candidates = self.get_objects_under_cursor(pos)
         if len(self.selection_candidates) == 0:
             self.deselect_all()
             return
 
-        if len(self.selection_candidates) > 0:
-            for pg in self.selected:
+        if not add_selection and not remove_selection:
+            for pg in self.selected.copy():
                 if pg is not self.selection_candidates[0]:
                     self.select(pg, False)
-            self.select(self.selection_candidates[0], True)
+        self.select(self.selection_candidates[0], not remove_selection)
 
     def get_objects_under_cursor(self, pos):
         """
@@ -55,7 +62,7 @@ class CanvasController(QObject):
         if len(candidates) == 0:
             return []
 
-        e = self.view.canvas_to_scene((20, 20))[0]
+        e = self.view.canvas_to_scene((10,10))[0]
 
         tested = [(c, c.hit_test(pos, e)) for c in candidates]
         tested = [c for c, d in sorted(tested, key=lambda x: x[1]) if d > 0]
@@ -72,16 +79,22 @@ class CanvasController(QObject):
             pixel_group.selected = False
             if pixel_group in self.selected:
                 self.selected.remove(pixel_group)
+        self.view.selection_changed.emit()
 
     def deselect_all(self):
         for pg in self.selected:
             pg.selected = False
         self.selected.clear()
         self.selection_candidates.clear()
+        self.view.selection_changed.emit()
 
     def on_hover_move(self, event):
+        self.view.cursor_loc = event.pos()
+        if len(self.selected) > 0:
+            return
+
         under_cursor = self.get_objects_under_cursor(event.pos())
-        for pg in self.hovering:
+        for pg in self.hovering.copy():
             if pg not in under_cursor:
                 pg.hovering = False
                 self.hovering.remove(pg)
@@ -97,14 +110,29 @@ class CanvasController(QObject):
         self.hovering.clear()
 
     def on_mouse_move(self, event):
-        pass
+        self.view.cursor_loc = event.localPos()
 
     def on_mouse_press(self, event):
         pass
 
     def on_mouse_release(self, event):
-        self.unhover_all()
-        self.try_select_under_cursor(event.localPos())
+        if self.model.design_mode:
+            self.unhover_all()
+            self.try_select_under_cursor(event.localPos())
+
+    def on_key_press(self, event):
+        pass
+
+    def on_key_release(self, event):
+        # TODO: Hotkey remapping
+
+        # Tab: selection disambiguation
+        if event.key() == Qt.Key_Tab:
+            if self.model.design_mode and len(self.selection_candidates) > 1:
+                self.select(self.selection_candidates[self.selection_index], False)
+                self.selection_index = \
+                    (self.selection_index + 1) % len(self.selection_candidates)
+                self.select(self.selection_candidates[self.selection_index], True)
 
     def import_legacy_scene(self, scene):
         self.model.size = scene.extents()

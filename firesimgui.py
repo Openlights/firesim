@@ -165,9 +165,7 @@ class FireSimGUI(QObject):
 
         self.netcontroller.new_frame.connect(self.canvas.controller.on_new_frame)
 
-        #self.view.setMaximumSize(QSize(max(640, cw + 130), max(480, ch)))
-        self.view.setMinimumSize(QSize(640, 480))
-        #self.view.resize(self.view.maximumSize())
+        self.view.setMinimumSize(QSize(800, 600))
 
         self.view.show()
         #self.view.showFullScreen()

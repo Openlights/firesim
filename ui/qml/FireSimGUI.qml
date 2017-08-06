@@ -24,6 +24,7 @@ Item {
             main.quit()
         }
     }
+    Keys.forwardTo: canvas
 
     Canvas {
         id: canvas
@@ -50,26 +51,49 @@ Item {
             spacing: 8
 
             Button {
-                id: btn_add_fixture
-                text: "Add Fixture"
+                id: btn_load
+                text: "Load"
+            }
+
+            Button {
+                id: btn_save
+                text: "Save"
+                onClicked: main.on_btn_save()
+            }
+
+            Button {
+                id: btn_load_bg
+                text: "Load Backdrop"
+            }
+
+            Button {
+                text: "Linear"
                 onClicked: main.on_btn_add_fixture()
             }
 
             Button {
-                id: btn_clear
-                text: "Clear"
-                onClicked: main.on_btn_clear()
+                text: "Rectangular"
+                onClicked: main.on_btn_add_fixture()
             }
 
-            /*Button {
-                id: btn_load
-                text: "Load Scene"
-            }*/
+            Button {
+                text: "Circular"
+                onClicked: main.on_btn_add_fixture()
+            }
 
             Button {
-                id: btn_save
-                text: "Save Scene"
-                onClicked: main.on_btn_save()
+                text: "Arbitrary"
+                onClicked: main.on_btn_add_fixture()
+            }
+
+            Button {
+                text: "Design Mode"
+                onClicked: canvas.model.design_mode = true
+            }
+
+            Button {
+                text: "Sim Mode"
+                onClicked: canvas.model.design_mode = false
             }
 
             Button {
@@ -78,48 +102,48 @@ Item {
             }
 
             Button {
-                text: App.labels_visible ? "Hide Labels" : "Show Labels"
-                onClicked: App.labels_visible = !App.labels_visible
-            }
-
-            Button {
-                text: App.locked ? "Unlock Scene" : "Lock Scene"
-                onClicked: App.locked = !App.locked
-            }
-
-            Button {
-                text: App.center_visible ? "Hide Center" : "Show Center"
-                onClicked: App.center_visible = !App.center_visible
-            }
-
-            Button {
                 text: App.blur_enable ? "Unblurred" : "Blurred"
                 onClicked: App.blur_enable = !App.blur_enable
             }
 
-            /*Button {
-                id: btn_load_bg
-                text: "Load Backdrop"
-            }*/
-
             Rectangle {
                 width: 110
-                height: 150
+                height: ((canvas.selection.length == 1) ?
+                         fixture_info_column.height + 10 :
+                         multiple_selection_column.height + 10)
+                visible: canvas.selection.length > 0
 
                 radius: 5
                 color: "#232323"
 
                 Column {
-                    id: fixture_info_column
+                    id: multiple_selection_column
                     spacing: 4
                     anchors.horizontalCenter: parent.horizontalCenter
+                    visible: canvas.selection.length > 1
 
                     Row {
                         anchors { bottomMargin: 8; topMargin: 24 }
                         Text {
                             font.pixelSize: 14
                             color: "#dddddd"
-                            text: "Fixture Info"
+                            text: canvas.selection.length + " Items Selected"
+                        }
+                    }
+                }
+
+                Column {
+                    id: fixture_info_column
+                    spacing: 4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: canvas.selection.length == 1
+
+                    Row {
+                        anchors { bottomMargin: 8; topMargin: 24 }
+                        Text {
+                            font.pixelSize: 14
+                            color: "#dddddd"
+                            text: "Pixel Group"
                         }
                     }
 
