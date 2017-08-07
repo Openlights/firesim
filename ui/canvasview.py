@@ -1,11 +1,13 @@
 import array
 import time
+import numpy as np
 
 from PyQt5.QtCore import (QObject, Qt, QPoint, QPointF, QRect, QRectF, QSizeF,
                           QMargins, pyqtSignal, pyqtSlot, pyqtProperty)
 from PyQt5.QtGui import (QPainter, QColor, QFont, QPen, QFontMetrics,
                          QOpenGLVersionProfile, QSurfaceFormat,
-                         QOpenGLShader, QOpenGLShaderProgram)
+                         QOpenGLShader, QOpenGLShaderProgram, QVector2D,
+                         QVector4D, QMatrix4x4, QOpenGLBuffer)
 from PyQt5.QtQuick import QQuickPaintedItem
 from PyQt5.QtQml import QQmlListProperty
 
@@ -19,7 +21,7 @@ class CanvasView(QQuickPaintedItem):
     chrome related to manipulating the scene.
     """
 
-    ENABLE_OPENGL = False
+    ENABLE_OPENGL = True
 
     def __init__(self, parent):
         super(CanvasView, self).__init__()
@@ -28,7 +30,7 @@ class CanvasView(QQuickPaintedItem):
         self._model = self.controller.model
 
         self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
-        self.setFillColor(QColor(0, 0, 0, 255))
+        #self.setFillColor(QColor(0, 0, 0, 255))
         self.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
         self.setAcceptHoverEvents(True)
         self.forceActiveFocus()
@@ -68,29 +70,60 @@ class CanvasView(QQuickPaintedItem):
     def init_opengl(self):
         ctx = self.window().openglContext()
         if ctx is not None:
-            self.gl = ctx.versionFunctions(
-                          QOpenGLVersionProfile(QSurfaceFormat()))
+            v = QOpenGLVersionProfile()
+            v.setVersion(2, 0)
+            self.gl = ctx.versionFunctions(v)
             self.gl.initializeOpenGLFunctions()
         else:
             print("No opengl context")
             return
 
-        pixel_shader_src = '''
-void main() {
-    vec2 pos = mod(gl_FragCoord.xy, vec2(50.0)) - vec2(25.0);
-    float dist_squared = dot(pos, pos);
+        vertex_shader = '''
+#version 120
+attribute highp vec4 posAttr;
+attribute lowp vec4 colAttr;
+varying lowp vec4 col;
 
-    gl_FragColor = mix(vec4(.90, .90, .90, 1.0), vec4(.20, .20, .40, 1.0),
-                       smoothstep(380.25, 420.25, dist_squared));
+void main() {
+    col = colAttr;
+    gl_Position = posAttr;
 }
  '''
 
+        fragment_shader = '''
+#version 120
+void main (void)
+{
+    gl_FragColor = vec4(0, 0, 0, 0);
+}
+'''
+
         self.program = QOpenGLShaderProgram(self)
 
+        self.program.addShaderFromSourceCode(QOpenGLShader.Vertex,
+                vertex_shader)
+
         self.program.addShaderFromSourceCode(QOpenGLShader.Fragment,
-                pixel_shader_src)
+                fragment_shader)
 
         self.program.link()
+
+        self.pos_attr = self.program.attributeLocation('posAttr')
+
+        self.vertices = np.array([
+                 0.0,  0.707,
+                -0.5, -0.5,
+                 0.5, -0.5
+            ], dtype=np.float32)
+
+        self.buf = QOpenGLBuffer()
+        self.buf.create()
+        self.buf.bind()
+        self.buf.setUsagePattern(QOpenGLBuffer.StaticDraw)
+        self.buf.allocate(self.vertices, self.vertices.nbytes)
+
+        self.buf.release()
+
 
     def scene_to_canvas(self, coord):
         """
@@ -129,35 +162,35 @@ void main() {
                 gl.glEnable(gl.GL_SCISSOR_TEST);
                 gl.glScissor(0, 0, self.width(), self.height());
 
-                gl.glClearColor(1.0, 0.0, 1.0, 1.0)
+                gl.glClearColor(0.0, 0.0, 0.0, 1.0)
                 gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
-                self.program.bind()
+                gl.glPointSize(15.0 if self.model.blurred else 5.0)
 
-                vertices = array.array("f", [
-                    0, 0,
-                    400, 400,
-                    800, 800,
-                    200, 200
-                ])
+                for pg in self.model.pixel_groups:
+                    if type(pg) == LinearPixelGroup:
+                        colors = self.model.color_data.get(pg.strand, None)
+                        if colors is None:
+                            continue
 
-                indices = array.array("B", [0,1,2,0,2,3])
+                        colors = colors[pg.offset:pg.offset + pg.count]
 
-                #gl.glEnableVertexAttribArray(self.vAttr)
+                        x1, y1 = self.scene_to_canvas(pg.start)
+                        x2, y2 = self.scene_to_canvas(pg.end)
+                        dx = (x2 - x1) / pg.count
+                        dy = (y2 - y1) / pg.count
 
-                # gl.glVertexAttribPointer(self.vAttr,
-                #     2,
-                #     gl.GL_FLOAT,
-                #     gl.GL_FALSE,
-                #     0,
-                #     vertices)
+                        x, y = x1, y1
+                        for i in range(pg.count):
 
-                #gl.glDrawArrays(gl.GL_TRIANGLES, 0, 4)
-                gl.glDrawElements(gl.GL_TRIANGLES, 6, gl.GL_UNSIGNED_BYTE, indices)
+                            gl.glBegin(gl.GL_POINTS)
+                            r, g, b = colors[i]
+                            gl.glColor4f(r / 255, g / 255, b / 255, 1)
+                            gl.glVertex2f(x, y)
+                            gl.glEnd()
 
-                #gl.glDisableVertexAttribArray(self.vAttr)
-
-                self.program.release()
+                            x += dx
+                            y += dy
 
                 gl.glDisable(gl.GL_SCISSOR_TEST);
 
@@ -228,44 +261,44 @@ void main() {
         bx, by = max(x1, x2), max(y1, y2)
 
         # Pixel colors (maybe move to a separate render pass)
-        colors = self.model.color_data.get(pg.strand, None)
-        if colors is not None:
+        # colors = self.model.color_data.get(pg.strand, None)
+        # if colors is not None:
 
-            colors = colors[pg.offset:pg.offset + pg.count]
+        #     colors = colors[pg.offset:pg.offset + pg.count]
 
-            painter.setPen(QColor(0, 0, 0, 0))
+        #     painter.setPen(QColor(0, 0, 0, 0))
 
-            if self.model.blurred:
-                spacing = 4
-                for i, loc in enumerate(pg.pixel_locations[::spacing]):
-                    px, py = self.scene_to_canvas(loc)
-                    px += dx
-                    py += dy
-                    r, g, b = colors[i]
-                    painter.setBrush(QColor(r, g, b, 50))
-                    # TODO: probably want a better LED scaling than this.
-                    rx, ry = self.scene_to_canvas((8, 8))
+        #     if self.model.blurred:
+        #         spacing = 4
+        #         for i, loc in enumerate(pg.pixel_locations[::spacing]):
+        #             px, py = self.scene_to_canvas(loc)
+        #             px += dx
+        #             py += dy
+        #             r, g, b = colors[i]
+        #             painter.setBrush(QColor(r, g, b, 50))
+        #             # TODO: probably want a better LED scaling than this.
+        #             rx, ry = self.scene_to_canvas((8, 8))
 
-                    painter.setBrush(QColor(r, g, b, 50))
-                    painter.drawEllipse(QPointF(px, py), 16, 16)
+        #             painter.setBrush(QColor(r, g, b, 50))
+        #             painter.drawEllipse(QPointF(px, py), 16, 16)
 
-                spacing = 3
-            else:
-                spacing = 1
+        #         spacing = 3
+        #     else:
+        #         spacing = 1
 
-            for i, loc in enumerate(pg.pixel_locations[::spacing]):
-                px, py = self.scene_to_canvas(loc)
-                px += dx
-                py += dy
-                r, g, b = colors[i]
-                painter.setBrush(QColor(r, g, b, 50))
-                # TODO: probably want a better LED scaling than this.
-                rx, ry = self.scene_to_canvas((8, 8))
-                #painter.drawEllipse(QPointF(px, py), rx, ry)
+        #     for i, loc in enumerate(pg.pixel_locations[::spacing]):
+        #         px, py = self.scene_to_canvas(loc)
+        #         px += dx
+        #         py += dy
+        #         r, g, b = colors[i]
+        #         painter.setBrush(QColor(r, g, b, 50))
+        #         # TODO: probably want a better LED scaling than this.
+        #         rx, ry = self.scene_to_canvas((8, 8))
+        #         #painter.drawEllipse(QPointF(px, py), rx, ry)
 
-                rx, ry = self.scene_to_canvas((3, 3))
-                painter.setBrush(QColor(r, g, b, 255))
-                painter.drawEllipse(QPointF(px, py), rx, ry)
+        #         rx, ry = self.scene_to_canvas((3, 3))
+        #         painter.setBrush(QColor(r, g, b, 255))
+        #         painter.drawEllipse(QPointF(px, py), rx, ry)
 
         if self.model.design_mode:
             # Bounding box (debug)
