@@ -167,6 +167,8 @@ void main (void)
 
                 gl.glPointSize(15.0 if self.model.blurred else 5.0)
 
+                gl.glBegin(gl.GL_POINTS)
+
                 for pg in self.model.pixel_groups:
                     if type(pg) == LinearPixelGroup:
                         colors = self.model.color_data.get(pg.strand, None)
@@ -177,20 +179,23 @@ void main (void)
 
                         x1, y1 = self.scene_to_canvas(pg.start)
                         x2, y2 = self.scene_to_canvas(pg.end)
+                        y1 = self.height() - y1
+                        y2 = self.height() - y2
                         dx = (x2 - x1) / pg.count
                         dy = (y2 - y1) / pg.count
 
                         x, y = x1, y1
                         for i in range(pg.count):
 
-                            gl.glBegin(gl.GL_POINTS)
+
                             r, g, b = colors[i]
                             gl.glColor4f(r / 255, g / 255, b / 255, 1)
                             gl.glVertex2f(x, y)
-                            gl.glEnd()
 
                             x += dx
                             y += dy
+
+                gl.glEnd()
 
                 gl.glDisable(gl.GL_SCISSOR_TEST);
 
