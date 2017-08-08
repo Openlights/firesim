@@ -207,7 +207,8 @@ void main (void)
 
         painter.setRenderHint(QPainter.Antialiasing)
 
-        selected = [pg for pg in self.model.pixel_groups if pg.selected]
+        selected = [pg for pg in self.model.pixel_groups
+                    if pg.selected or pg.hovering]
         s = set(selected)
         unselected = [pg for pg in self.model.pixel_groups if pg not in s]
 
@@ -232,10 +233,10 @@ void main (void)
 
         frame_time = 1.0 / (time.time() - start)
 
-        if len(self._last_render_times) < 5:
+        if len(self._last_render_times) < 20:
             self._last_render_times.append(frame_time)
         else:
-            self._fps = sum(self._last_render_times) / 5
+            self._fps = sum(self._last_render_times) / 20
             self._last_render_times.clear()
 
         # Stats
@@ -329,6 +330,8 @@ void main (void)
             if pg.selected:
                 self._draw_drag_handle(painter, (x1, y1), False, False)
                 self._draw_drag_handle(painter, (x2, y2), False, False)
+
+            if pg.selected or pg.hovering:
                 self._draw_address(painter, pg, (dx, dy))
 
     painters = {
