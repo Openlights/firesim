@@ -139,7 +139,10 @@ class CanvasController(QObject):
 
             if self.dragging:
                 self.dragging = False
-                # Handle drag end
+                final_pos = self.drag_delta.x(), self.drag_delta.y()
+                for pg in self.selected:
+                    pg.move_by(self.view.canvas_to_scene(final_pos))
+                return
 
             if (event.localPos() - self.mouse_down_pos).manhattanLength() <= 5:
                 self.unhover_all()

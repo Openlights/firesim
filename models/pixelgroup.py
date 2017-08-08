@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import operator
 
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 
@@ -92,6 +93,12 @@ class PixelGroup(QObject):
         """
         raise NotImplementedError("Please override hit_test()!")
 
+    def move_by(self, pos):
+        """
+        Translates the entire group by the delta (x, y) in scene space.
+        """
+        raise NotImplementedError("Please override move_by()!")
+
 
 class LinearPixelGroup(PixelGroup):
     """
@@ -106,18 +113,21 @@ class LinearPixelGroup(PixelGroup):
         self.start = start
         self.end = end
         self._bounding_box = None
-
-        ox = (end[0] - start[0]) / count
-        oy = (end[1] - start[1]) / count
-        px, py = start[0], start[1]
-        for i in range(count):
-            self.pixel_locations[i] = (px, py)
-            px += ox
-            py += oy
+        self._update_geometry()
 
     def __repr__(self):
         return ("LinearPixelGroup address (%s) start (%s) end (%s) count %d" %
                 (self.address, self.start, self.end, self.count))
+
+    def _update_geometry(self):
+        ox = (self.end[0] - self.start[0]) / self.count
+        oy = (self.end[1] - self.start[1]) / self.count
+        px, py = self.start[0], self.start[1]
+        for i in range(self.count):
+            self.pixel_locations[i] = (px, py)
+            px += ox
+            py += oy
+        self._bounding_box = None
 
     def bounding_box(self):
         if self._bounding_box is None:
@@ -132,6 +142,11 @@ class LinearPixelGroup(PixelGroup):
         dist = distance_point_to_line(self.start, self.end, pos)
         #print(repr(self), "pos", pos, "e", epsilon, "distance", dist)
         return 0 if (dist > epsilon) else dist
+
+    def move_by(self, pos):
+        self.start = tuple(map(operator.add, self.start, pos))
+        self.end = tuple(map(operator.add, self.end, pos))
+        self._update_geometry()
 
 
 class RectangularPixelGroup(PixelGroup):

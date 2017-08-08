@@ -189,6 +189,15 @@ void main (void)
 
                         x1, y1 = self.scene_to_canvas(pg.start)
                         x2, y2 = self.scene_to_canvas(pg.end)
+
+                        if self.controller.dragging and pg.selected:
+                            dx = self.controller.drag_delta.x()
+                            dy = self.controller.drag_delta.y()
+                            x1 += dx
+                            x2 += dx
+                            y1 += dy
+                            y2 += dy
+
                         y1 = self.height() - y1
                         y2 = self.height() - y2
                         dx = (x2 - x1) / pg.count
