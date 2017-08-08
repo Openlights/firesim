@@ -25,9 +25,10 @@ class NetController(QtCore.QObject):
         self.in_frame = False
         self.running = True
         self.last_time = time.clock()
-        self.times = []
-        self.frame_start_time = 0.0
+        self._frame_times = []
+        self._frame_start_time = 0.0
         self._frame_data = {}
+        self.fps = 0
 
         if USE_ZMQ:
             self.context = zmq.Context()
@@ -71,24 +72,13 @@ class NetController(QtCore.QObject):
         self.in_frame = False
         self.updates += 1
 
-    def get_stats(self):
-        dt = time.clock() - self.last_time
-        if dt == 0:
-            return 0
-        ups = old_div(self.updates, dt)
-        pps = old_div(self.packets, dt)
-        self.last_time = time.clock()
-        self.updates = 0
-        self.packets = 0
-        return {'pps': pps, 'ups': ups}
-
     def process_packet(self, packet):
         cmd = chr(packet[0])
         datalen = 0
 
         # Begin frame
         if cmd == 'B':
-            self.frame_start_time = time.time()
+            self._frame_start_time = time.time()
             self.frame_started()
 
         # Unpack strand pixel data
@@ -100,9 +90,14 @@ class NetController(QtCore.QObject):
 
         # End frame
         elif cmd == 'E':
-            self.times.append((time.time() - self.frame_start_time))
-            if len(self.times) > 100:
-                self.times.pop(0)
+            fps = 1.0 / (time.time() - self._frame_start_time)
+
+            if len(self._frame_times) < 50:
+                self._frame_times.append(fps)
+            else:
+                self.fps = sum(self._frame_times) / 50
+                self._frame_times.pop(0)
+
             self.new_frame.emit(self._frame_data)
 
         else:

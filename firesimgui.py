@@ -148,11 +148,6 @@ class FireSimGUI(QObject):
         #self.netcontroller.moveToThread(self.net_thread)
         #self.netcontroller.start.emit()
 
-        self.net_stats_timer = QTimer()
-        self.net_stats_timer.setInterval(1000)
-        self.net_stats_timer.timeout.connect(self.update_net_stats)
-        self.net_stats_timer.start()
-
         self.redraw_timer = QTimer()
         self.redraw_timer.setInterval(33)
         self.redraw_timer.timeout.connect(self.scenecontroller.update_all)
@@ -182,10 +177,6 @@ class FireSimGUI(QObject):
                 yappi.get_func_stats().print_all()
             except ImportError:
                 pass
-
-    @pyqtSlot()
-    def update_net_stats(self):
-        self.canvas.net_stats = self.netcontroller.get_stats()
 
     @pyqtSlot()
     def on_network_event(self):

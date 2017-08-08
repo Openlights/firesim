@@ -92,6 +92,16 @@ void main() {
 
         fragment_shader = '''
 #version 120
+
+vec4 blur5(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
+    vec4 color = vec4(0.0);
+    vec2 off1 = vec2(1.3333333333333333) * direction;
+    color += texture2D(image, uv) * 0.29411764705882354;
+    color += texture2D(image, uv + (off1 / resolution)) * 0.35294117647058826;
+    color += texture2D(image, uv - (off1 / resolution)) * 0.35294117647058826;
+    return color;
+}
+
 void main (void)
 {
     gl_FragColor = vec4(0, 0, 0, 0);
@@ -237,15 +247,15 @@ void main (void)
             self._last_render_times.append(frame_time)
         else:
             self._fps = sum(self._last_render_times) / 20
-            self._last_render_times.clear()
+            self._last_render_times.pop(0)
 
         # Stats
         f = QFont()
         f.setPointSize(8)
         painter.setFont(f)
-        painter.setPen(QColor(170, 170, 200, 255))
-        #painter.drawText(8, 16, "%0.1f packets/sec" % self.net_stats['pps'])
-        painter.drawText(8, 32, "%d fps" % self._fps)
+        painter.setPen(QColor(160, 150, 150, 200))
+        painter.drawText(8, 16, "Net %d pps" % self.gui.netcontroller.fps)
+        painter.drawText(8, 32, "GUI %d fps" % self._fps)
 
     def _paint_linear_pixel_group(self, painter, pg):
         x1, y1 = self.scene_to_canvas(pg.start)
