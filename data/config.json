@@ -1,4 +1,4 @@
 {
-    "scene-root": "data/scenes",
-    "color-mode": "RGB8"
+    "file-type": "firesim-config",
+    "last-opened-scene": "data/scenes/firefly2015.json"
 }

@@ -62,7 +62,7 @@ class CanvasController(QObject):
         """
         pos = self.view.canvas_to_scene((pos.x(), pos.y()))
 
-        candidates = [pg for pg in self.model.pixel_groups
+        candidates = [pg for pg in self.model.scene.pixel_groups
                       if hit_test_rect(pg.bounding_box(), pos)]
 
         if len(candidates) == 0:
@@ -169,12 +169,3 @@ class CanvasController(QObject):
                     self.dragging = False
                 else:
                     self.deselect_all()
-
-    def import_legacy_scene(self, scene):
-        self.model.size = scene.extents()
-        self.model.center = scene.center()
-        for fixture in scene.fixtures():
-            self.model.pixel_groups.append(LinearPixelGroup(
-                fixture.pos1(), fixture.pos2(), fixture.pixels(),
-                (fixture.strand(), fixture._data_offset)
-            ))

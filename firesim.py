@@ -4,7 +4,7 @@ import sys
 import logging as log
 
 from firesimgui import FireSimGUI
-from util.arguments import parse_args
+from lib.arguments import parse_args
 
 def sig_handler(app, sig, frame):
     log.info("Firesim received signal %d.  Shutting down.", sig)

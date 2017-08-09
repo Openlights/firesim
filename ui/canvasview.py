@@ -30,7 +30,7 @@ class CanvasView(QQuickPaintedItem):
         self._model = self.controller.model
 
         self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
-        #self.setFillColor(QColor(0, 0, 0, 255))
+        self.setFillColor(QColor(0, 0, 0, 255))
         self.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
         self.setAcceptHoverEvents(True)
         self.forceActiveFocus()
@@ -65,8 +65,11 @@ class CanvasView(QQuickPaintedItem):
         pass
 
     def on_window_changed(self, window):
-        self.init_opengl()
+        # if self.ENABLE_OPENGL:
+        #     self.init_opengl()
+        pass
 
+    @pyqtSlot()
     def init_opengl(self):
         ctx = self.window().openglContext()
         if ctx is not None:
@@ -139,7 +142,7 @@ void main (void)
         """
         Returns a scene coordinate tuple (x, y) transformed to canvas space
         """
-        canvas_width, canvas_height = self.model.size
+        canvas_width, canvas_height = self.model.scene.extents
         scale_x = self.width() / canvas_width
         scale_y = self.height() / canvas_height
         scale = min(scale_x, scale_y)
@@ -151,7 +154,7 @@ void main (void)
         """
         Returns a canvas coordinate tuple (x, y) transformed to scene space
         """
-        canvas_width, canvas_height = self.model.size
+        canvas_width, canvas_height = self.model.scene.extents
         scale_x = canvas_width / self.width()
         scale_y = canvas_height / self.height()
         scale = max(scale_x, scale_y)
@@ -179,7 +182,7 @@ void main (void)
 
                 gl.glBegin(gl.GL_POINTS)
 
-                for pg in self.model.pixel_groups:
+                for pg in self.model.scene.pixel_groups:
                     if type(pg) == LinearPixelGroup:
                         colors = self.model.color_data.get(pg.strand, None)
                         if colors is None:
@@ -221,15 +224,14 @@ void main (void)
                 painter.endNativePainting()
             else:
                 if self.window().openglContext() is not None:
-                    # TODO: Re-init OpenGL but on the right thread
                     self.init_opengl()
 
         painter.setRenderHint(QPainter.Antialiasing)
 
-        selected = [pg for pg in self.model.pixel_groups
+        selected = [pg for pg in self.model.scene.pixel_groups
                     if pg.selected or pg.hovering]
         s = set(selected)
-        unselected = [pg for pg in self.model.pixel_groups if pg not in s]
+        unselected = [pg for pg in self.model.scene.pixel_groups if pg not in s]
 
         for pg in unselected:
             self.painters[pg.__class__](self, painter, pg)
@@ -284,46 +286,6 @@ void main (void)
 
         ax, ay = min(x1, x2), min(y1, y2)
         bx, by = max(x1, x2), max(y1, y2)
-
-        # Pixel colors (maybe move to a separate render pass)
-        # colors = self.model.color_data.get(pg.strand, None)
-        # if colors is not None:
-
-        #     colors = colors[pg.offset:pg.offset + pg.count]
-
-        #     painter.setPen(QColor(0, 0, 0, 0))
-
-        #     if self.model.blurred:
-        #         spacing = 4
-        #         for i, loc in enumerate(pg.pixel_locations[::spacing]):
-        #             px, py = self.scene_to_canvas(loc)
-        #             px += dx
-        #             py += dy
-        #             r, g, b = colors[i]
-        #             painter.setBrush(QColor(r, g, b, 50))
-        #             # TODO: probably want a better LED scaling than this.
-        #             rx, ry = self.scene_to_canvas((8, 8))
-
-        #             painter.setBrush(QColor(r, g, b, 50))
-        #             painter.drawEllipse(QPointF(px, py), 16, 16)
-
-        #         spacing = 3
-        #     else:
-        #         spacing = 1
-
-        #     for i, loc in enumerate(pg.pixel_locations[::spacing]):
-        #         px, py = self.scene_to_canvas(loc)
-        #         px += dx
-        #         py += dy
-        #         r, g, b = colors[i]
-        #         painter.setBrush(QColor(r, g, b, 50))
-        #         # TODO: probably want a better LED scaling than this.
-        #         rx, ry = self.scene_to_canvas((8, 8))
-        #         #painter.drawEllipse(QPointF(px, py), rx, ry)
-
-        #         rx, ry = self.scene_to_canvas((3, 3))
-        #         painter.setBrush(QColor(r, g, b, 255))
-        #         painter.drawEllipse(QPointF(px, py), rx, ry)
 
         if self.model.design_mode:
             # Bounding box (debug)

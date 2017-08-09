@@ -1,18 +1,5 @@
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 
-from models.pixelgroup import LinearPixelGroup
-
-
-test_pg_list = [
-    {
-        "type": "LinearPixelGroup",
-        "start": [100, 100],
-        "end": [300, 300],
-        "count": 120,
-        "address": [0, 0]
-    }
-]
-
 
 class Canvas(QObject):
 
@@ -21,9 +8,7 @@ class Canvas(QObject):
     def __init__(self):
         super(Canvas, self).__init__()
 
-        self.pixel_groups = []
-        self.size = (800, 800)
-        self.center = (400, 400)
+        self._scene = None
         self.color_data = {}
 
         # The canvas is always in either design mode or sim mode.
@@ -52,3 +37,10 @@ class Canvas(QObject):
             self._blurred = val
             self.changed.emit()
 
+    @property
+    def scene(self):
+        return self._scene
+
+    @scene.setter
+    def scene(self, s):
+        self._scene = s

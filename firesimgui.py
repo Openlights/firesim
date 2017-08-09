@@ -13,9 +13,8 @@ from PyQt5.QtWidgets import QApplication
 
 from ui.canvasview import CanvasView
 
-from util.config import Config
-from models.scene import Scene, FixtureIdError
-from controllers.scenecontroller import SceneController
+from lib.config import Config
+from models.scene import Scene
 from controllers.netcontroller import NetController
 
 
@@ -23,11 +22,11 @@ class UIState(QObject):
     def __init__(self, parent=None):
         super(UIState, self).__init__(parent)
         self.parent = parent
-        self._backdrop_enable = parent.scenecontroller.scene.get("backdrop-enable", False)
-        self._labels_visible = parent.scenecontroller.scene.get("labels-visible", False)
-        self._locked = parent.scenecontroller.scene.get("locked", False)
-        self._center_visible = parent.scenecontroller.scene.get("center-visible", False)
-        self._blur_enable = parent.scenecontroller.scene.get("blur-enable", False)
+        self._backdrop_enable = parent.scene.get("backdrop-enable", False)
+        self._labels_visible = parent.scene.get("labels-visible", False)
+        self._locked = parent.scene.get("locked", False)
+        self._center_visible = parent.scene.get("center-visible", False)
+        self._blur_enable = parent.scene.get("blur-enable", False)
 
     backdrop_enable_changed = pyqtSignal()
     labels_visible_changed = pyqtSignal()
@@ -105,14 +104,16 @@ class FireSimGUI(QObject):
         self.selected_fixture = None
         self.is_blurred = False
 
-        self.scene = Scene(os.path.join(self.config.get("scene-root"), self.args.scene) + ".json")
-        self.scenecontroller = SceneController(app=self, scene=self.scene)
+        scene_file_path = (self.args.scene if self.args.scene is not None
+                           else self.config.get("last-opened-scene"))
+
+        self.scene = Scene(scene_file_path)
 
         qmlRegisterType(CanvasView, "FireSim", 1, 0, "Canvas")
 
         self.view = QQuickView()
 
-        self.view.setTitle("FireSim")
+        self.view.setTitle("FireSim - %s" % self.scene.name)
         self.view.setResizeMode(QQuickView.SizeRootObjectToView)
 
         self.view.closeEvent = self.on_close
@@ -123,24 +124,16 @@ class FireSimGUI(QObject):
         self.state = UIState(self)
         self.context.setContextProperty('App', self.state)
 
-        self.state.backdrop_enable_changed.connect(self.scenecontroller.on_backdrop_enable_changed)
-        self.state.labels_visible_changed.connect(self.scenecontroller.on_labels_visible_changed)
-
-        self.fixture_info_list = []
-        self.context.setContextProperty('fixtureInfoModel', self.fixture_info_list)
-
         self.view.setSource(QUrl('ui/qml/FireSimGUI.qml'))
 
         self.root = self.view.rootObject()
         self.canvas = self.root.findChild(CanvasView)
         self.canvas.gui = self
+        self.canvas.model.scene = self.scene
 
-        cw, ch = self.scenecontroller.scene.extents()
+        cw, ch = self.scene.extents
         self.canvas.setWidth(cw)
         self.canvas.setHeight(ch)
-
-        self.scenecontroller.set_canvas(self.canvas)
-        self.canvas.controller.import_legacy_scene(self.scene)
 
         #self.net_thread = QThread()
         #self.net_thread.start()
@@ -150,7 +143,7 @@ class FireSimGUI(QObject):
 
         self.redraw_timer = QTimer()
         self.redraw_timer.setInterval(33)
-        self.redraw_timer.timeout.connect(self.scenecontroller.update_all)
+        self.redraw_timer.timeout.connect(self.canvas.update)
         self.redraw_timer.start()
 
         self.netcontroller.new_frame.connect(self.canvas.controller.on_new_frame)
@@ -184,46 +177,8 @@ class FireSimGUI(QObject):
 
     @pyqtSlot()
     def on_btn_add_fixture(self):
-        self.scenecontroller.add_fixture()
-
-    @pyqtSlot()
-    def on_btn_clear(self):
-        self.scenecontroller.clear_fixtures()
+        pass
 
     @pyqtSlot()
     def on_btn_save(self):
-        self.scenecontroller.save_scene()
-
-    def widget_selected(self, selected, fixture, multi):
-        self.selected_fixture = None
-
-        if multi:
-            pass
-        else:
-            if selected:
-                self.selected_fixture_strand = fixture.strand()
-                self.selected_fixture_address = fixture.address()
-                self.selected_fixture_pixels = fixture.pixels()
-            else:
-                self.selected_fixture_strand = 0
-                self.selected_fixture_address = 0
-                self.selected_fixture_pixels = 0
-
-        if selected:
-            self.selected_fixture = fixture
-
-    def update_selected_fixture_properties(self):
-        if self.selected_fixture is not None:
-            new_strand = int(self.selected_fixture_strand)
-            new_address = int(self.selected_fixture_address)
-            if (self.selected_fixture.strand() != new_strand
-                or self.selected_fixture.address() != new_address):
-                try:
-                    self.scenecontroller.update_fixture(
-                        self.selected_fixture, new_strand, new_address
-                    )
-                except FixtureIdError:
-                    log.exception("Error updating fixture properties")
-                    return
-            self.selected_fixture.set_pixels(int(self.selected_fixture_pixels))
-            self.selected_fixture.get_widget().update()
+        self.scene.save()

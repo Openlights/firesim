@@ -31,15 +31,13 @@ class PixelGroup(QObject):
     LED addresses are (strand, offset) tuples.
     """
 
-    def __init__(self, count, address=None):
+    def __init__(self, count, strand=0, offset=0):
         super(PixelGroup, self).__init__()
-        self.pixel_locations = np.zeros(count, dtype=pixel_location)
-        self.pixel_colors = np.zeros(count, dtype=pixel_color)
 
         # Properties accessible from QML
         self._count = count
-        self._strand = address[0]
-        self._offset = address[1]
+        self._strand = strand
+        self._offset = offset
 
         # GUI-related
         self.selected = False
@@ -49,8 +47,8 @@ class PixelGroup(QObject):
     changed = pyqtSignal()
 
     def __repr__(self):
-        return "PixelGroup address (%d, %d)" % (self.address[0],
-                                                self.address[1])
+        return "PixelGroup address (%d, %d)" % (self.strand, self.offset)
+
     @pyqtProperty(int, notify=changed)
     def count(self):
         return self._count
@@ -59,6 +57,8 @@ class PixelGroup(QObject):
     def count(self, val):
         if self._count != val:
             self._count = val
+            self.pixel_locations = np.zeros(self._count, dtype=pixel_location)
+            self.pixel_colors = np.zeros(self.count, dtype=pixel_color)
 
     @pyqtProperty(int, notify=changed)
     def strand(self):
@@ -99,6 +99,18 @@ class PixelGroup(QObject):
         """
         raise NotImplementedError("Please override move_by()!")
 
+    def from_json(self, json):
+        """
+        Loads the PixelGroup data from a JSON dict
+        """
+        raise NotImplementedError("Please override from_json()!")
+
+    def to_json(self):
+        """
+        Returns the PixelGroup data as a dict suitable for saving in JSON
+        """
+        raise NotImplementedError("Please override to_json()!")
+
 
 class LinearPixelGroup(PixelGroup):
     """
@@ -108,16 +120,44 @@ class LinearPixelGroup(PixelGroup):
     The first pixel will overlap with the
     """
 
-    def __init__(self, start, end, count, address=None):
-        super(LinearPixelGroup, self).__init__(count, address)
-        self.start = start
-        self.end = end
+    def __init__(self, start=(0, 0), end=(0, 0), count=0,
+                 strand=0, offset=0, json=None):
+
+        super(LinearPixelGroup, self).__init__(count, strand, offset)
+
+        if json is not None:
+            self.from_json(json)
+        else:
+            self.start = start
+            self.end = end
+            self.count = count
+            self.strand = strand
+            self.offset = offset
+
         self._bounding_box = None
         self._update_geometry()
 
     def __repr__(self):
         return ("LinearPixelGroup address (%s) start (%s) end (%s) count %d" %
                 (self.address, self.start, self.end, self.count))
+
+    def from_json(self, json):
+        self.start = tuple(json["start"])
+        self.end = tuple(json["end"])
+        self.count = json["count"]
+        self.strand = json["strand"]
+        self.offset = json["offset"]
+
+    def to_json(self):
+        d = {
+            "type": "linear",
+            "strand": self.strand,
+            "offset": self.offset,
+            "count": self.count,
+            "start": self.start,
+            "end": self.end
+        }
+        return d
 
     def _update_geometry(self):
         ox = (self.end[0] - self.start[0]) / self.count
