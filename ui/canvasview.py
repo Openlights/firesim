@@ -70,6 +70,10 @@ class CanvasView(QQuickPaintedItem):
         pass
 
     @pyqtSlot()
+    def on_resize(self):
+        pass
+
+    @pyqtSlot()
     def init_opengl(self):
         ctx = self.window().openglContext()
         if ctx is not None:
@@ -173,7 +177,10 @@ void main (void)
                 gl = self.gl
 
                 gl.glEnable(gl.GL_SCISSOR_TEST);
-                gl.glScissor(0, 0, self.width(), self.height());
+                ratio = self.window().devicePixelRatio()
+                w = self.window().width() * ratio
+                h = self.window().height() * ratio
+                gl.glScissor(0, 0, w, h)
 
                 gl.glClearColor(0.0, 0.0, 0.0, 1.0)
                 gl.glClear(gl.GL_COLOR_BUFFER_BIT)
