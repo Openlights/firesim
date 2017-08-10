@@ -1,6 +1,10 @@
 import math
 
 
+def vec2_sum(v1, v2):
+    return tuple(map(sum, zip(v1, v2)))
+
+
 def distance(p1, p2):
     return math.sqrt(math.pow(p2[0] - p1[0], 2) + math.pow(p2[1] - p1[1], 2))
 

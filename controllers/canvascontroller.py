@@ -1,7 +1,7 @@
 import numpy as np
 from copy import copy
 
-from PyQt5.QtCore import Qt, QObject, pyqtSlot
+from PyQt5.QtCore import Qt, QObject, pyqtSlot, QPointF
 from PyQt5.QtGui import QGuiApplication
 
 from models.pixelgroup import *
@@ -26,6 +26,7 @@ class CanvasController(QObject):
         self.hovering = []
         self.dragging = False
         self.drag_delta = None
+        self.child_handling_drag = None
 
     @pyqtSlot(dict)
     def on_new_frame(self, frame):
@@ -120,31 +121,47 @@ class CanvasController(QObject):
 
         if self.model.design_mode and len(self.selected) > 0:
 
-            delta = event.localPos() - self.mouse_down_pos
+            delta = event.localPos() - QPointF(*self.mouse_down_pos)
 
             # TODO: Detect if we are starting a drag over a drag handle,
             # and behave differently.
 
             if delta.manhattanLength() > 5:
                 self.dragging = True
+            else:
+                return
 
             if self.dragging:
-                self.drag_delta = delta
+                self.drag_delta = delta.x(), delta.y()
+
+            if self.child_handling_drag is not None:
+                delta = self.view.canvas_to_scene(self.drag_delta)
+                self.child_handling_drag.on_drag_move(delta)
+            elif len(self.selected) == 1:
+                start_pos = self.view.canvas_to_scene(self.mouse_down_pos)
+                if self.selected[0].hit_test(start_pos):
+                    self.child_handling_drag = self.selected[0]
+                    self.child_handling_drag.on_drag_start(start_pos)
 
     def on_mouse_press(self, event):
-        self.mouse_down_pos = event.localPos()
+        self.mouse_down_pos = event.localPos().x(), event.localPos().y()
 
     def on_mouse_release(self, event):
         if self.model.design_mode:
 
             if self.dragging:
                 self.dragging = False
-                final_pos = self.drag_delta.x(), self.drag_delta.y()
-                for pg in self.selected:
-                    pg.move_by(self.view.canvas_to_scene(final_pos))
+                if self.child_handling_drag:
+                    delta = self.view.canvas_to_scene(self.drag_delta)
+                    self.child_handling_drag.on_drag_end(delta)
+                    self.child_handling_drag = None
+                else:
+                    for pg in self.selected:
+                        pg.move_by(self.view.canvas_to_scene(self.drag_delta))
                 return
 
-            if (event.localPos() - self.mouse_down_pos).manhattanLength() <= 5:
+            delta = (event.localPos() - QPointF(*self.mouse_down_pos))
+            if delta.manhattanLength() <= 5:
                 self.unhover_all()
                 self.try_select_under_cursor(event.localPos())
 
@@ -167,5 +184,7 @@ class CanvasController(QObject):
                 if self.dragging:
                     # Cancel drag
                     self.dragging = False
+                    if self.child_handling_drag is not None:
+                        self.child_handling_drag.on_drag_cancel()
                 else:
                     self.deselect_all()

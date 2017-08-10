@@ -1,11 +1,11 @@
 import json
 import numpy as np
-import operator
 
-from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject, QPoint, QPointF
 
 from lib.dtypes import pixel_color, pixel_location
-from lib.geometry import distance, distance_point_to_line, inflate_rect
+from lib.geometry import (distance, distance_point_to_line, inflate_rect,
+                          vec2_sum)
 
 __all__ = [
     "PixelGroup", "LinearPixelGroup", "RectangularPixelGroup",
@@ -13,11 +13,48 @@ __all__ = [
 ]
 
 
+class Handle:
+    """
+    Represents a graphical handle used for manipulating objects
+
+    TODO: these should be associated with properties in the parent class, so
+    they can automatically update a property when moved, etc.
+    """
+
+    def __init__(self, parent, pos):
+        self.parent = parent
+        self.pos = pos
+        self.hovering = False
+        self.dragging = False
+        self.drag_start_pos = None
+
+    @property
+    def pos(self):
+        if self.parent.dragging:
+            return vec2_sum(self._pos, self.parent.drag_delta)
+        return self._pos
+
+    @pos.setter
+    def pos(self, p):
+        self._pos = p
+
+    def hit_test(self, pos, epsilon=25):
+        if type(pos) == QPoint or type(pos) == QPointF:
+            pos = pos.x(), pos.y()
+        dist = distance(self.pos, pos)
+        return 0 if (dist > epsilon) else dist
+
+
 class PixelGroup(QObject):
     """
     A PixelGroup is a set of pixels that have some internal geometric ordering.
     For example, a linear array (LED strip), square array, or circular array.
     This class gets subclassed to define the shape-specific details.
+
+    These classes handle the data model as well as UI interactivity (drag, etc).
+    At some point it might make sense to split those two functions apart, but
+    for now they are both here for simplicity.  Actually drawing the PixelGroup
+    is done by painter methods in CanvasView.
 
     PixelGroups are each a single entity in the scene model (i.e. stored in the
     scene file) and a single widget to interact with in the canvas.
@@ -43,6 +80,10 @@ class PixelGroup(QObject):
         self.selected = False
         self.draw_bb = False
         self.hovering = False
+        self.handles = []
+        self.dragging = False
+        self._drag_start_pos = None
+        self._drag_delta = None
 
     changed = pyqtSignal()
 
@@ -78,6 +119,10 @@ class PixelGroup(QObject):
         if self._offset != val:
             self._offset = val
 
+    @property
+    def drag_delta(self):
+        return self._drag_delta
+
     def bounding_box(self):
         """
         Returns a bounding box that encompasses the pixels in the group
@@ -111,6 +156,18 @@ class PixelGroup(QObject):
         """
         raise NotImplementedError("Please override to_json()!")
 
+    def on_drag_start(self, start_pos):
+        raise NotImplementedError("Please override on_drag_start()!")
+
+    def on_drag_move(self, delta_pos):
+        raise NotImplementedError("Please override on_drag_move()!")
+
+    def on_drag_end(self, delta_pos):
+        raise NotImplementedError("Please override on_drag_end()!")
+
+    def on_drag_cancel(self):
+        raise NotImplementedError("Please override on_drag_cancel()!")
+
 
 class LinearPixelGroup(PixelGroup):
     """
@@ -134,12 +191,35 @@ class LinearPixelGroup(PixelGroup):
             self.strand = strand
             self.offset = offset
 
+        self.start_handle = Handle(self, self.start)
+        self.end_handle = Handle(self, self.end)
+
         self._bounding_box = None
         self._update_geometry()
 
     def __repr__(self):
         return ("LinearPixelGroup address (%s) start (%s) end (%s) count %d" %
                 (self.address, self.start, self.end, self.count))
+
+    @property
+    def start(self):
+        if self._drag_delta is not None:
+            return vec2_sum(self._start, self._drag_delta)
+        return self._start
+
+    @start.setter
+    def start(self, val):
+        self._start = val
+
+    @property
+    def end(self):
+        if self._drag_delta is not None:
+            return vec2_sum(self._end, self._drag_delta)
+        return self._end
+
+    @end.setter
+    def end(self, val):
+        self._end = val
 
     def from_json(self, json):
         self.start = tuple(json["start"])
@@ -169,6 +249,10 @@ class LinearPixelGroup(PixelGroup):
             py += oy
         self._bounding_box = None
 
+        # TODO: It would be nice if Handles updated automatically
+        self.start_handle.pos = self.start
+        self.end_handle.pos = self.end
+
     def bounding_box(self):
         if self._bounding_box is None:
             x1, y1 = self.start
@@ -180,13 +264,61 @@ class LinearPixelGroup(PixelGroup):
 
     def hit_test(self, pos, epsilon=10):
         dist = distance_point_to_line(self.start, self.end, pos)
-        #print(repr(self), "pos", pos, "e", epsilon, "distance", dist)
-        return 0 if (dist > epsilon) else dist
+        hit = (dist <= epsilon)
+        return dist if hit else 0
 
     def move_by(self, pos):
-        self.start = tuple(map(operator.add, self.start, pos))
-        self.end = tuple(map(operator.add, self.end, pos))
+        self.start = vec2_sum(self.start, pos)
+        self.end = vec2_sum(self.end, pos)
         self._update_geometry()
+
+    def on_drag_start(self, start_pos):
+        # TODO: This could be more smart if the Handles were more smart
+        if self.start_handle.hit_test(start_pos):
+            self.start_handle.drag_start_pos = self.start_handle.pos
+            self.start_handle.dragging = True
+        elif self.end_handle.hit_test(start_pos):
+            self.end_handle.drag_start_pos = self.end_handle.pos
+            self.end_handle.dragging = True
+        else:
+            self.dragging = True
+            self._drag_start_pos = start_pos
+
+    def on_drag_move(self, delta_pos):
+        if self.start_handle.dragging:
+            self.start = vec2_sum(self.start_handle.drag_start_pos, delta_pos)
+            self.start_handle.pos = self.start
+        elif self.end_handle.dragging:
+            self.end = vec2_sum(self.end_handle.drag_start_pos, delta_pos)
+            self.end_handle.pos = self.end
+        else:
+            self._drag_delta = delta_pos
+
+    def on_drag_end(self, delta_pos):
+        if self.dragging:
+            self.dragging = False
+            self._drag_start_pos = None
+            self._drag_delta = None
+            self.move_by(delta_pos)
+
+        self.start_handle.dragging = False
+        self.start_handle.drag_start_pos = None
+        self.end_handle.dragging = False
+        self.end_handle.drag_start_pos = None
+
+    def on_drag_cancel(self):
+        if self.start_handle.dragging:
+            self.start = self.start_handle.drag_start_pos
+            self.start_handle.dragging = False
+            self.start_handle.drag_start_pos = None
+        elif self.end_handle.dragging:
+            self.end = self.end_handle.drag_start_pos
+            self.end_handle.dragging = False
+            self.end_handle.drag_start_pos = None
+        else:
+            self.dragging = False
+            self._drag_start_pos = None
+            self._drag_delta = None
 
 
 class RectangularPixelGroup(PixelGroup):

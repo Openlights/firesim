@@ -200,14 +200,6 @@ void main (void)
                         x1, y1 = self.scene_to_canvas(pg.start)
                         x2, y2 = self.scene_to_canvas(pg.end)
 
-                        if self.controller.dragging and pg.selected:
-                            dx = self.controller.drag_delta.x()
-                            dy = self.controller.drag_delta.y()
-                            x1 += dx
-                            x2 += dx
-                            y1 += dy
-                            y2 += dy
-
                         y1 = self.height() - y1
                         y2 = self.height() - y2
                         dx = (x2 - x1) / pg.count
@@ -215,7 +207,6 @@ void main (void)
 
                         x, y = x1, y1
                         for i in range(pg.count):
-
 
                             r, g, b = colors[i]
                             gl.glColor4f(r / 255, g / 255, b / 255, 1)
@@ -279,18 +270,6 @@ void main (void)
         x1, y1 = self.scene_to_canvas(pg.start)
         x2, y2 = self.scene_to_canvas(pg.end)
 
-        if self.controller.dragging and pg.selected:
-            dx = self.controller.drag_delta.x()
-            dy = self.controller.drag_delta.y()
-        else:
-            dx = 0
-            dy = 0
-
-        x1 += dx
-        x2 += dx
-        y1 += dy
-        y2 += dy
-
         ax, ay = min(x1, x2), min(y1, y2)
         bx, by = max(x1, x2), max(y1, y2)
 
@@ -316,11 +295,11 @@ void main (void)
             painter.drawLine(QPointF(x1, y1),QPointF(x2, y2))
 
             if pg.selected:
-                self._draw_drag_handle(painter, (x1, y1), False, False)
-                self._draw_drag_handle(painter, (x2, y2), False, False)
+                self._draw_drag_handle(painter, pg.start_handle)
+                self._draw_drag_handle(painter, pg.end_handle)
 
             if pg.selected or pg.hovering:
-                self._draw_address(painter, pg, (dx, dy))
+                self._draw_address(painter, pg, (0, 0))
 
     painters = {
         LinearPixelGroup: _paint_linear_pixel_group
@@ -334,11 +313,15 @@ void main (void)
         painter.setPen(QPen(color, 1, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         painter.drawRect(x, y, w, h)
 
-    def _draw_drag_handle(self, painter, location, hovering, dragging):
-        x, y = location
+    def _draw_drag_handle(self, painter, handle):
+        x, y = self.scene_to_canvas(handle.pos)
         painter.setPen(QPen(QColor(200, 200, 200, 200), 1, Qt.SolidLine))
-        if hovering:
-            painter.setBrush(QColor(50, 100, 255, 255))
+        if handle.hovering:
+            painter.setBrush(QColor(50, 100, 255, 150))
+            rect = QRectF(x - 6, y - 6, 12, 12)
+            painter.drawRoundedRect(rect, 1, 1)
+        if handle.dragging:
+            painter.setBrush(QColor(50, 255, 100, 150))
             rect = QRectF(x - 6, y - 6, 12, 12)
             painter.drawRoundedRect(rect, 1, 1)
         painter.setBrush(QColor(0, 0, 0, 0))
