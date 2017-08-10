@@ -25,6 +25,7 @@ class CanvasController(QObject):
         self.selection_index = 0
         self.hovering = []
         self.dragging = False
+        self.drag_canceled = False
         self.drag_delta = None
         self.child_handling_drag = None
 
@@ -123,15 +124,25 @@ class CanvasController(QObject):
 
             delta = event.localPos() - QPointF(*self.mouse_down_pos)
 
-            # TODO: Detect if we are starting a drag over a drag handle,
-            # and behave differently.
+            # TODO: For multiple objects selected, we should create a bounding
+            #       box to encompass them all, and then only start a drag if the
+            #       mouse is inside that bounding box.
 
-            if delta.manhattanLength() > 5:
+            # Start a drag if the mouse has moved a little bit and we are either
+            # doing a multi-select drag or the mouse started inside the selected
+            # object.
+            if (delta.manhattanLength() > 5 and
+                (len(self.selected) > 1 or
+                 self.selected[0].hit_test(
+                    self.view.canvas_to_scene(self.mouse_down_pos)))):
                 self.dragging = True
-            else:
+            elif not self.dragging:
                 return
 
             if self.dragging:
+                if self.drag_canceled:
+                    return
+
                 self.drag_delta = delta.x(), delta.y()
 
             if self.child_handling_drag is not None:
@@ -149,8 +160,15 @@ class CanvasController(QObject):
     def on_mouse_release(self, event):
         if self.model.design_mode:
 
+            if self.drag_canceled:
+                self.drag_canceled = False
+                self.dragging = False
+                self.child_handling_drag = None
+                return
+
             if self.dragging:
                 self.dragging = False
+
                 if self.child_handling_drag:
                     delta = self.view.canvas_to_scene(self.drag_delta)
                     self.child_handling_drag.on_drag_end(delta)
@@ -184,6 +202,7 @@ class CanvasController(QObject):
                 if self.dragging:
                     # Cancel drag
                     self.dragging = False
+                    self.drag_canceled = True
                     if self.child_handling_drag is not None:
                         self.child_handling_drag.on_drag_cancel()
                 else:

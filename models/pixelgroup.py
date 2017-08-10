@@ -283,6 +283,7 @@ class LinearPixelGroup(PixelGroup):
         else:
             self.dragging = True
             self._drag_start_pos = start_pos
+            self._drag_delta = (0, 0)
 
     def on_drag_move(self, delta_pos):
         if self.start_handle.dragging:
@@ -311,10 +312,12 @@ class LinearPixelGroup(PixelGroup):
             self.start = self.start_handle.drag_start_pos
             self.start_handle.dragging = False
             self.start_handle.drag_start_pos = None
+            self.start_handle.pos = self.start
         elif self.end_handle.dragging:
             self.end = self.end_handle.drag_start_pos
             self.end_handle.dragging = False
             self.end_handle.drag_start_pos = None
+            self.end_handle.pos = self.end
         else:
             self.dragging = False
             self._drag_start_pos = None
