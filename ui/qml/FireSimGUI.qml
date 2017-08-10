@@ -71,7 +71,7 @@ Item {
                 onClicked: main.on_btn_add_fixture()
             }
 
-            Button {
+            /*Button {
                 text: "Rectangular"
                 onClicked: main.on_btn_add_fixture()
             }
@@ -84,7 +84,7 @@ Item {
             Button {
                 text: "Arbitrary"
                 onClicked: main.on_btn_add_fixture()
-            }
+            }*/
 
             Button {
                 text: "Design Mode"
