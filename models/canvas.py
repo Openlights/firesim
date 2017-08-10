@@ -18,7 +18,7 @@ class Canvas(QObject):
 
         self._blurred = False
 
-    @pyqtProperty(bool)
+    @pyqtProperty(bool, notify=changed)
     def design_mode(self):
         return self._design_mode
 
@@ -26,6 +26,7 @@ class Canvas(QObject):
     def design_mode(self, val):
         if self._design_mode != val:
             self._design_mode = val
+            self.changed.emit()
 
     @pyqtProperty(bool, notify=changed)
     def blurred(self):

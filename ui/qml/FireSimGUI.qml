@@ -67,24 +67,9 @@ Item {
             }
 
             Button {
-                text: "Linear"
-                onClicked: main.on_btn_add_fixture()
+                text: App.backdrop_enable ? "Hide Backdrop" : "Show Backdrop"
+                onClicked: App.backdrop_enable = !App.backdrop_enable
             }
-
-            /*Button {
-                text: "Rectangular"
-                onClicked: main.on_btn_add_fixture()
-            }
-
-            Button {
-                text: "Circular"
-                onClicked: main.on_btn_add_fixture()
-            }
-
-            Button {
-                text: "Arbitrary"
-                onClicked: main.on_btn_add_fixture()
-            }*/
 
             Button {
                 text: "Design Mode"
@@ -97,9 +82,28 @@ Item {
             }
 
             Button {
-                text: App.backdrop_enable ? "Hide Backdrop" : "Show Backdrop"
-                onClicked: App.backdrop_enable = !App.backdrop_enable
+                text: "Add Linear"
+                visible: canvas.model.design_mode
+                onClicked: canvas.model.scene.add_new_pixel_group("linear")
             }
+
+            /*Button {
+                text: "Rectangular"
+                visible: canvas.model.design_mode
+                onClicked: main.on_btn_add_fixture()
+            }
+
+            Button {
+                text: "Circular"
+                visible: canvas.model.design_mode
+                onClicked: main.on_btn_add_fixture()
+            }
+
+            Button {
+                text: "Arbitrary"
+                visible: canvas.model.design_mode
+                onClicked: main.on_btn_add_fixture()
+            }*/
 
             Button {
                 text: canvas.model.blurred ? "Unblurred" : "Blurred"
