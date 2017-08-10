@@ -281,14 +281,14 @@ void main (void)
 
             if pg.selected or pg.hovering:
                 painter.setPen(QPen(QColor(100, 100, 255, 170),
-                                          8,
+                                          6,
                                           Qt.SolidLine,
                                           Qt.RoundCap,
                                           Qt.RoundJoin))
                 painter.drawLine(QPointF(x1, y1),QPointF(x2, y2))
 
             painter.setPen(QPen(QColor(100, 100, 100, 200),
-                                      4,
+                                      2,
                                       Qt.SolidLine,
                                       Qt.RoundCap,
                                       Qt.RoundJoin))
@@ -315,18 +315,20 @@ void main (void)
 
     def _draw_drag_handle(self, painter, handle):
         x, y = self.scene_to_canvas(handle.pos)
-        painter.setPen(QPen(QColor(200, 200, 200, 200), 1, Qt.SolidLine))
-        if handle.hovering:
-            painter.setBrush(QColor(50, 100, 255, 150))
-            rect = QRectF(x - 6, y - 6, 12, 12)
-            painter.drawRoundedRect(rect, 1, 1)
+
         if handle.dragging:
-            painter.setBrush(QColor(50, 255, 100, 150))
-            rect = QRectF(x - 6, y - 6, 12, 12)
-            painter.drawRoundedRect(rect, 1, 1)
-        painter.setBrush(QColor(0, 0, 0, 0))
-        rect = QRectF(x - 4, y - 4, 8, 8)
-        painter.drawRoundedRect(rect, 1, 1)
+            color = QColor(50, 255, 100, 150)
+            rect = QRectF(x - 5, y - 5, 10, 10)
+        elif handle.hovering:
+            color = QColor(50, 100, 255, 150)
+            rect = QRectF(x - 5, y - 5, 10, 10)
+        else:
+            color = QColor(200, 200, 200, 200)
+            rect = QRectF(x - 4, y - 4, 8, 8)
+
+        painter.setPen(QPen(color, 1, Qt.SolidLine))
+        painter.setBrush(color)
+        painter.drawRoundedRect(rect, 2, 2)
 
     def _draw_address(self, painter, pg, offset):
         x1, y1 = self.scene_to_canvas(pg.start)

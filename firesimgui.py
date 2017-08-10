@@ -120,6 +120,7 @@ class FireSimGUI(QObject):
 
         self.context = self.view.rootContext()
         self.context.setContextProperty('main', self)
+        self.context.setContextProperty('view', self.view)
 
         self.state = UIState(self)
         self.context.setContextProperty('App', self.state)

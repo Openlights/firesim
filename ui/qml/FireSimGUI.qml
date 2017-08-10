@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Window 2.2
 import QtGraphicalEffects 1.0
 import FireSim 1.0
 import "widgets"
@@ -110,12 +111,23 @@ Item {
                 onClicked: canvas.model.blurred = !canvas.model.blurred
             }
 
+            Button {
+                text: ((view.visibility == Window.FullScreen) ?
+                       "Exit Fullscreen" : "Fullscreen")
+                onClicked: {
+                    if (view.visibility == Window.FullScreen)
+                        view.visibility = Window.Windowed
+                    else
+                        view.visibility = Window.FullScreen
+                }
+            }
+
             Rectangle {
                 width: 110
                 height: ((canvas.selection.length == 1) ?
                          fixture_info_column.height + 10 :
                          multiple_selection_column.height + 10)
-                visible: canvas.selection.length > 0
+                visible: canvas.model.design_mode && canvas.selection.length > 0
 
                 radius: 5
                 color: "#232323"
