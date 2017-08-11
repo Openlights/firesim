@@ -188,6 +188,7 @@ class CanvasController(QObject):
 
     def on_key_release(self, event):
         # TODO: Hotkey remapping
+        mods = event.modifiers()
 
         # Tab: selection disambiguation
         if event.key() == Qt.Key_Tab:
@@ -207,3 +208,27 @@ class CanvasController(QObject):
                         self.child_handling_drag.on_drag_cancel()
                 else:
                     self.deselect_all()
+
+        elif event.key() == Qt.Key_Up:
+            if self.model.design_mode and len(self.selected) > 0:
+                delta = 5 if (mods & Qt.ShiftModifier) else 1
+                for pg in self.selected:
+                    pg.move_by((0, -delta))
+
+        elif event.key() == Qt.Key_Down:
+            if self.model.design_mode and len(self.selected) > 0:
+                delta = 5 if (mods & Qt.ShiftModifier) else 1
+                for pg in self.selected:
+                    pg.move_by((0, delta))
+
+        elif event.key() == Qt.Key_Right:
+            if self.model.design_mode and len(self.selected) > 0:
+                delta = 5 if (mods & Qt.ShiftModifier) else 1
+                for pg in self.selected:
+                    pg.move_by((delta, 0))
+
+        elif event.key() == Qt.Key_Left:
+            if self.model.design_mode and len(self.selected) > 0:
+                delta = 5 if (mods & Qt.ShiftModifier) else 1
+                for pg in self.selected:
+                    pg.move_by((-delta, 0))
