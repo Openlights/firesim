@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import QtQuick.Window 2.2
+import QtQuick.Controls 1.4
 import QtGraphicalEffects 1.0
+
 import FireSim 1.0
 import "widgets"
 
@@ -42,78 +44,100 @@ Item {
     Rectangle {
         id: toolbox
 
-        width: 130
         color: "#121212";
         anchors { left: parent.left; top: parent.top; bottom: parent.bottom; }
+        width: 70
 
         Column {
             anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: 8; }
 
             spacing: 8
 
-            Button {
+            ToolButton {
                 id: btn_load
-                text: "Load"
+                tooltip: "Load Scene"
+                iconSource: "../res/icon/ic_unarchive_white_24dp.png"
             }
 
-            Button {
+            ToolButton {
                 id: btn_save
-                text: "Save"
+                tooltip: "Save Scene"
+                iconSource: "../res/icon/ic_save_white_24dp.png"
                 onClicked: main.on_btn_save()
             }
 
-            Button {
+            ToolButton {
                 id: btn_load_bg
-                text: "Load Backdrop"
+                tooltip: "Load Background"
+                iconSource: "../res/icon/ic_add_a_photo_white_24dp.png"
             }
 
-            Button {
-                text: App.backdrop_enable ? "Hide Backdrop" : "Show Backdrop"
+            ToolButton {
+                tooltip: "Show/Hide Background"
+                iconSource: "../res/icon/ic_image_white_24dp.png"
                 onClicked: App.backdrop_enable = !App.backdrop_enable
+                checkable: true
+                checked: App.backdrop_enable
             }
 
-            Button {
-                text: "Design Mode"
+            ExclusiveGroup { id: designSimGroup }
+
+            ToolButton {
+                tooltip: "Design Mode"
+                checkable: true
+                checked: canvas.model.design_mode
+                exclusiveGroup: designSimGroup
+                iconSource: "../res/icon/ic_create_white_24dp.png"
                 onClicked: canvas.model.design_mode = true
             }
 
-            Button {
-                text: "Sim Mode"
+            ToolButton {
+                tooltip: "Simulation Mode"
+                checkable: true
+                checked: !canvas.model.design_mode
+                exclusiveGroup: designSimGroup
+                iconSource: "../res/icon/ic_visibility_white_24dp.png"
                 onClicked: canvas.model.design_mode = false
             }
 
-            Button {
-                text: "Add Linear"
+            ToolButton {
+                tooltip: "Create Linear Group"
+                iconSource: "../res/icon/ic_dehaze_white_24dp.png"
                 visible: canvas.model.design_mode
                 onClicked: canvas.model.scene.add_new_pixel_group("linear")
             }
 
-            /*Button {
-                text: "Rectangular"
+            /*ToolButton {
+                iconSource: "../res/icon/ic_apps_white_24dp.png"
                 visible: canvas.model.design_mode
-                onClicked: main.on_btn_add_fixture()
+                onClicked: canvas.model.scene.add_new_pixel_group("rectangular")
             }
 
-            Button {
-                text: "Circular"
+            ToolButton {
+                iconSource: "../res/icon/ic_radio_button_unchecked_white_24dp.png"
                 visible: canvas.model.design_mode
-                onClicked: main.on_btn_add_fixture()
+                onClicked: canvas.model.scene.add_new_pixel_group("circular")
             }
 
-            Button {
-                text: "Arbitrary"
+            ToolButton {
+                iconSource: "../res/icon/ic_grain_white_24dp.png"
                 visible: canvas.model.design_mode
-                onClicked: main.on_btn_add_fixture()
+                onClicked: canvas.model.scene.add_new_pixel_group("arbitrary")
             }*/
 
-            Button {
-                text: canvas.model.blurred ? "Unblurred" : "Blurred"
+            ToolButton {
+                tooltip: "Blur On/Off"
                 onClicked: canvas.model.blurred = !canvas.model.blurred
+                iconSource: (canvas.model.blurred ?
+                             "../res/icon/ic_blur_off_white_24dp.png" :
+                             "../res/icon/ic_blur_on_white_24dp.png")
             }
 
-            Button {
-                text: ((view.visibility == Window.FullScreen) ?
-                       "Exit Fullscreen" : "Fullscreen")
+            ToolButton {
+                tooltip: "Fullscreen"
+                iconSource: ((view.visibility == Window.FullScreen) ?
+                             "../res/icon/ic_fullscreen_exit_white_24dp.png" :
+                             "../res/icon/ic_fullscreen_white_24dp.png")
                 onClicked: {
                     if (view.visibility == Window.FullScreen)
                         view.visibility = Window.Windowed
@@ -123,7 +147,6 @@ Item {
             }
 
             Rectangle {
-                width: 110
                 height: ((canvas.selection.length == 1) ?
                          fixture_info_column.height + 10 :
                          multiple_selection_column.height + 10)

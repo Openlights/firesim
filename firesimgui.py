@@ -6,10 +6,12 @@ import os.path
 # See: https://bugs.launchpad.net/ubuntu/+source/python-qt4/+bug/941826
 from OpenGL import GL
 
-from PyQt5.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, QUrl, QTimer, QSize
+from PyQt5.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot, QObject, QUrl,
+                          QTimer, QSize)
 from PyQt5.QtQml import qmlRegisterType, QQmlComponent
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon
 
 from ui.canvasview import CanvasView
 
@@ -149,8 +151,8 @@ class FireSimGUI(QObject):
 
         self.netcontroller.new_frame.connect(self.canvas.controller.on_new_frame)
 
-        self.view.setMinimumSize(QSize(800, 600))
-        self.view.resize(QSize(800, 600))
+        self.view.setMinimumSize(QSize(550, 550))
+        self.view.resize(QSize(700, 550))
         self.view.widthChanged.connect(self.canvas.on_resize)
         self.view.heightChanged.connect(self.canvas.on_resize)
 
