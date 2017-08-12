@@ -46,7 +46,7 @@ Item {
 
         color: "#121212";
         anchors { left: parent.left; top: parent.top; bottom: parent.bottom; }
-        width: 70
+        width: 48
 
         Column {
             anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: 8; }
