@@ -90,7 +90,10 @@ class NetController(QtCore.QObject):
 
         # End frame
         elif cmd == 'E':
-            fps = 1.0 / (time.time() - self._frame_start_time)
+            try:
+                fps = 1.0 / (time.time() - self._frame_start_time)
+            except ZeroDivisionError:
+                fps = 0
 
             if len(self._frame_times) < 50:
                 self._frame_times.append(fps)

@@ -65,9 +65,8 @@ class CanvasView(QQuickPaintedItem):
         pass
 
     def on_window_changed(self, window):
-        # if self.ENABLE_OPENGL:
-        #     self.init_opengl()
-        pass
+        if self.ENABLE_OPENGL:
+            self.init_opengl()
 
     @pyqtSlot()
     def on_resize(self):
@@ -81,6 +80,7 @@ class CanvasView(QQuickPaintedItem):
             v.setVersion(2, 0)
             self.gl = ctx.versionFunctions(v)
             self.gl.initializeOpenGLFunctions()
+            print("Initialized OpenGL rendering")
         else:
             print("No opengl context")
             return
@@ -175,11 +175,20 @@ void main (void)
                 painter.beginNativePainting()
 
                 gl = self.gl
-
-                gl.glEnable(gl.GL_SCISSOR_TEST);
                 ratio = self.window().devicePixelRatio()
                 w = self.window().width() * ratio
                 h = self.window().height() * ratio
+
+                gl.glViewport(0, 0, w, h)
+                gl.glMatrixMode(gl.GL_PROJECTION)
+                gl.glLoadIdentity()
+
+                gl.glOrtho(0, w, h, 0, -10, 10)
+
+                gl.glMatrixMode(gl.GL_MODELVIEW)
+                gl.glLoadIdentity()
+
+                gl.glEnable(gl.GL_SCISSOR_TEST)
                 gl.glScissor(0, 0, w, h)
 
                 gl.glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -217,7 +226,7 @@ void main (void)
 
                 gl.glEnd()
 
-                gl.glDisable(gl.GL_SCISSOR_TEST);
+                gl.glDisable(gl.GL_SCISSOR_TEST)
 
                 painter.endNativePainting()
             else:
@@ -250,7 +259,10 @@ void main (void)
         #     painter.drawLine(QPointF(x - 5, y),QPointF(x + 5, y))
         #     painter.drawLine(QPointF(x, y - 5),QPointF(x, y + 5))
 
-        frame_time = 1.0 / (time.time() - start)
+        try:
+            frame_time = 1.0 / (time.time() - start)
+        except ZeroDivisionError:
+            frame_time = 0
 
         if len(self._last_render_times) < 20:
             self._last_render_times.append(frame_time)
