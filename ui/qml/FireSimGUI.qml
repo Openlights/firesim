@@ -76,9 +76,9 @@ Item {
             ToolButton {
                 tooltip: "Show/Hide Background Image"
                 iconSource: "../res/icon/ic_image_white_24dp.png"
-                onClicked: App.backdrop_enable = !App.backdrop_enable
+                onClicked: canvas.model.scene.backdrop_enable = !canvas.model.scene.backdrop_enable
                 checkable: true
-                checked: App.backdrop_enable
+                checked: canvas.model.scene.backdrop_enable
             }
 
             ExclusiveGroup { id: designSimGroup }

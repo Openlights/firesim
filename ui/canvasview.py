@@ -1,4 +1,5 @@
 import array
+import logging
 import time
 import numpy as np
 
@@ -7,12 +8,15 @@ from PyQt5.QtCore import (QObject, Qt, QPoint, QPointF, QRect, QRectF, QSizeF,
 from PyQt5.QtGui import (QPainter, QColor, QFont, QPen, QFontMetrics,
                          QOpenGLVersionProfile, QSurfaceFormat,
                          QOpenGLShader, QOpenGLShaderProgram, QVector2D,
-                         QVector4D, QMatrix4x4, QOpenGLBuffer)
+                         QVector4D, QMatrix4x4, QOpenGLBuffer, QImage)
 from PyQt5.QtQuick import QQuickPaintedItem
 from PyQt5.QtQml import QQmlListProperty
 
 from controllers.canvascontroller import CanvasController
 from models.pixelgroup import *
+
+
+log = logging.getLogger("firesim.ui.canvasview")
 
 
 class CanvasView(QQuickPaintedItem):
@@ -43,6 +47,7 @@ class CanvasView(QQuickPaintedItem):
 
         self._last_render_times = []
         self._fps = 0
+        self._cached_backdrop = None
 
         self.windowChanged.connect(self.on_window_changed)
 
@@ -170,6 +175,23 @@ void main (void)
 
         start = time.time()
 
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)
+
+        if self.model.scene.backdrop_enabled:
+            if self._cached_backdrop is None:
+                log.info("Loading backdrop from %s" % self.model.scene.backdrop_filepath)
+                self._cached_backdrop = QImage(self.model.scene.backdrop_filepath)
+                if self._cached_backdrop is None:
+                    log.warn("Could not load backdrop image; disabling")
+                    self.model.scene.backdrop_enabled = False
+
+            iw, ih = self.scene_to_canvas(self.model.scene.extents)
+            painter.drawImage(QRect(0, 0, iw, ih),
+                              self._cached_backdrop)
+        else:
+            self._cached_backdrop = None
+
+
         if self.ENABLE_OPENGL:
             if self.gl is not None:
                 painter.beginNativePainting()
@@ -191,8 +213,9 @@ void main (void)
                 gl.glEnable(gl.GL_SCISSOR_TEST)
                 gl.glScissor(0, 0, w, h)
 
-                gl.glClearColor(0.0, 0.0, 0.0, 1.0)
-                gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+                if not self.model.scene.backdrop_enabled:
+                    gl.glClearColor(0, 0, 0, 0)
+                    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
                 gl.glPointSize(15.0 if self.model.blurred else 5.0)
 

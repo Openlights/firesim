@@ -196,6 +196,24 @@ class Scene(JSONDict):
         self._pixel_groups = pixel_groups
         self.dirty = True
 
+    @property
+    def backdrop_enabled(self):
+        return self.data.get("backdrop-enable")
+
+    @backdrop_enabled.setter
+    def backdrop_enabled(self, en):
+        self.data["backdrop-enable"] = en
+        self.dirty = True
+
+    @property
+    def backdrop_filepath(self):
+        return self.data.get("backdrop-filename")
+
+    @backdrop_filepath.setter
+    def backdrop_filepath(self, path):
+        self.data["backdrop-filename"] = path
+        self.dirty = True
+
     def get_matrix_extents(self):
         """
         Returns a tuple of (strands, pixels) indicating the maximum extents needed
