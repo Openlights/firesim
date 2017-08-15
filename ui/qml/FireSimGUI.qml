@@ -55,8 +55,9 @@ Item {
 
             ToolButton {
                 id: btn_load
-                tooltip: "Load Scene"
+                tooltip: "Open Scene"
                 iconSource: "../res/icon/ic_unarchive_white_24dp.png"
+                onClicked: main.on_btn_open()
             }
 
             ToolButton {
@@ -68,12 +69,12 @@ Item {
 
             ToolButton {
                 id: btn_load_bg
-                tooltip: "Load Background"
+                tooltip: "Open Background Image"
                 iconSource: "../res/icon/ic_add_a_photo_white_24dp.png"
             }
 
             ToolButton {
-                tooltip: "Show/Hide Background"
+                tooltip: "Show/Hide Background Image"
                 iconSource: "../res/icon/ic_image_white_24dp.png"
                 onClicked: App.backdrop_enable = !App.backdrop_enable
                 checkable: true

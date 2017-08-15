@@ -147,8 +147,8 @@ void main (void)
         Returns a scene coordinate tuple (x, y) transformed to canvas space
         """
         canvas_width, canvas_height = self.model.scene.extents
-        scale_x = self.width() / canvas_width
-        scale_y = self.height() / canvas_height
+        scale_x = self.window().width() / canvas_width
+        scale_y = self.window().height() / canvas_height
         scale = min(scale_x, scale_y)
         # TODO: add offets to center the view when aspect ratio is wrong
         scaled = (coord[0] * scale, coord[1] * scale)
@@ -159,8 +159,8 @@ void main (void)
         Returns a canvas coordinate tuple (x, y) transformed to scene space
         """
         canvas_width, canvas_height = self.model.scene.extents
-        scale_x = canvas_width / self.width()
-        scale_y = canvas_height / self.height()
+        scale_x = canvas_width / self.window().width()
+        scale_y = canvas_height / self.window().height()
         scale = max(scale_x, scale_y)
         # TODO: add offets to center the view when aspect ratio is wrong
         scaled = (coord[0] * scale, coord[1] * scale)
@@ -176,8 +176,8 @@ void main (void)
 
                 gl = self.gl
                 ratio = self.window().devicePixelRatio()
-                w = self.window().width() * ratio
-                h = self.window().height() * ratio
+                w = self.width() * ratio
+                h = self.height() * ratio
 
                 gl.glViewport(0, 0, w, h)
                 gl.glMatrixMode(gl.GL_PROJECTION)
@@ -215,9 +215,7 @@ void main (void)
                         dy = (y2 - y1) / pg.count
 
                         x, y = x1, y1
-                        for i in range(pg.count):
-
-                            r, g, b = colors[i]
+                        for r, g, b in colors:
                             gl.glColor4f(r / 255, g / 255, b / 255, 1)
                             gl.glVertex2f(x, y)
 

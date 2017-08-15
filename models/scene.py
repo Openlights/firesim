@@ -68,16 +68,10 @@ class Scene(JSONDict):
     """
 
     def __init__(self, filepath=None):
-        self._filepath = filepath
+        self._reset()
+        super(Scene, self).__init__('scene', filepath, False)
 
-        if self._filepath is None:
-            self._filepath = ""
-
-        super(Scene, self).__init__('scene', self._filepath, False)
-
-        if self.get('file-version', 1) < 2:
-            self._migrate_v1_to_v2()
-
+    def _reset(self):
         self._fixtures = None
         self._fixture_dict = {}
         self._fixture_hierarchy = None
@@ -91,14 +85,24 @@ class Scene(JSONDict):
         self._all_pixels_raw = None
         self._strand_settings = None
         self._tree = None
+        self._pixel_groups = []
+
+    def set_filepath_and_load(self, path):
+        self.filepath = path
+        self.load(False)
 
     def load(self, create_new):
         super(Scene, self).load(create_new)
-        self._pixel_groups = []
+
+        if self.get('file-version', 1) < 2:
+            self._migrate_v1_to_v2()
+
+        self._reset()
         self._load_pixel_groups()
 
     def save(self):
-        self.data["pixel-groups"] = [pg.to_json() for pg in self.pixel_groups]
+        if len(self.pixel_groups) > 0:
+            self.data["pixel-groups"] = [pg.to_json() for pg in self.pixel_groups]
         super(Scene, self).save()
 
     def warmup(self):
@@ -457,7 +461,7 @@ class Scene(JSONDict):
             for group in groups[1:]:
                 group["offset"] = offset
                 offset += group["count"]
-            self.data["pixel-groups"].append(groups)
+            self.data["pixel-groups"].extend(groups)
         self.data.pop("fixtures")
 
         # Migrate strand settings
@@ -467,8 +471,11 @@ class Scene(JSONDict):
         self.data.pop("strand-settings")
 
         # Removed attributes
-        self.data.pop("labels-visible")
-        self.data.pop("locked")
+        try:
+            self.data.pop("labels-visible")
+            self.data.pop("locked")
+        except KeyError:
+            pass
 
         log.info("Migrated scene from v1 to v2 format")
 

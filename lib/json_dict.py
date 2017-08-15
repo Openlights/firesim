@@ -30,14 +30,14 @@ class JSONDict(collections.MutableMapping):
     This file-type is used for subclasses as a validation step.
     """
 
-    def __init__(self, filetype, filename, create_new):
+    def __init__(self, filetype, filepath, create_new):
         self.data = dict()
         self.filetype = filetype
-        self.filename = filename
+        self.filepath = filepath
 
         self._dirty = False
 
-        if self.filename != "":
+        if self.filepath != "":
             self.load(create_new)
 
     def __getitem__(self, key):
@@ -63,15 +63,23 @@ class JSONDict(collections.MutableMapping):
     def dirty(self, val):
         self._dirty = self._dirty or val
 
+    @property
+    def filepath(self):
+        return self._filepath
+
+    @filepath.setter
+    def filepath(self, path):
+        self._filepath = path
+
     def load(self, create_new):
-        if not os.path.exists(self.filename):
+        if not os.path.exists(self.filepath):
             if create_new:
-                with open(self.filename, 'w') as f:
+                with open(self.filepath, 'w') as f:
                     json.dump({'file-type': self.filetype}, f, indent=4)
             else:
-                raise ValueError("File %s does not exist." % self.filename)
+                raise ValueError("File %s does not exist." % self.filepath)
         else:
-            with open(self.filename, 'r') as f:
+            with open(self.filepath, 'r') as f:
                 try:
                     self.data = self._unicode_to_str(json.load(f))
                     if self.data.get('file-type', None) != self.filetype:
@@ -80,8 +88,8 @@ class JSONDict(collections.MutableMapping):
                     raise ValueError("Parse error in JSON file.")
 
     def save(self):
-        assert self.filename != ""
-        with open(self.filename, 'w') as f:
+        assert self.filepath != ""
+        with open(self.filepath, 'w') as f:
             json.dump(self.data, f, indent=4, sort_keys=True)
             self._dirty = False
 

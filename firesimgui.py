@@ -10,7 +10,7 @@ from PyQt5.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot, QObject, QUrl,
                           QTimer, QSize)
 from PyQt5.QtQml import qmlRegisterType, QQmlComponent
 from PyQt5.QtQuick import QQuickView
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QFileDialog
 from PyQt5.QtGui import QIcon
 
 from ui.canvasview import CanvasView
@@ -115,7 +115,6 @@ class FireSimGUI(QObject):
 
         self.view = QQuickView()
 
-        self.view.setTitle("FireSim - %s" % self.scene.name)
         self.view.setResizeMode(QQuickView.SizeRootObjectToView)
 
         self.view.closeEvent = self.on_close
@@ -134,9 +133,7 @@ class FireSimGUI(QObject):
         self.canvas.gui = self
         self.canvas.model.scene = self.scene
 
-        cw, ch = self.scene.extents
-        self.canvas.setWidth(cw)
-        self.canvas.setHeight(ch)
+        self.set_properties_from_scene()
 
         #self.net_thread = QThread()
         #self.net_thread.start()
@@ -153,12 +150,17 @@ class FireSimGUI(QObject):
 
         self.view.setMinimumSize(QSize(550, 550))
         self.view.resize(QSize(700, 550))
-        self.view.widthChanged.connect(self.canvas.on_resize)
-        self.view.heightChanged.connect(self.canvas.on_resize)
 
         self.view.show()
         #self.view.showFullScreen()
         #self.view.setGeometry(self.app.desktop().availableGeometry())
+
+    def set_properties_from_scene(self):
+        self.view.setTitle("FireSim - %s" % self.scene.name)
+
+        cw, ch = self.scene.extents
+        self.canvas.setWidth(cw)
+        self.canvas.setHeight(ch)
 
     @pyqtSlot()
     def quit(self):
@@ -182,8 +184,18 @@ class FireSimGUI(QObject):
         self.canvas.update()
 
     @pyqtSlot()
-    def on_btn_add_fixture(self):
-        pass
+    def on_btn_open(self):
+        file_name = QFileDialog.getOpenFileName(self.app.focusWidget(),
+                                                "Open Scene", "",
+                                                "Scene Files (*.json)")
+        if len(file_name[0]) > 0:
+            self.scene.save()
+            self.redraw_timer.stop()
+            self.scene.set_filepath_and_load(file_name[0])
+            self.config['last-opened-scene'] = file_name[0]
+            self.config.save()
+            self.set_properties_from_scene()
+            self.redraw_timer.start()
 
     @pyqtSlot()
     def on_btn_save(self):
