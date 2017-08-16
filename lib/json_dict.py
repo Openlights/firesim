@@ -71,11 +71,21 @@ class JSONDict(collections.MutableMapping):
     def filepath(self, path):
         self._filepath = path
 
+    def generate_new_data(self):
+        """
+        Generates a "new file" containing whatever defaults necessary
+        (override in child classes)
+        """
+        self.data.empty()
+        self.data['file-type'] = self.filetype
+
     def load(self, create_new):
-        if not os.path.exists(self.filepath):
+
+        if self.filepath is None or not os.path.exists(self.filepath):
             if create_new:
-                with open(self.filepath, 'w') as f:
-                    json.dump({'file-type': self.filetype}, f, indent=4)
+                self.generate_new_data()
+                if self.filepath is not None:
+                    self.save()
             else:
                 raise ValueError("File %s does not exist." % self.filepath)
         else:
@@ -88,7 +98,9 @@ class JSONDict(collections.MutableMapping):
                     raise ValueError("Parse error in JSON file.")
 
     def save(self):
-        assert self.filepath != ""
+        if self.filepath is None or self.filepath == "":
+            return False
+
         with open(self.filepath, 'w') as f:
             json.dump(self.data, f, indent=4, sort_keys=True)
             self._dirty = False

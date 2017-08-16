@@ -69,7 +69,7 @@ class Scene(JSONDict):
 
     def __init__(self, filepath=None):
         self._reset()
-        super(Scene, self).__init__('scene', filepath, False)
+        super(Scene, self).__init__('scene', filepath, True)
 
     def _reset(self):
         self._fixtures = None
@@ -86,6 +86,15 @@ class Scene(JSONDict):
         self._strand_settings = None
         self._tree = None
         self._pixel_groups = []
+
+    def generate_new_data(self):
+        self.data['file-version'] = 2
+        self.data['scene-name'] = "Untitled"
+        self.data['bounding-box'] = [1000, 1000]
+        self.data['extents'] = [1000, 1000]
+        self.data['center'] = [500, 500]
+        self.data['strands'] = []
+        self.data['pixel-groups'] = []
 
     def set_filepath_and_load(self, path):
         self.filepath = path
