@@ -54,6 +54,13 @@ Item {
             spacing: 8
 
             ToolButton {
+                id: btn_new
+                tooltip: "New Scene"
+                iconSource: "../res/icon/ic_note_add_white_24dp.png"
+                onClicked: main.on_btn_new()
+            }
+
+            ToolButton {
                 id: btn_load
                 tooltip: "Open Scene"
                 iconSource: "../res/icon/ic_unarchive_white_24dp.png"

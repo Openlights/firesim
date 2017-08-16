@@ -95,6 +95,15 @@ class Scene(JSONDict):
         self.data['center'] = [500, 500]
         self.data['strands'] = []
         self.data['pixel-groups'] = []
+        self.data['backdrop-filename'] = ""
+        self.data['backdrop-enable'] = False
+
+    def new(self, filepath=None):
+        self._reset()
+        self.generate_new_data()
+        self.filepath = filepath
+        if filepath is not None:
+            self.save()
 
     def set_filepath_and_load(self, path):
         self.filepath = path

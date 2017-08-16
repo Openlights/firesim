@@ -128,7 +128,18 @@ class FireSimGUI(QObject):
             self.redraw_timer.start()
 
     @pyqtSlot()
+    def on_btn_new(self):
+        self.scene.save()
+        self.scene.new()
+        self.set_properties_from_scene()
+
+    @pyqtSlot()
     def on_btn_save(self):
+        if self.scene.filepath is None or self.scene.filepath == "":
+            filepath = QFileDialog.getSaveFileName(self.app.focusWidget(),
+                                                   "Save Scene As", "",
+                                                   "Scene Files (*.json)")
+            self.scene.filepath = filepath[0]
         self.scene.save()
 
     @pyqtSlot()
