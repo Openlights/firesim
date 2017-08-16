@@ -1,2 +1,7 @@
 *.pyc
 .idea
+*.qmlc
+*.out
+
+# App-specific files
+data/config.json

@@ -1,122 +1,508 @@
-import logging as log
+# This file is part of Firemix.
+#
+# Copyright 2013-2016 Jonathan Evans <jon@craftyjon.com>
+#
+# Firemix is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Firemix is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Firemix.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
+from builtins import range
+import os
+import math
+import logging
+import numpy as np
+from scipy import spatial
 
-from models.fixture import Fixture
-from util.jsonloader import JSONLoader
+from lib.json_dict import JSONDict
+from lib.buffer_utils import BufferUtils
+from models.pixelgroup import LinearPixelGroup
 
-class FixtureIdError(Exception):
-    def __init__(self, msg, strand, address):
-        super(FixtureIdError, self).__init__(
-            "%s: [%d:%d]" % (msg, strand, address)
-        )
+log = logging.getLogger("firemix.lib.scene")
 
-class Scene(JSONLoader):
+class Scene(JSONDict):
+    """
+    The scene file holds all the data related to pixel positioning and other
+    relevant information for designing the scene.
 
-    def __init__(self, filename=None):
-        JSONLoader.__init__(self, filename)
-        self._dirty = False
+    This class is for managing that file as well as utility methods for getting
+    information about pixel groups and their spatial relationships.
+
+    Example minimal scene file:
+
+    {
+        "file-type": "scene",
+        "file-version": 2,
+        "scene-name": "Universe Light Lounge",
+        "bounding-box": [800, 800],
+        "extents": [800, 800],
+        "center": [400, 400],
+        "strands": [
+            {
+                "id": 0,
+                "enabled": true,
+                "color-mode": "BGR8",
+                "length": 240
+            }
+        ],
+        "pixel-groups": [
+            {
+                "type": "linear",
+                "strand": 0,
+                "offset": 120,
+                "count": 120,
+                "start": [100, 100],
+                "end": [200, 200]
+            }
+        ]
+    }
+
+    """
+
+    def __init__(self, filepath=None):
+        self._reset()
+        super(Scene, self).__init__('scene', filepath, False)
+
+    def _reset(self):
         self._fixtures = None
+        self._fixture_dict = {}
         self._fixture_hierarchy = None
-        # The model really shouldn't contain a reference to its controller, but
-        # this makes the current refactor easier
-        self._controller = None
+        self._colliding_fixtures_cache = {}
+        self._pixel_neighbors_cache = {}
+        self._pixel_locations_cache = {}
+        self._pixel_distance_cache = {}
+        self._intersection_points = None
+        self._all_pixels = None
+        self._all_pixel_locations = None
+        self._all_pixels_raw = None
+        self._strand_settings = None
+        self._tree = None
+        self._pixel_groups = []
 
-    def set_controller(self, controller):
-        assert self._controller is None
-        self._controller = controller
-        self._hydrate()
+    def set_filepath_and_load(self, path):
+        self.filepath = path
+        self.load(False)
 
-    def _hydrate(self):
-        assert self._controller is not None
-        assert self._fixtures is None
-        assert self._fixture_hierarchy is None
+    def load(self, create_new):
+        super(Scene, self).load(create_new)
 
-        if self._data.get("fixtures", None):
-            self._fixtures = [Fixture(data=fd, controller=self._controller)
-                              for fd in self._data["fixtures"]]
-        else:
-            self._fixtures = []
+        if self.get('file-version', 1) < 2:
+            self._migrate_v1_to_v2()
 
-        self._fixture_hierarchy = defaultdict(dict)
-        for f in self._fixtures:
-            self._fixture_hierarchy[f.strand()][f.address()] = f
-
+        self._reset()
+        self._load_pixel_groups()
 
     def save(self):
-        if self._dirty:
-            self._data["fixtures"] = [f.pack() for f in self._fixtures]
+        if len(self.pixel_groups) > 0:
+            self.data["pixel-groups"] = [pg.to_json() for pg in self.pixel_groups]
+        super(Scene, self).save()
 
-        JSONLoader.save(self)
+    def warmup(self):
+        """
+        Warms up caches
+        """
+        log.info("Warming up scene caches...")
+        fh = self.fixture_hierarchy()
+        for strand in fh:
+            for fixture in fh[strand]:
+                self.get_colliding_fixtures(strand, fixture)
+                for pixel in range(self.fixture(strand, fixture).pixels):
+                    index = BufferUtils.logical_to_index((strand, fixture, pixel))
+                    neighbors = self.get_pixel_neighbors(index)
+                    self.get_pixel_location(index)
+                    for neighbor in neighbors:
+                        self.get_pixel_distance(index, neighbor)
+        self.get_fixture_bounding_box()
+        self.get_intersection_points()
+        self.get_all_pixels_logical()
+        self._tree = spatial.KDTree(self.get_all_pixel_locations())
 
+        locations = self.get_all_pixel_locations()
+        self.pixelDistances = np.empty([len(locations), len(locations)])
+
+        for pixel in range(len(locations)):
+            cx, cy = locations[pixel]
+            x,y = (locations - (cx, cy)).T
+            pixel_distances = np.sqrt(np.square(x) + np.square(y))
+            self.pixelDistances[pixel] = pixel_distances
+
+        log.info("Done")
+
+    @property
     def extents(self):
-        return tuple(self._data.get("extents", (100, 100)))
+        """
+        Returns the (x, y) extents of the scene.  Useful for determining
+        relative position of fixtures to some reference point.
+        """
+        return tuple(self.data.get("extents", (0, 0)))
 
-    def bounding_box(self):
-        return tuple(self._data.get("bounding-box", self.extents()))
+    @extents.setter
+    def extents(self, val):
+        assert type(val) == tuple and len(val) == 2
+        self["extents"] = val
+        self.dirty = True
 
+    @property
     def center(self):
-        return tuple(self._data.get("center", (50, 50)))
+        """
+        Returns the (x, y) centroid of all fixtures in the scene
+        """
+        center = self.data.get("center", None)
+        if center is None:
+            bb = self.get_fixture_bounding_box()
+            center = ((bb[0] + bb[2]) / 2.0), ((bb[1] + bb[3]) / 2.0)
+            self.data["center"] = center
+        else:
+            center = tuple(center)
+        return center
 
-    def set_center(self, point):
-        self._data["center"] = point
+    @center.setter
+    def center(self, val):
+        self.data["center"] = val
+        self.dirty = True
 
+    @property
     def name(self):
-        return self._data.get("name", "")
+        return self.data.get("scene-name", "")
 
-    def fixtures(self):
-        return self._fixtures
+    @name.setter
+    def name(self, name):
+        self.data["scene-name"] = name
+        self.dirty = True
 
-    def fixture(self, strand, address):
-        if (strand in self._fixture_hierarchy
-            and address in self._fixture_hierarchy[strand]):
-            return self._fixture_hierarchy[strand][address]
-        return None
+    @property
+    def strands(self):
+        return self.data.get("strands")
 
-    def add_fixture(self, fixture):
-        assert fixture not in self._fixtures
-        if (fixture.strand() in self._fixture_hierarchy
-            and fixture.address() in self._fixture_hierarchy[fixture.strand()]):
-            raise FixtureIdError("Attempt to add a fixture with "
-                                 "strand/address that already exists",
-                                 fixture.strand(), fixture.address())
+    @strands.setter
+    def strands(self, strands):
+        self.data["strands"] = strands
+        self.dirty = True
 
-        self._fixtures.append(fixture)
-        self._fixture_hierarchy[fixture.strand()][fixture.address()] = fixture
-        self._dirty = True
+    @property
+    def pixel_groups(self):
+        return self._pixel_groups
 
-    def delete_fixture(self, fixture):
-        assert fixture in self._fixtures
-        self._fixtures.remove(fixture)
-        del self._fixture_hierarchy[fixture.strand()][fixture.address()]
-        if not self._fixture_hierarchy[fixture.strand()]:
-            del self._fixture_hierarchy[fixture.strand()]
-        fixture.destroy()
-        self._dirty = True
+    @pixel_groups.setter
+    def pixel_groups(self, pixel_groups):
+        self._pixel_groups = pixel_groups
+        self.dirty = True
 
-    def clear_fixtures(self):
-        for fixture in self._fixtures:
-            fixture.destroy()
-        self._fixtures = []
-        self._fixture_hierarchy = defaultdict(dict)
-        self._dirty = True
+    @property
+    def backdrop_enable(self):
+        return self.data.get("backdrop-enable")
 
-    def update_fixture(self, fixture, new_strand, new_address):
-        assert fixture in self._fixtures
-        if (new_strand in self._fixture_hierarchy
-            and new_address in self._fixture_hierarchy[new_strand]):
-            raise FixtureIdError("Attempt to use an existing strand/address",
-                                 new_strand, new_address)
+    @backdrop_enable.setter
+    def backdrop_enable(self, en):
+        self.data["backdrop-enable"] = en
+        self.dirty = True
 
-        old_strand = fixture.strand()
-        old_address = fixture.address()
-        del self._fixture_hierarchy[old_strand][old_address]
-        if not self._fixture_hierarchy[old_strand]:
-            del self._fixture_hierarchy[old_strand]
-        fixture.set_strand(new_strand)
-        fixture.set_address(new_address)
-        self._fixture_hierarchy[new_strand][new_address] = fixture
-        self._dirty = True
+    @property
+    def backdrop_filepath(self):
+        return self.data.get("backdrop-filename")
 
-    def fixture_hierarchy(self):
-        return self._fixture_hierarchy
+    @backdrop_filepath.setter
+    def backdrop_filepath(self, path):
+        self.data["backdrop-filename"] = path
+        self.dirty = True
+
+    def get_matrix_extents(self):
+        """
+        Returns a tuple of (strands, pixels) indicating the maximum extents needed
+        to store the pixels in memory (note that we now assume that each strand
+        is the same length).
+        """
+        fh = self.fixture_hierarchy()
+        strands = len(fh)
+        longest_strand = 0
+        for strand in fh:
+            strand_len = sum([fh[strand][f].pixels for f in fh[strand]])
+            longest_strand = max(strand_len, longest_strand)
+
+        return (strands, longest_strand)
+
+    def get_colliding_fixtures(self, strand, address, loc='start', radius=50):
+        """
+        Returns a list of (strand, fixture, pixel) tuples containing the addresses of any fixtures that collide with the
+        input fixture.  Pixel is set to the closest pixel to the target location (generally either the first or last
+        pixel).  The collision bound is a circle given by the radius input, centered on the specified fixture endpoint.
+
+        Location to collide: 'start' == pos1, 'end' == pos2, 'midpoint' == midpoint
+        """
+        f = self.fixture(strand, address)
+
+        if loc == 'start':
+            center = f.pos1
+        elif loc == 'end':
+            center = f.pos2
+        elif loc == 'midpoint':
+            center = f.midpoint()
+        else:
+            raise ValueError("loc must be one of 'start', 'end', 'midpoint'")
+
+        colliding = self._colliding_fixtures_cache.get((strand, address, loc), None)
+
+        if colliding is None:
+            colliding = []
+            r2 = pow(radius, 2)
+            x1, y1 = center
+            for tf in self.fixtures():
+                # Match start point
+                x2, y2 = tf.pos1
+                if pow(x2 - x1, 2) + pow(y2 - y1, 2) <= r2:
+                    #print tf, "collides with", strand, address
+                    colliding.append((tf.strand, tf.address, 0))
+                    continue
+                    # Match end point
+                x2, y2 = tf.pos2
+                if pow(x2 - x1, 2) + pow(y2 - y1, 2) <= r2:
+                    #print tf, "collides with", strand, address, "backwards"
+                    colliding.append((tf.strand, tf.address, tf.pixels - 1))
+
+            self._colliding_fixtures_cache[(strand, address, loc)] = colliding
+
+        return colliding
+
+    def get_pixel_neighbors(self, index):
+        """
+        Returns a list of pixel addresses that are adjacent to the given address.
+        """
+
+        neighbors = self._pixel_neighbors_cache.get(index, None)
+
+        if neighbors is None:
+            neighbors = []
+            if self._tree:
+                neighbors = self._tree.query_ball_point(self.get_pixel_location(index), 3)
+                # if len(neighbors) > 4:
+                #     print index, neighbors
+                self._pixel_neighbors_cache[index] = neighbors
+
+        return neighbors
+
+    def get_pixel_location(self, index):
+        """
+        Returns a given pixel's location in scene coordinates.
+        """
+        loc = self._pixel_locations_cache.get(index, None)
+
+        if loc is None:
+
+            strand, address, pixel = BufferUtils.index_to_logical(index)
+            f = self.fixture(strand, address)
+
+            if pixel == 0:
+                loc = f.pos1
+            elif pixel == (f.pixels - 1):
+                loc = f.pos2
+            else:
+                x1, y1 = f.pos1
+                x2, y2 = f.pos2
+                scale = old_div(float(pixel), f.pixels)
+                relx, rely = ((x2 - x1) * scale, (y2 - y1) * scale)
+                loc = (x1 + relx, y1 + rely)
+
+            self._pixel_locations_cache[index] = loc
+
+        return loc
+
+    def get_pixel_distance(self, first, second):
+        """
+        Calculates the distance (in scene coordinate units) between two pixels
+        """
+        dist = self._pixel_distance_cache.get((first, second), None)
+        if dist is None:
+            first_loc = self.get_pixel_location(first)
+            second_loc = self.get_pixel_location(second)
+            dist = self.get_point_distance(first_loc, second_loc)
+            self._pixel_distance_cache[(first, second)] = dist
+            self._pixel_distance_cache[(second, first)] = dist
+        return dist
+
+    def get_point_distance(self, first, second):
+        return math.fabs(math.sqrt(math.pow(second[0] - first[0], 2) + math.pow(second[1] - first[1], 2)))
+
+    def get_all_pixels_logical(self):
+        """
+        Returns all the pixel addresses in the scene (in logical strand, fixture, offset tuples)
+        """
+        if self._all_pixels is None:
+            addresses = []
+            for f in self.fixtures():
+                for pixel in range(f.pixels):
+                    addresses.append((f.strand, f.address, pixel))
+            self._all_pixels = addresses
+        return self._all_pixels
+
+    def get_pixel_distances(self, pixel):
+        return self.pixelDistances[pixel]
+
+    def get_all_pixels(self):
+        """
+        Returns a list of all pixels in buffer address format (strand, offset)
+        """
+        if self._all_pixels_raw is None:
+            all_pixels = []
+            for s, a, p in self.get_all_pixels_logical():
+                #pxs.append(BufferUtils.get_buffer_address((s, a, p), scene=self))
+                all_pixels.append(BufferUtils.logical_to_index((s, a, p), scene=self))
+            all_pixels = sorted(all_pixels)
+            self._all_pixels_raw = all_pixels
+
+        return self._all_pixels_raw
+
+    def get_all_pixel_locations(self):
+        """
+        Returns a numpy array of (x, y) pairs.
+        """
+        if self._all_pixel_locations is None:
+            pixels = self.get_all_pixels()
+            pixel_location_list = []
+            for pixel in pixels:
+                pixel_location_list.append(self.get_pixel_location(pixel))
+
+            self._all_pixel_locations = np.asarray(pixel_location_list)
+        return np.copy(self._all_pixel_locations)
+
+
+    def get_fixture_bounding_box(self):
+        """
+        Returns the bounding box containing all fixtures in the scene
+        Return value is a tuple of (xmin, ymin, xmax, ymax)
+        """
+        xmin = 999999
+        xmax = -999999
+        ymin = 999999
+        ymax = -999999
+
+        fh = self.fixture_hierarchy()
+        for strand in fh:
+            for fixture in fh[strand]:
+                for pixel in range(self.fixture(strand, fixture).pixels):
+                    x, y = self.get_pixel_location(BufferUtils.logical_to_index((strand, fixture, pixel)))
+                    if x < xmin:
+                        xmin = x
+                    if x > xmax:
+                        xmax = x
+                    if y < ymin:
+                        ymin = y
+                    if y > ymax:
+                        ymax = y
+
+        return (xmin, ymin, xmax, ymax)
+
+    def get_intersection_points(self, threshold=50):
+        """
+        Returns a list of points in scene coordinates that represent the average location of
+        each intersection of two or more fixture endpoints.
+
+        For each fixture endpoint, all other endpoints are compared to see if they fall within a certain distance
+        of the given endpoint.  This loop generates a list of groups.  Then, the average location of each
+        group is calculated and returned.
+        """
+        if self._intersection_points is None:
+
+            endpoints = []
+            for f in self.fixtures():
+                endpoints.append(f.pos1)
+                endpoints.append(f.pos2)
+
+            groups = []
+            while len(endpoints) > 0:
+                endpoint = endpoints.pop()
+                group = [endpoint]
+                to_remove = []
+                for other in endpoints:
+                    dx, dy = (other[0] - endpoint[0], other[1] - endpoint[1])
+                    dist = math.fabs(math.sqrt(math.pow(dx, 2) + math.pow(dy, 2)))
+                    if (dist < threshold):
+                        group.append(other)
+                        to_remove.append(other)
+                endpoints = [e for e in endpoints if e not in to_remove]
+                groups.append(group)
+
+            centroids = []
+            for group in groups:
+                num_points = len(group)
+                tx = 0
+                ty = 0
+                for point in group:
+                    tx += point[0]
+                    ty += point[1]
+                centroids.append((old_div(tx, num_points), old_div(ty, num_points)))
+            self._intersection_points = centroids
+
+        return self._intersection_points
+
+    def _migrate_v1_to_v2(self):
+
+        # Add version
+        self.data["file-version"] = 2
+
+        # name -> scene-name
+        self.data["scene-name"] = self.data["name"]
+        self.data.pop("name")
+
+        # Migrate fixtures to pixel groups
+        self.data["pixel-groups"] = []
+        strand_lengths = {}
+        strand_pixel_groups = {}
+
+        for fix in self.data["fixtures"]:
+            pg = {
+                "type": fix["type"],
+                "strand": fix["strand"],
+                "offset": fix["address"],  # Will be fixed below
+                "count": fix["pixels"],
+                "start": fix["pos1"],
+                "end": fix["pos2"]
+            }
+            if strand_pixel_groups.get(fix["strand"], None) is None:
+                strand_pixel_groups[fix["strand"]] = [pg,]
+                strand_lengths[fix["strand"]] = fix["pixels"]
+            else:
+                strand_pixel_groups[fix["strand"]].append(pg)
+                strand_lengths[fix["strand"]] += fix["pixels"]
+
+        # Convert address to offset
+        for strand, groups in strand_pixel_groups.items():
+            groups = sorted(groups, key=lambda g: g["offset"])
+            offset = groups[0]["count"]
+            for group in groups[1:]:
+                group["offset"] = offset
+                offset += group["count"]
+            self.data["pixel-groups"].extend(groups)
+        self.data.pop("fixtures")
+
+        # Migrate strand settings
+        self.data["strands"] = self.data["strand-settings"]
+        for i, strand in enumerate(self.data["strands"]):
+            self.data["strands"][i]["length"] = strand_lengths[i]
+        self.data.pop("strand-settings")
+
+        # Removed attributes
+        try:
+            self.data.pop("labels-visible")
+            self.data.pop("locked")
+        except KeyError:
+            pass
+
+        log.info("Migrated scene from v1 to v2 format")
+
+        self.save()
+
+    def _load_pixel_groups(self):
+        for pg_data in self["pixel-groups"]:
+            if pg_data["type"] == "linear":
+                pg = LinearPixelGroup(json=pg_data)
+                self._pixel_groups.append(pg)
+            else:
+                raise NotImplementedError("Unsupported pixel group type!")

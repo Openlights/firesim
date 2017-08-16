@@ -1,514 +1,527 @@
 {
-  "backdrop-enable": false,
-  "backdrop-filename": "lights.png",
-  "bounding-box": [
-    800,
-    800
-  ],
-  "center": [
-    400,
-    400
-  ],
-  "extents": [
-    800,
-    800
-  ],
-  "file-type": "scene",
-  "fixtures": [
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        580,
-        92
-      ],
-      "pos2": [
-        757,
-        397
-      ],
-      "strand": 10,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        225,
-        94
-      ],
-      "pos2": [
-        49,
-        396
-      ],
-      "strand": 8,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        580,
-        92
-      ],
-      "pos2": [
-        223,
-        92
-      ],
-      "strand": 8,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        48,
-        397
-      ],
-      "pos2": [
-        226,
-        704
-      ],
-      "strand": 0,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        228,
-        705
-      ],
-      "pos2": [
-        582,
-        704
-      ],
-      "strand": 0,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        755,
-        400
-      ],
-      "pos2": [
-        580,
-        705
-      ],
-      "strand": 10,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        314,
-        94
-      ],
-      "pos2": [
-        491,
-        398
-      ],
-      "strand": 5,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        355,
-        322
-      ],
-      "pos2": [
-        180,
-        627
-      ],
-      "strand": 13,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        712,
-        321
-      ],
-      "pos2": [
-        359,
-        321
-      ],
-      "strand": 13,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        184,
-        171
-      ],
-      "pos2": [
-        358,
-        473
-      ],
-      "strand": 3,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        358,
-        474
-      ],
-      "pos2": [
-        711,
-        476
-      ],
-      "strand": 3,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        492,
-        397
-      ],
-      "pos2": [
-        313,
-        704
-      ],
-      "strand": 5,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        404,
-        94
-      ],
-      "pos2": [
-        577,
-        396
-      ],
-      "strand": 6,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        314,
-        246
-      ],
-      "pos2": [
-        136,
-        551
-      ],
-      "strand": 12,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        624,
-        168
-      ],
-      "pos2": [
-        271,
-        168
-      ],
-      "strand": 11,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        135,
-        247
-      ],
-      "pos2": [
-        313,
-        548
-      ],
-      "strand": 2,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        316,
-        550
-      ],
-      "pos2": [
-        667,
-        553
-      ],
-      "strand": 2,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        579,
-        396
-      ],
-      "pos2": [
-        404,
-        704
-      ],
-      "strand": 6,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        491,
-        90
-      ],
-      "pos2": [
-        669,
-        396
-      ],
-      "strand": 7,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        268,
-        169
-      ],
-      "pos2": [
-        91,
-        471
-      ],
-      "strand": 11,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        670,
-        245
-      ],
-      "pos2": [
-        316,
-        245
-      ],
-      "strand": 12,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        92,
-        323
-      ],
-      "pos2": [
-        270,
-        629
-      ],
-      "strand": 1,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        271,
-        629
-      ],
-      "pos2": [
-        629,
-        628
-      ],
-      "strand": 1,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        669,
-        399
-      ],
-      "pos2": [
-        495,
-        701
-      ],
-      "strand": 7,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        226,
-        94
-      ],
-      "pos2": [
-        401,
-        400
-      ],
-      "strand": 4,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        756,
-        399
-      ],
-      "pos2": [
+    "backdrop-enable": false,
+    "backdrop-filename": "lights.png",
+    "bounding-box": [
+        800,
+        800
+    ],
+    "center": [
         400,
-        399
-      ],
-      "strand": 14,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        400,
-        401
-      ],
-      "pos2": [
-        225,
-        704
-      ],
-      "strand": 9,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        398,
-        398
-      ],
-      "pos2": [
-        49,
-        398
-      ],
-      "strand": 14,
-      "type": "linear"
-    },
-    {
-      "address": 1,
-      "pixels": 120,
-      "pos1": [
-        398,
         400
-      ],
-      "pos2": [
-        577,
-        705
-      ],
-      "strand": 4,
-      "type": "linear"
-    },
-    {
-      "address": 0,
-      "pixels": 120,
-      "pos1": [
-        580,
-        94
-      ],
-      "pos2": [
-        401,
-        398
-      ],
-      "strand": 9,
-      "type": "linear"
-    }
-  ],
-  "labels-visible": false,
-  "locked": true,
-  "name": "Demo",
-  "strand-settings": [
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 0
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 1
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 2
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 3
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 4
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 5
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 6
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 8
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 9
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 10
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 11
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 12
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 13
-    },
-    {
-      "color-mode": "BGR8",
-      "enabled": true,
-      "id": 14
-    }
-  ]
+    ],
+    "extents": [
+        800,
+        800
+    ],
+    "file-type": "scene",
+    "file-version": 2,
+    "pixel-groups": [
+        {
+            "count": 120,
+            "end": [
+                757,
+                397
+            ],
+            "offset": 0,
+            "start": [
+                580,
+                92
+            ],
+            "strand": 10,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                580,
+                705
+            ],
+            "offset": 120,
+            "start": [
+                755,
+                400
+            ],
+            "strand": 10,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                223,
+                92
+            ],
+            "offset": 0,
+            "start": [
+                580,
+                92
+            ],
+            "strand": 8,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                49,
+                396
+            ],
+            "offset": 120,
+            "start": [
+                225,
+                94
+            ],
+            "strand": 8,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                227.33333333333331,
+                705.3333333333334
+            ],
+            "offset": 0,
+            "start": [
+                49.33333333333333,
+                398.3333333333333
+            ],
+            "strand": 0,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                582,
+                704
+            ],
+            "offset": 120,
+            "start": [
+                228,
+                705
+            ],
+            "strand": 0,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                491,
+                398
+            ],
+            "offset": 0,
+            "start": [
+                314,
+                94
+            ],
+            "strand": 5,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                313,
+                704
+            ],
+            "offset": 120,
+            "start": [
+                492,
+                397
+            ],
+            "strand": 5,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                359,
+                321
+            ],
+            "offset": 0,
+            "start": [
+                712,
+                321
+            ],
+            "strand": 13,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                180,
+                627
+            ],
+            "offset": 120,
+            "start": [
+                355,
+                322
+            ],
+            "strand": 13,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                358,
+                473
+            ],
+            "offset": 0,
+            "start": [
+                184,
+                171
+            ],
+            "strand": 3,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                711,
+                476
+            ],
+            "offset": 120,
+            "start": [
+                358,
+                474
+            ],
+            "strand": 3,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                577,
+                396
+            ],
+            "offset": 0,
+            "start": [
+                404,
+                94
+            ],
+            "strand": 6,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                404,
+                704
+            ],
+            "offset": 120,
+            "start": [
+                579,
+                396
+            ],
+            "strand": 6,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                316,
+                245
+            ],
+            "offset": 0,
+            "start": [
+                670,
+                245
+            ],
+            "strand": 12,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                136,
+                551
+            ],
+            "offset": 120,
+            "start": [
+                314,
+                246
+            ],
+            "strand": 12,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                271,
+                168
+            ],
+            "offset": 0,
+            "start": [
+                624,
+                168
+            ],
+            "strand": 11,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                91,
+                471
+            ],
+            "offset": 120,
+            "start": [
+                268,
+                169
+            ],
+            "strand": 11,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                313,
+                548
+            ],
+            "offset": 0,
+            "start": [
+                135,
+                247
+            ],
+            "strand": 2,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                667,
+                553
+            ],
+            "offset": 120,
+            "start": [
+                316,
+                550
+            ],
+            "strand": 2,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                669,
+                396
+            ],
+            "offset": 0,
+            "start": [
+                491,
+                90
+            ],
+            "strand": 7,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                495,
+                701
+            ],
+            "offset": 120,
+            "start": [
+                669,
+                399
+            ],
+            "strand": 7,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                270,
+                629
+            ],
+            "offset": 0,
+            "start": [
+                92,
+                323
+            ],
+            "strand": 1,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                629,
+                628
+            ],
+            "offset": 120,
+            "start": [
+                271,
+                629
+            ],
+            "strand": 1,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                401,
+                400
+            ],
+            "offset": 0,
+            "start": [
+                226,
+                94
+            ],
+            "strand": 4,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                577,
+                705
+            ],
+            "offset": 120,
+            "start": [
+                398,
+                400
+            ],
+            "strand": 4,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                400,
+                399
+            ],
+            "offset": 0,
+            "start": [
+                756,
+                399
+            ],
+            "strand": 14,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                49,
+                398
+            ],
+            "offset": 120,
+            "start": [
+                398,
+                398
+            ],
+            "strand": 14,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                401,
+                398
+            ],
+            "offset": 0,
+            "start": [
+                580,
+                94
+            ],
+            "strand": 9,
+            "type": "linear"
+        },
+        {
+            "count": 120,
+            "end": [
+                225,
+                704
+            ],
+            "offset": 120,
+            "start": [
+                400,
+                401
+            ],
+            "strand": 9,
+            "type": "linear"
+        }
+    ],
+    "scene-name": "Universe Light Lounge",
+    "strands": [
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 0,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 1,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 2,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 3,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 4,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 5,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 6,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 8,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 9,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 10,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 11,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 12,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 13,
+            "length": 240
+        },
+        {
+            "color-mode": "BGR8",
+            "enabled": true,
+            "id": 14,
+            "length": 240
+        }
+    ]
 }

@@ -6,84 +6,18 @@ import os.path
 # See: https://bugs.launchpad.net/ubuntu/+source/python-qt4/+bug/941826
 from OpenGL import GL
 
-from PyQt5.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject, QUrl, QTimer, QSize
+from PyQt5.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot, QObject, QUrl,
+                          QTimer, QSize)
 from PyQt5.QtQml import qmlRegisterType, QQmlComponent
 from PyQt5.QtQuick import QQuickView
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QFileDialog
+from PyQt5.QtGui import QIcon
 
-from ui.canvaswidget import CanvasWidget
-from ui.fixturewidget import FixtureWidget
-from util.config import Config
-from models.scene import Scene, FixtureIdError
-from controllers.scenecontroller import SceneController
+from ui.canvasview import CanvasView
+
+from lib.config import Config
+from models.scene import Scene
 from controllers.netcontroller import NetController
-
-
-class UIState(QObject):
-    def __init__(self, parent=None):
-        super(UIState, self).__init__(parent)
-        self.parent = parent
-        self._backdrop_enable = parent.scenecontroller.scene.get("backdrop-enable", False)
-        self._labels_visible = parent.scenecontroller.scene.get("labels-visible", False)
-        self._locked = parent.scenecontroller.scene.get("locked", False)
-        self._center_visible = parent.scenecontroller.scene.get("center-visible", False)
-        self._blur_enable = parent.scenecontroller.scene.get("blur-enable", False)
-
-    backdrop_enable_changed = pyqtSignal()
-    labels_visible_changed = pyqtSignal()
-    locked_changed = pyqtSignal()
-    center_visible_changed = pyqtSignal()
-    blur_enable_changed = pyqtSignal()
-
-    @pyqtProperty(bool, notify=backdrop_enable_changed)
-    def backdrop_enable(self):
-        return self._backdrop_enable
-
-    @backdrop_enable.setter
-    def backdrop_enable(self, val):
-        if self._backdrop_enable != val:
-            self._backdrop_enable = val
-            self.backdrop_enable_changed.emit()
-
-    @pyqtProperty(bool, notify=labels_visible_changed)
-    def labels_visible(self):
-        return self._labels_visible
-
-    @labels_visible.setter
-    def labels_visible(self, val):
-        if self._labels_visible != val:
-            self._labels_visible = val
-            self.labels_visible_changed.emit()
-
-    @pyqtProperty(bool, notify=locked_changed)
-    def locked(self):
-        return self._locked
-
-    @locked.setter
-    def locked(self, val):
-        if self._locked != val:
-            self._locked = val
-            self.locked_changed.emit()
-
-    @pyqtProperty(bool, notify=center_visible_changed)
-    def center_visible(self):
-        return self._center_visible
-
-    @center_visible.setter
-    def center_visible(self, val):
-        if self._center_visible != val:
-            self._center_visible = val
-            self.center_visible_changed.emit()
-
-    @pyqtProperty(bool, notify=blur_enable_changed)
-    def blur_enable(self):
-        return self._blur_enable
-
-    @blur_enable.setter
-    def blur_enable(self, val):
-        if self._blur_enable != val:
-            self._blur_enable = val
-            self.blur_enable_changed.emit()
 
 
 class FireSimGUI(QObject):
@@ -102,49 +36,34 @@ class FireSimGUI(QObject):
             except ImportError:
                 log.error("Could not enable YaPPI profiling")
 
-        self._selected_fixture_strand = 0
-        self._selected_fixture_address = 0
-        self._selected_fixture_pixels = 0
-
         self.selected_fixture = None
         self.is_blurred = False
 
-        self.scene = Scene(os.path.join(self.config.get("scene-root"), self.args.scene) + ".json")
-        self.scenecontroller = SceneController(app=self, scene=self.scene)
+        scene_file_path = (self.args.scene if self.args.scene is not None
+                           else self.config.get("last-opened-scene"))
 
-        qmlRegisterType(CanvasWidget, "FireSim", 1, 0, "SimCanvas")
-        qmlRegisterType(FixtureWidget, "FireSim", 1, 0, "Fixture")
+        self.scene = Scene(scene_file_path)
+
+        qmlRegisterType(CanvasView, "FireSim", 1, 0, "Canvas")
 
         self.view = QQuickView()
 
-        self.view.setTitle("FireSim")
         self.view.setResizeMode(QQuickView.SizeRootObjectToView)
 
         self.view.closeEvent = self.on_close
 
         self.context = self.view.rootContext()
         self.context.setContextProperty('main', self)
-
-        self.state = UIState(self)
-        self.context.setContextProperty('App', self.state)
-
-        self.state.backdrop_enable_changed.connect(self.scenecontroller.on_backdrop_enable_changed)
-        self.state.labels_visible_changed.connect(self.scenecontroller.on_labels_visible_changed)
-
-        self.fixture_info_list = []
-        self.context.setContextProperty('fixtureInfoModel', self.fixture_info_list)
+        self.context.setContextProperty('view', self.view)
 
         self.view.setSource(QUrl('ui/qml/FireSimGUI.qml'))
 
         self.root = self.view.rootObject()
-        self.canvas = self.root.findChild(CanvasWidget)
+        self.canvas = self.root.findChild(CanvasView)
         self.canvas.gui = self
+        self.canvas.model.scene = self.scene
 
-        cw, ch = self.scenecontroller.scene.extents()
-        self.canvas.setWidth(cw)
-        self.canvas.setHeight(ch)
-
-        self.scenecontroller.set_canvas(self.canvas)
+        self.set_properties_from_scene()
 
         #self.net_thread = QThread()
         #self.net_thread.start()
@@ -152,27 +71,26 @@ class FireSimGUI(QObject):
         #self.netcontroller.moveToThread(self.net_thread)
         #self.netcontroller.start.emit()
 
-        self.net_stats_timer = QTimer()
-        self.net_stats_timer.setInterval(1000)
-        self.net_stats_timer.timeout.connect(self.update_net_stats)
-        self.net_stats_timer.start()
-
         self.redraw_timer = QTimer()
         self.redraw_timer.setInterval(33)
-        self.redraw_timer.timeout.connect(self.scenecontroller.update_all)
+        self.redraw_timer.timeout.connect(self.canvas.update)
         self.redraw_timer.start()
 
-        self.netcontroller.data_received.connect(self.on_network_event)
-        self.scenecontroller.new_frame.connect(self.netcontroller.frame_complete)
-        self.netcontroller.data_received.connect(self.scenecontroller.process_command)
+        self.netcontroller.new_frame.connect(self.canvas.controller.on_new_frame)
 
-        self.view.setMaximumSize(QSize(max(640, cw + 130), max(480, ch)))
-        self.view.setMinimumSize(self.view.maximumSize())
-        self.view.resize(self.view.maximumSize())
+        self.view.setMinimumSize(QSize(550, 550))
+        self.view.resize(QSize(700, 550))
 
         self.view.show()
         #self.view.showFullScreen()
         #self.view.setGeometry(self.app.desktop().availableGeometry())
+
+    def set_properties_from_scene(self):
+        self.view.setTitle("FireSim - %s" % self.scene.name)
+
+        cw, ch = self.scene.extents
+        self.canvas.setWidth(cw)
+        self.canvas.setHeight(ch)
 
     @pyqtSlot()
     def quit(self):
@@ -192,94 +110,33 @@ class FireSimGUI(QObject):
                 pass
 
     @pyqtSlot()
-    def update_net_stats(self):
-        self.canvas.net_stats = self.netcontroller.get_stats()
-
-    @pyqtSlot()
     def on_network_event(self):
         self.canvas.update()
 
     @pyqtSlot()
-    def on_btn_add_fixture(self):
-        self.scenecontroller.add_fixture()
-
-    @pyqtSlot()
-    def on_btn_clear(self):
-        self.scenecontroller.clear_fixtures()
+    def on_btn_open(self):
+        file_name = QFileDialog.getOpenFileName(self.app.focusWidget(),
+                                                "Open Scene", "",
+                                                "Scene Files (*.json)")
+        if len(file_name[0]) > 0:
+            self.scene.save()
+            self.redraw_timer.stop()
+            self.scene.set_filepath_and_load(file_name[0])
+            self.config['last-opened-scene'] = file_name[0]
+            self.config.save()
+            self.set_properties_from_scene()
+            self.redraw_timer.start()
 
     @pyqtSlot()
     def on_btn_save(self):
-        self.scenecontroller.save_scene()
+        self.scene.save()
 
-    def widget_selected(self, selected, fixture, multi):
-        self.selected_fixture = None
+    @pyqtSlot()
+    def on_btn_open_backdrop(self):
+        file_types = "Image Files (*.png *.jpg *.bmp *.jpeg *.xpm *.xbm *.ppm)"
+        file_name = QFileDialog.getOpenFileName(self.app.focusWidget(),
+                                                "Open Scene", "",
+                                                file_types)
 
-        if multi:
-            pass
-        else:
-            if selected:
-                self.selected_fixture_strand = fixture.strand()
-                self.selected_fixture_address = fixture.address()
-                self.selected_fixture_pixels = fixture.pixels()
-            else:
-                self.selected_fixture_strand = 0
-                self.selected_fixture_address = 0
-                self.selected_fixture_pixels = 0
-
-        if selected:
-            self.selected_fixture = fixture
-
-    def update_selected_fixture_properties(self):
-        if self.selected_fixture is not None:
-            new_strand = int(self.selected_fixture_strand)
-            new_address = int(self.selected_fixture_address)
-            if (self.selected_fixture.strand() != new_strand
-                or self.selected_fixture.address() != new_address):
-                try:
-                    self.scenecontroller.update_fixture(
-                        self.selected_fixture, new_strand, new_address
-                    )
-                except FixtureIdError:
-                    log.exception("Error updating fixture properties")
-                    return
-            self.selected_fixture.set_pixels(int(self.selected_fixture_pixels))
-            self.selected_fixture.get_widget().update()
-
-    def _get_selected_fixture_strand(self):
-        return self._selected_fixture_strand
-
-    def _set_selected_fixture_strand(self, strand):
-        if self._selected_fixture_strand == strand:
-            return
-        self._selected_fixture_strand = strand
-        self.update_selected_fixture_properties()
-        self.on_selected_fixture_strand.emit()
-
-    def _get_selected_fixture_address(self):
-        return self._selected_fixture_address
-
-    def _set_selected_fixture_address(self, address):
-        if self._selected_fixture_address == address:
-            return
-        self._selected_fixture_address = address
-        self.update_selected_fixture_properties()
-        self.on_selected_fixture_address.emit()
-
-    def _get_selected_fixture_pixels(self):
-        return self._selected_fixture_pixels
-
-    def _set_selected_fixture_pixels(self, pixels):
-        if self._selected_fixture_pixels == pixels:
-            return
-        self._selected_fixture_pixels = pixels
-        self.update_selected_fixture_properties()
-        self.on_selected_fixture_pixels.emit()
-
-    on_selected_fixture_strand = pyqtSignal()
-    on_selected_fixture_address = pyqtSignal()
-    on_selected_fixture_pixels = pyqtSignal()
-
-    selected_fixture_strand = pyqtProperty(int, _get_selected_fixture_strand, _set_selected_fixture_strand, notify=on_selected_fixture_strand)
-    selected_fixture_address = pyqtProperty(int, _get_selected_fixture_address, _set_selected_fixture_address, notify=on_selected_fixture_address)
-    selected_fixture_pixels = pyqtProperty(int, _get_selected_fixture_pixels, _set_selected_fixture_pixels, notify=on_selected_fixture_pixels)
-
+        if len(file_name[0]) > 0:
+            self.scene.backdrop_filepath = file_name[0]

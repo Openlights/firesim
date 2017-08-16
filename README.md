@@ -6,6 +6,8 @@ It can display the output of FireMix, which is useful for developing presets wit
 
 More information on preset development is on the [FireMix Page](https://github.com/craftyjon/firemix/)
 
+![FireSim screenshot](/firesim.png?raw=true)
+
 
 Installation / Development
 --------------------------
@@ -18,11 +20,11 @@ Getting Started
 
 FireMix stores information about the current lightshow design in a Scene file (as a JSON dictionary).  The scene
 can have a background image assigned (for reference when designing the show) and contains zero or more fixtures.
-Each fixture is a set of individually-addressable RGB LEDs arranged in a 1xN grid (i.e. each fixture represents 
+Each fixture is a set of individually-addressable RGB LEDs arranged in a 1xN grid (i.e. each fixture represents
 a segment of a strip of RGB LEDs).  Pixels are addressed by a tuple of (strand, fixture, pixel), where each strand
 represents an individual hardware controller, each fixture is a zero-based address along the strand, and each pixel
 is a zero-based offset along a fixture.  Fixtures can have any number of pixels, and strands can have any number of
-fixtures (in the simulator--in real life, you will be constrained by nuisances such as voltage droop and signal 
+fixtures (in the simulator--in real life, you will be constrained by nuisances such as voltage droop and signal
 integrity!)
 
 When the scene is unlocked, you can use FireSim to design the lightshow.  Use the command buttons on the left to add

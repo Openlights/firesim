@@ -4,7 +4,7 @@ import sys
 import logging as log
 
 from firesimgui import FireSimGUI
-from util.arguments import parse_args
+from lib.arguments import parse_args
 
 def sig_handler(app, sig, frame):
     log.info("Firesim received signal %d.  Shutting down.", sig)
@@ -14,7 +14,7 @@ def sig_handler(app, sig, frame):
         log.exception("Ignoring exception during shutdown request")
 
 def main():
-    log.basicConfig(level=log.DEBUG)
+    log.basicConfig(level=log.WARN)
     log.info("Booting FireSim...")
     args = parse_args()
     sim = FireSimGUI(args)

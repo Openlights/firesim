@@ -16,7 +16,7 @@ Column {
         anchors { leftMargin: 2; rightMargin: 2 }
         Text {
             color: "#eeeeee"
-            font.pixelSize: 12
+            font.pixelSize: 10
             text: key + ": "
         }
         Rectangle {
@@ -26,7 +26,7 @@ Column {
             TextInput {
                 id: textfield
                 anchors.fill: parent
-                font.pixelSize: 12
+                font.pixelSize: 10
                 anchors { leftMargin: 2; rightMargin: 2 }
                 color: "#eeeeee"
                 //text: ""
