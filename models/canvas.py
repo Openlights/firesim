@@ -8,7 +8,7 @@ class Canvas(QObject):
     def __init__(self):
         super(Canvas, self).__init__()
 
-        self._scene = None
+        self.scene = None
         self.color_data = {}
 
         # The canvas is always in either design mode or sim mode.
@@ -38,10 +38,10 @@ class Canvas(QObject):
             self._blurred = val
             self.changed.emit()
 
-    @property
-    def scene(self):
-        return self._scene
+    @pyqtProperty(bool, notify=changed)
+    def backdrop_enable(self):
+        return self.scene.backdrop_enable if self.scene else False
 
-    @scene.setter
-    def scene(self, s):
-        self._scene = s
+    @backdrop_enable.setter
+    def backdrop_enable(self, s):
+        self.scene.backdrop_enable = s

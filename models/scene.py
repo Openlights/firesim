@@ -197,11 +197,11 @@ class Scene(JSONDict):
         self.dirty = True
 
     @property
-    def backdrop_enabled(self):
+    def backdrop_enable(self):
         return self.data.get("backdrop-enable")
 
-    @backdrop_enabled.setter
-    def backdrop_enabled(self, en):
+    @backdrop_enable.setter
+    def backdrop_enable(self, en):
         self.data["backdrop-enable"] = en
         self.dirty = True
 

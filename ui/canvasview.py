@@ -177,13 +177,13 @@ void main (void)
 
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
 
-        if self.model.scene.backdrop_enabled:
+        if self.model.scene.backdrop_enable:
             if self._cached_backdrop is None:
                 log.info("Loading backdrop from %s" % self.model.scene.backdrop_filepath)
                 self._cached_backdrop = QImage(self.model.scene.backdrop_filepath)
                 if self._cached_backdrop is None:
                     log.warn("Could not load backdrop image; disabling")
-                    self.model.scene.backdrop_enabled = False
+                    self.model.scene.backdrop_enable = False
 
             iw, ih = self.scene_to_canvas(self.model.scene.extents)
             painter.drawImage(QRect(0, 0, iw, ih),
@@ -213,8 +213,8 @@ void main (void)
                 gl.glEnable(gl.GL_SCISSOR_TEST)
                 gl.glScissor(0, 0, w, h)
 
-                if not self.model.scene.backdrop_enabled:
-                    gl.glClearColor(0, 0, 0, 0)
+                if not self.model.backdrop_enable:
+                    gl.glClearColor(0, 0, 0, 1)
                     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
                 gl.glPointSize(15.0 if self.model.blurred else 5.0)

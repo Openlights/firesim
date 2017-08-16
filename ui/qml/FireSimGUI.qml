@@ -76,9 +76,9 @@ Item {
             ToolButton {
                 tooltip: "Show/Hide Background Image"
                 iconSource: "../res/icon/ic_image_white_24dp.png"
-                onClicked: canvas.model.scene.backdrop_enable = !canvas.model.scene.backdrop_enable
+                onClicked: canvas.model.backdrop_enable = !canvas.model.backdrop_enable
                 checkable: true
-                checked: canvas.model.scene.backdrop_enable
+                checked: canvas.model.backdrop_enable
             }
 
             ExclusiveGroup { id: designSimGroup }
@@ -146,65 +146,69 @@ Item {
                         view.visibility = Window.FullScreen
                 }
             }
+        }
+    }
 
-            Rectangle {
-                height: ((canvas.selection.length == 1) ?
-                         fixture_info_column.height + 10 :
-                         multiple_selection_column.height + 10)
-                visible: canvas.model.design_mode && canvas.selection.length > 0
+    Rectangle {
+        anchors { top: canvas.top; right: canvas.right; margins: 10 }
 
-                radius: 5
-                color: "#232323"
+        width: 100
 
-                Column {
-                    id: multiple_selection_column
-                    spacing: 4
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: canvas.selection.length > 1
+        height: ((canvas.selection.length == 1) ?
+                 fixture_info_column.height + 10 :
+                 multiple_selection_column.height + 10)
+        visible: canvas.model.design_mode && canvas.selection.length > 0
 
-                    Row {
-                        anchors { bottomMargin: 8; topMargin: 24 }
-                        Text {
-                            font.pixelSize: 14
-                            color: "#dddddd"
-                            text: canvas.selection.length + " Items Selected"
-                        }
-                    }
+        radius: 5
+        color: "#aa232323"
+
+        Column {
+            id: multiple_selection_column
+            spacing: 4
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: canvas.selection.length > 1
+
+            Row {
+                anchors { bottomMargin: 8; topMargin: 24 }
+                Text {
+                    font.pixelSize: 11
+                    color: "#dddddd"
+                    text: canvas.selection.length + " Items Selected"
                 }
+            }
+        }
 
-                Column {
-                    id: fixture_info_column
-                    spacing: 4
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: canvas.selection.length == 1
+        Column {
+            id: fixture_info_column
+            spacing: 4
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: canvas.selection.length == 1
 
-                    Row {
-                        anchors { bottomMargin: 8; topMargin: 24 }
-                        Text {
-                            font.pixelSize: 14
-                            color: "#dddddd"
-                            text: "Pixel Group"
-                        }
-                    }
-
-                    LabeledInput {
-                        id: input_fixture_strand
-                        key: "Strand ID"
-                        value: canvas.selection.length == 1 ? canvas.selection[0].strand : ""
-                    }
-
-                    LabeledInput {
-                        id: input_fixture_address
-                        key: "Offset"
-                        value: canvas.selection.length == 1 ? canvas.selection[0].offset : ""
-                    }
-
-                    LabeledInput {
-                        id: input_fixture_pixels
-                        key: "Pixel Count"
-                        value: canvas.selection.length == 1 ? canvas.selection[0].count : ""
-                    }
+            Row {
+                anchors { bottomMargin: 8; topMargin: 24 }
+                Text {
+                    font.pixelSize: 11
+                    color: "#dddddd"
+                    text: "Pixel Group"
                 }
+            }
+
+            LabeledInput {
+                id: input_fixture_strand
+                key: "Strand ID"
+                value: canvas.selection.length == 1 ? canvas.selection[0].strand : ""
+            }
+
+            LabeledInput {
+                id: input_fixture_address
+                key: "Offset"
+                value: canvas.selection.length == 1 ? canvas.selection[0].offset : ""
+            }
+
+            LabeledInput {
+                id: input_fixture_pixels
+                key: "Pixel Count"
+                value: canvas.selection.length == 1 ? canvas.selection[0].count : ""
             }
         }
     }
