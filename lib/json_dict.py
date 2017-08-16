@@ -76,7 +76,7 @@ class JSONDict(collections.MutableMapping):
         Generates a "new file" containing whatever defaults necessary
         (override in child classes)
         """
-        self.data.empty()
+        self.data.clear()
         self.data['file-type'] = self.filetype
 
     def load(self, create_new):
