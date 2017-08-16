@@ -130,3 +130,13 @@ class FireSimGUI(QObject):
     @pyqtSlot()
     def on_btn_save(self):
         self.scene.save()
+
+    @pyqtSlot()
+    def on_btn_open_backdrop(self):
+        file_types = "Image Files (*.png *.jpg *.bmp *.jpeg *.xpm *.xbm *.ppm)"
+        file_name = QFileDialog.getOpenFileName(self.app.focusWidget(),
+                                                "Open Scene", "",
+                                                file_types)
+
+        if len(file_name[0]) > 0:
+            self.scene.backdrop_filepath = file_name[0]

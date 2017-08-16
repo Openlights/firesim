@@ -48,6 +48,7 @@ class CanvasView(QQuickPaintedItem):
         self._last_render_times = []
         self._fps = 0
         self._cached_backdrop = None
+        self._cached_backdrop_path = None
 
         self.windowChanged.connect(self.on_window_changed)
 
@@ -178,12 +179,14 @@ void main (void)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
 
         if self.model.scene.backdrop_enable:
-            if self._cached_backdrop is None:
+            if self._cached_backdrop is None or self._cached_backdrop_path != self.model.scene.backdrop_filepath:
                 log.info("Loading backdrop from %s" % self.model.scene.backdrop_filepath)
                 self._cached_backdrop = QImage(self.model.scene.backdrop_filepath)
                 if self._cached_backdrop is None:
                     log.warn("Could not load backdrop image; disabling")
                     self.model.scene.backdrop_enable = False
+                else:
+                    self._cached_backdrop_path = self.model.scene.backdrop_filepath
 
             iw, ih = self.scene_to_canvas(self.model.scene.extents)
             painter.drawImage(QRect(0, 0, iw, ih),

@@ -71,6 +71,7 @@ Item {
                 id: btn_load_bg
                 tooltip: "Open Background Image"
                 iconSource: "../res/icon/ic_add_a_photo_white_24dp.png"
+                onClicked: main.on_btn_open_backdrop()
             }
 
             ToolButton {
