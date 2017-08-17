@@ -22,11 +22,6 @@ Item {
     focus: true
     Keys.enabled: true
     Keys.priority: Keys.BeforeItem
-    Keys.onReleased: {
-        if (event.key == Qt.Key_Q && event.modifiers == Qt.ControlModifier) {
-            main.quit()
-        }
-    }
     Keys.forwardTo: canvas
 
     Shortcut {
@@ -72,6 +67,11 @@ Item {
     Shortcut {
         sequence: "Ctrl+G"
         onActivated: canvas.model.backdrop_enable = !canvas.model.backdrop_enable
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Q"
+        onActivated: main.quit()
     }
 
     Canvas {

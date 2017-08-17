@@ -220,7 +220,8 @@ void main (void)
                     gl.glClearColor(0, 0, 0, 1)
                     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
-                gl.glPointSize(15.0 if self.model.blurred else 5.0)
+                size = self.scene_to_canvas((10, 10))[0]
+                gl.glPointSize(3 * size if self.model.blurred else size)
 
                 gl.glBegin(gl.GL_POINTS)
 
