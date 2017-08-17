@@ -59,6 +59,21 @@ Item {
         onActivated: canvas.model.blurred = !canvas.model.blurred
     }
 
+    Shortcut {
+        sequence: "Ctrl+D"
+        onActivated: canvas.model.design_mode = true
+    }
+
+    Shortcut {
+        sequence: "Ctrl+M"
+        onActivated: canvas.model.design_mode = false
+    }
+
+    Shortcut {
+        sequence: "Ctrl+G"
+        onActivated: canvas.model.backdrop_enable = !canvas.model.backdrop_enable
+    }
+
     Canvas {
         id: canvas
         anchors {
