@@ -7,7 +7,7 @@ import os.path
 from OpenGL import GL
 
 from PyQt5.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot, QObject, QUrl,
-                          QTimer, QSize)
+                          QTimer, QSize, QRect)
 from PyQt5.QtQml import qmlRegisterType, QQmlComponent
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtWidgets import QApplication, QFileDialog
@@ -26,6 +26,7 @@ class FireSimGUI(QObject):
         QObject.__init__(self)
 
         self.app = QApplication(["FireSim"])
+        self.app.aboutToQuit.connect(self.about_to_quit)
         self.args = args
         self.config = Config("data/config.json")
 
@@ -78,8 +79,12 @@ class FireSimGUI(QObject):
 
         self.netcontroller.new_frame.connect(self.canvas.controller.on_new_frame)
 
-        self.view.setMinimumSize(QSize(550, 550))
-        self.view.resize(QSize(700, 550))
+        geom_str = self.config.get("window-geometry", None)
+        if geom_str is not None:
+            self.view.setGeometry(QRect(*geom_str))
+        else:
+            self.view.setMinimumSize(QSize(550, 550))
+            self.view.resize(QSize(700, 550))
 
         self.view.show()
         #self.view.showFullScreen()
@@ -93,7 +98,15 @@ class FireSimGUI(QObject):
         self.canvas.setHeight(ch)
 
     @pyqtSlot()
+    def about_to_quit(self):
+        rect = self.view.geometry()
+        self.config["window-geometry"] = [rect.x(), rect.y(),
+                                          rect.width(), rect.height()]
+        self.config.save()
+
+    @pyqtSlot()
     def quit(self):
+        self.about_to_quit()
         self.app.quit()
 
     def run(self):
