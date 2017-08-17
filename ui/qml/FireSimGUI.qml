@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.9
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.4
 import QtGraphicalEffects 1.0
@@ -28,6 +28,36 @@ Item {
         }
     }
     Keys.forwardTo: canvas
+
+    Shortcut {
+        sequence: StandardKey.Open
+        onActivated: main.on_btn_open()
+    }
+
+    Shortcut {
+        sequence: StandardKey.New
+        onActivated: main.on_btn_new()
+    }
+
+    Shortcut {
+        sequence: StandardKey.Save
+        onActivated: main.on_btn_save()
+    }
+
+    Shortcut {
+        sequences: [StandardKey.FullScreen, "F11"]
+        onActivated: {
+            if (view.visibility == Window.FullScreen)
+                view.visibility = Window.Windowed
+            else
+                view.visibility = Window.FullScreen
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+B"
+        onActivated: canvas.model.blurred = !canvas.model.blurred
+    }
 
     Canvas {
         id: canvas
