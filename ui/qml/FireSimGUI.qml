@@ -158,7 +158,7 @@ Item {
                 tooltip: "Create Linear Group"
                 iconSource: "../res/icon/ic_dehaze_white_24dp.png"
                 visible: canvas.model.design_mode
-                onClicked: canvas.model.scene.add_new_pixel_group("linear")
+                onClicked: canvas.controller.add_new_pixel_group("linear")
             }
 
             /*ToolButton {
