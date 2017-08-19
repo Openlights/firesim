@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.9
 
 Column {
     id: labeledInput
@@ -6,7 +6,7 @@ Column {
     property variant key
     property alias value: textfield.text
 
-    signal changed
+    signal changed(string value)
 
     width: 80
     height: 16
@@ -31,6 +31,7 @@ Column {
                 color: "#eeeeee"
                 //text: ""
                 selectByMouse: true
+                onEditingFinished: labeledInput.changed(text)
             }
         }
     }

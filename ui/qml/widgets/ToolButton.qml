@@ -5,6 +5,7 @@ import QtGraphicalEffects 1.0
 
 Button {
     id: btn
+    property color textColor: "#ddd"
 
     style: ButtonStyle {
         background: Rectangle {
@@ -23,7 +24,26 @@ Button {
                 }
             }
         }
+
+        label: Item {
+            implicitWidth: row.implicitWidth
+            implicitHeight: row.implicitHeight
+            Row {
+                id: row
+                anchors.centerIn: parent
+                spacing: 2
+                Image {
+                    source: control.iconSource
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                Text {
+                    id: text
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: control.text
+                    font.pointSize: 8
+                    color: control.textColor
+                }
+            }
+        }
     }
-
-
 }

@@ -100,7 +100,7 @@ class FireSimGUI(QObject):
 
     @pyqtSlot(float)
     def set_target_fps(self, fps):
-        log.warn("Target FPS: %d" % fps)
+        log.info("Target FPS: %d" % fps)
         self.target_fps = fps
         self.redraw_timer.stop()
         self.redraw_timer.setInterval(1 / fps)

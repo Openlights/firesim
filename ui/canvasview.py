@@ -385,6 +385,20 @@ void main (void)
         painter.setBrush(color)
         painter.drawRoundedRect(rect, 2, 2)
 
+        label_pos = QPoint(x + 10, y + 10)
+        label_font = QFont()
+        label_font.setPointSize(8)
+        painter.setFont(label_font)
+
+        label_string = "Start" if (handle == handle.parent.start_handle) else "End"
+        fm = QFontMetrics(label_font)
+        text_rect = fm.boundingRect(label_string)
+        text_rect += QMargins(5, 2, 5, 2)
+        label_rect = QRect(label_pos - QPoint(12, 7), text_rect.size())
+
+        painter.setPen(QColor(255, 255, 255, 255))
+        painter.drawText(label_rect, Qt.AlignCenter, label_string)
+
     def _draw_address(self, painter, pg, offset):
         x1, y1 = self.scene_to_canvas(pg.start)
         x2, y2 = self.scene_to_canvas(pg.end)
