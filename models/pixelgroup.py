@@ -1,7 +1,8 @@
 import json
 import numpy as np
 
-from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject, QPoint, QPointF
+from PyQt5.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot, QObject, QPoint,
+                          QPointF)
 
 from lib.dtypes import pixel_color, pixel_location
 from lib.geometry import (distance, distance_point_to_line, inflate_rect,
@@ -107,7 +108,7 @@ class PixelGroup(QObject):
 
     @strand.setter
     def strand(self, val):
-        if self._strand != val:
+        if self._strand != val and val > 0:
             self._strand = val
 
     @pyqtProperty(int, notify=changed)
@@ -116,7 +117,7 @@ class PixelGroup(QObject):
 
     @offset.setter
     def offset(self, val):
-        if self._offset != val:
+        if self._offset != val and val > 0:
             self._offset = val
 
     @property
@@ -168,6 +169,9 @@ class PixelGroup(QObject):
     def on_drag_cancel(self):
         raise NotImplementedError("Please override on_drag_cancel()!")
 
+    def type(self):
+        raise NotImplementedError("Please override type()!")
+
 
 class LinearPixelGroup(PixelGroup):
     """
@@ -181,7 +185,6 @@ class LinearPixelGroup(PixelGroup):
                  strand=0, offset=0, json=None):
 
         super(LinearPixelGroup, self).__init__(count, strand, offset)
-
         if json is not None:
             self.from_json(json)
         else:
@@ -197,9 +200,15 @@ class LinearPixelGroup(PixelGroup):
         self._bounding_box = None
         self._update_geometry()
 
+    changed = pyqtSignal()
+
     def __repr__(self):
         return ("LinearPixelGroup address (%s) start (%s) end (%s) count %d" %
                 (self.address, self.start, self.end, self.count))
+
+    @pyqtProperty(str, notify=changed)
+    def type(self):
+        return "linear"
 
     @property
     def start(self):
@@ -221,6 +230,13 @@ class LinearPixelGroup(PixelGroup):
     def end(self, val):
         self._end = val
 
+    @pyqtSlot()
+    def flip(self):
+        temp = self.start
+        self.start = self.end
+        self.end = temp
+        self._update_geometry()
+
     def from_json(self, json):
         self.start = tuple(json["start"])
         self.end = tuple(json["end"])
@@ -240,13 +256,14 @@ class LinearPixelGroup(PixelGroup):
         return d
 
     def _update_geometry(self):
-        ox = (self.end[0] - self.start[0]) / self.count
-        oy = (self.end[1] - self.start[1]) / self.count
-        px, py = self.start[0], self.start[1]
-        for i in range(self.count):
-            self.pixel_locations[i] = (px, py)
-            px += ox
-            py += oy
+        if self.count > 0:
+            ox = (self.end[0] - self.start[0]) / self.count
+            oy = (self.end[1] - self.start[1]) / self.count
+            px, py = self.start[0], self.start[1]
+            for i in range(self.count):
+                self.pixel_locations[i] = (px, py)
+                px += ox
+                py += oy
         self._bounding_box = None
 
         # TODO: It would be nice if Handles updated automatically

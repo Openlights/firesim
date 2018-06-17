@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtProperty, pyqtSignal, pyqtSlot, QObject
 
 
 class Canvas(QObject):

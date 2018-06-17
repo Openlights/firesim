@@ -20,15 +20,19 @@ class NetController(QtCore.QObject):
         self.context = None
         self.socket = None
         self.app = app
-        self.updates = 0
-        self.packets = 0
+
         self.in_frame = False
         self.running = True
-        self.last_time = time.clock()
-        self._frame_times = []
-        self._frame_start_time = 0.0
+
         self._frame_data = {}
+
+        self._frame_count = 0
+        self._frame_time = time.perf_counter()
         self.fps = 0
+
+        self._packet_count = 0
+        self._packet_time = time.perf_counter()
+        self.pps = 0
 
         if USE_ZMQ:
             self.context = zmq.Context()
@@ -52,17 +56,13 @@ class NetController(QtCore.QObject):
                 packet = [c for c in datagram]
             else:
                 packet = [ord(c) for c in datagram.data()]
-            self.packets += 1
+            self._packet_count += 1
+            delta = time.perf_counter() - self._packet_time
+            if delta > 1:
+                self.pps = 0 if delta == 0 else (self._packet_count / delta)
+                self._packet_count = 0
+                self._packet_time = time.perf_counter()
             self.process_packet(packet)
-
-    @QtCore.pyqtSlot()
-    def run(self):
-        while self.running:
-            packets = self.socket.recv_multipart()
-            for packet in packets:
-                self.data_received.emit(packet)
-                self.packets += 1
-            QtCore.QCoreApplication.processEvents()
 
     def frame_started(self):
         self.in_frame = True
@@ -70,7 +70,6 @@ class NetController(QtCore.QObject):
     @QtCore.pyqtSlot()
     def frame_complete(self):
         self.in_frame = False
-        self.updates += 1
 
     def process_packet(self, packet):
         cmd = chr(packet[0])
@@ -78,7 +77,6 @@ class NetController(QtCore.QObject):
 
         # Begin frame
         if cmd == 'B':
-            self._frame_start_time = time.time()
             self.frame_started()
 
         # Unpack strand pixel data
@@ -90,18 +88,14 @@ class NetController(QtCore.QObject):
 
         # End frame
         elif cmd == 'E':
-            try:
-                fps = 1.0 / (time.time() - self._frame_start_time)
-            except ZeroDivisionError:
-                fps = 0
-
-            if len(self._frame_times) < 50:
-                self._frame_times.append(fps)
-            else:
-                self.fps = sum(self._frame_times) / 50
-                self._frame_times.pop(0)
-
             self.new_frame.emit(self._frame_data)
+
+            self._frame_count += 1
+            delta = time.perf_counter() - self._frame_time
+            if delta > 1:
+                self.fps = 0 if delta == 0 else (self._frame_count / delta)
+                self._frame_count = 0
+                self._frame_time = time.perf_counter()
 
         else:
             log.error("Malformed packet of length %d!" % len(packet))

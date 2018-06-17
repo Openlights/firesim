@@ -158,7 +158,7 @@ Item {
                 tooltip: "Create Linear Group"
                 iconSource: "../res/icon/ic_dehaze_white_24dp.png"
                 visible: canvas.model.design_mode
-                onClicked: canvas.model.scene.add_new_pixel_group("linear")
+                onClicked: canvas.controller.add_new_pixel_group("linear")
             }
 
             /*ToolButton {
@@ -203,65 +203,75 @@ Item {
     }
 
     Rectangle {
-        anchors { top: canvas.top; right: canvas.right; margins: 10 }
+        anchors { top: window.top; right: window.right; margins: 10 }
 
         width: 100
 
-        height: ((canvas.selection.length == 1) ?
-                 fixture_info_column.height + 10 :
-                 multiple_selection_column.height + 10)
+        height: fixture_info_column.height + 10
         visible: canvas.model.design_mode && canvas.selection.length > 0
 
         radius: 5
         color: "#aa232323"
 
         Column {
-            id: multiple_selection_column
-            spacing: 4
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: canvas.selection.length > 1
-
-            Row {
-                anchors { bottomMargin: 8; topMargin: 24 }
-                Text {
-                    font.pixelSize: 11
-                    color: "#dddddd"
-                    text: canvas.selection.length + " Items Selected"
-                }
-            }
-        }
-
-        Column {
             id: fixture_info_column
-            spacing: 4
+            spacing: 6
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: canvas.selection.length == 1
+
 
             Row {
                 anchors { bottomMargin: 8; topMargin: 24 }
                 Text {
                     font.pixelSize: 11
                     color: "#dddddd"
-                    text: "Pixel Group"
+                    text: (canvas.selection.length == 1 ? "Pixel Group"
+                           : canvas.selection.length + " Items Selected")
+
                 }
             }
 
             LabeledInput {
+                visible: canvas.selection.length == 1
                 id: input_fixture_strand
                 key: "Strand ID"
                 value: canvas.selection.length == 1 ? canvas.selection[0].strand : ""
+                onChanged: canvas.selection[0].strand = parseInt(value)
             }
 
             LabeledInput {
+                visible: canvas.selection.length == 1
                 id: input_fixture_address
                 key: "Offset"
                 value: canvas.selection.length == 1 ? canvas.selection[0].offset : ""
+                onChanged: canvas.selection[0].offset = parseInt(value)
             }
 
             LabeledInput {
+                visible: canvas.selection.length == 1
                 id: input_fixture_pixels
                 key: "Pixel Count"
                 value: canvas.selection.length == 1 ? canvas.selection[0].count : ""
+                onChanged: canvas.selection[0].count = parseInt(value)
+            }
+
+            Row {
+                visible: ((canvas.selection.length == 1) &&
+                          (canvas.selection[0].type == "linear"))
+                ToolButton {
+                    width: fixture_info_column.width
+                    text: "Flip Start/End"
+                    onClicked: canvas.selection[0].flip()
+                }
+            }
+
+            Row {
+                ToolButton {
+                    width: fixture_info_column.width
+                    text: (canvas.selection.length == 1 ? "Delete Group"
+                                                        : "Delete Groups")
+                    textColor: "#f99"
+                    onClicked: canvas.controller.delete_selected_groups()
+                }
             }
         }
     }

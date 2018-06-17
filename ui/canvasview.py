@@ -27,10 +27,12 @@ class CanvasView(QQuickPaintedItem):
 
     ENABLE_OPENGL = True
 
+    update_target_fps = pyqtSignal(float)
+
     def __init__(self, parent):
         super(CanvasView, self).__init__()
         self.parent = parent
-        self.controller = CanvasController(self)
+        self._controller = CanvasController(self)
         self._model = self.controller.model
 
         self.setRenderTarget(QQuickPaintedItem.FramebufferObject)
@@ -41,12 +43,13 @@ class CanvasView(QQuickPaintedItem):
 
         #self.renderer = CanvasRenderer()
 
-        self.cursor_loc = None
-
         self.gl = None
 
-        self._last_render_times = []
+        self._frame_time = time.perf_counter()
+        self._frame_count = 0
         self._fps = 0
+        self._fps_below_target = 0
+
         self._cached_backdrop = None
         self._cached_backdrop_path = None
 
@@ -62,6 +65,14 @@ class CanvasView(QQuickPaintedItem):
     @model.setter
     def model(self, val):
         self._model = val
+
+    @pyqtProperty(QObject, notify=model_changed)
+    def controller(self):
+        return self._controller
+
+    @controller.setter
+    def controller(self, val):
+        self._controller = val
 
     @pyqtProperty(QQmlListProperty, notify=selection_changed)
     def selection(self):
@@ -274,8 +285,8 @@ void main (void)
         self._render_pixels_this_frame = False
 
         # Debug - cursor drawing
-        # if self.cursor_loc is not None:
-        #     x, y = self.cursor_loc.x(), self.cursor_loc.y()
+        # if self.controller.cursor_loc is not None:
+        #     x, y = self.controller.cursor_loc.x(), self.controller.cursor_loc.y()
         #     painter.setPen(QPen(QColor(255, 255, 0, 255),
         #                               1,
         #                               Qt.SolidLine,
@@ -284,23 +295,30 @@ void main (void)
         #     painter.drawLine(QPointF(x - 5, y),QPointF(x + 5, y))
         #     painter.drawLine(QPointF(x, y - 5),QPointF(x, y + 5))
 
-        try:
-            frame_time = 1.0 / (time.time() - start)
-        except ZeroDivisionError:
-            frame_time = 0
+        self._frame_count += 1
+        delta = time.perf_counter() - self._frame_time
+        if delta > 1 and self._frame_count > 1:
+            self._fps = 0 if delta == 0 else (self._frame_count / delta)
+            self._frame_count = 0
+            self._frame_time = time.perf_counter()
 
-        if len(self._last_render_times) < 20:
-            self._last_render_times.append(frame_time)
-        else:
-            self._fps = sum(self._last_render_times) / 20
-            self._last_render_times.pop(0)
+            # Auto throttle
+            if self._fps < self.gui.target_fps - 10:
+                self._fps_below_target += 1
+                if self._fps_below_target > 10:
+                    new_target = max(self.gui.target_fps - 10, 10)
+                    log.warn("FPS target not met; lowering to %d" % new_target)
+                    self.update_target_fps.emit(new_target)
+                    self._fps_below_target = 0
 
         # Stats
         f = QFont()
         f.setPointSize(8)
         painter.setFont(f)
         painter.setPen(QColor(160, 150, 150, 200))
-        painter.drawText(8, 16, "Net %d pps" % self.gui.netcontroller.fps)
+        painter.drawText(8, 16, "Net %d pps / %d fps" %
+                         (self.gui.netcontroller.pps,
+                          self.gui.netcontroller.fps))
         painter.drawText(8, 32, "GUI %d fps" % self._fps)
 
     def _paint_linear_pixel_group(self, painter, pg):
@@ -366,6 +384,20 @@ void main (void)
         painter.setPen(QPen(color, 1, Qt.SolidLine))
         painter.setBrush(color)
         painter.drawRoundedRect(rect, 2, 2)
+
+        label_pos = QPoint(x + 10, y + 10)
+        label_font = QFont()
+        label_font.setPointSize(8)
+        painter.setFont(label_font)
+
+        label_string = "Start" if (handle == handle.parent.start_handle) else "End"
+        fm = QFontMetrics(label_font)
+        text_rect = fm.boundingRect(label_string)
+        text_rect += QMargins(5, 2, 5, 2)
+        label_rect = QRect(label_pos - QPoint(12, 7), text_rect.size())
+
+        painter.setPen(QColor(255, 255, 255, 255))
+        painter.drawText(label_rect, Qt.AlignCenter, label_string)
 
     def _draw_address(self, painter, pg, offset):
         x1, y1 = self.scene_to_canvas(pg.start)

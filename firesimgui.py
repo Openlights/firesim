@@ -63,6 +63,7 @@ class FireSimGUI(QObject):
         self.canvas = self.root.findChild(CanvasView)
         self.canvas.gui = self
         self.canvas.model.scene = self.scene
+        self.canvas.update_target_fps.connect(self.set_target_fps)
 
         self.set_properties_from_scene()
 
@@ -73,7 +74,7 @@ class FireSimGUI(QObject):
         #self.netcontroller.start.emit()
 
         self.redraw_timer = QTimer()
-        self.redraw_timer.setInterval(33)
+        self.set_target_fps(60)
         self.redraw_timer.timeout.connect(self.canvas.update)
         self.redraw_timer.start()
 
@@ -96,6 +97,14 @@ class FireSimGUI(QObject):
         cw, ch = self.scene.extents
         self.canvas.setWidth(cw)
         self.canvas.setHeight(ch)
+
+    @pyqtSlot(float)
+    def set_target_fps(self, fps):
+        log.info("Target FPS: %d" % fps)
+        self.target_fps = fps
+        self.redraw_timer.stop()
+        self.redraw_timer.setInterval(1 / fps)
+        self.redraw_timer.start()
 
     @pyqtSlot()
     def about_to_quit(self):
