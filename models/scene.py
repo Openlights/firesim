@@ -22,6 +22,8 @@ import logging
 import numpy as np
 from scipy import spatial
 
+from PyQt5.QtCore import (pyqtProperty, pyqtSignal, pyqtSlot)
+
 from lib.json_dict import JSONDict
 from lib.buffer_utils import BufferUtils
 from models.pixelgroup import LinearPixelGroup
@@ -66,6 +68,8 @@ class Scene(JSONDict):
     }
 
     """
+
+    changed = pyqtSignal()
 
     def __init__(self, filepath=None):
         self._reset()
@@ -187,7 +191,7 @@ class Scene(JSONDict):
         self.data["center"] = val
         self.dirty = True
 
-    @property
+    @pyqtProperty(str, notify=changed)
     def name(self):
         return self.data.get("scene-name", "")
 

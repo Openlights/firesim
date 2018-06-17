@@ -205,34 +205,49 @@ Item {
     Rectangle {
         anchors { top: window.top; right: window.right; margins: 10 }
 
-        width: 100
-
-        height: fixture_info_column.height + 10
-        visible: canvas.model.design_mode && canvas.selection.length > 0
-
+        width: 120
+        height: tool_palette.height + 20
         radius: 5
         color: "#aa232323"
+        visible: canvas.model.design_mode
 
         Column {
-            id: fixture_info_column
+            id: tool_palette
             spacing: 6
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors { left: parent.left; right: parent.right; margins: 10;
+                      verticalCenter: parent.verticalCenter }
 
-
-            Row {
+            Text {
                 anchors { bottomMargin: 8; topMargin: 24 }
-                Text {
-                    font.pixelSize: 11
-                    color: "#dddddd"
-                    text: (canvas.selection.length == 1 ? "Pixel Group"
-                           : canvas.selection.length + " Items Selected")
+                font.pixelSize: 12
+                font.bold: true
+                color: "#dddddd"
+                text: "Scene"
+            }
 
-                }
+            LabeledInput {
+                id: input_scene_name
+                key: "Name"
+                value: scene.name
+            }
+
+            Item {
+                width: 1
+                height: 6
+            }
+
+            Text {
+                visible: canvas.selection.length > 0
+                anchors { bottomMargin: 8; topMargin: 24 }
+                font.pixelSize: 12
+                font.bold: true
+                color: "#dddddd"
+                text: (canvas.selection.length == 1 ? "Pixel Group"
+                       : canvas.selection.length + " Items Selected")
             }
 
             LabeledInput {
                 visible: canvas.selection.length == 1
-                id: input_fixture_strand
                 key: "Strand ID"
                 value: canvas.selection.length == 1 ? canvas.selection[0].strand : ""
                 onChanged: canvas.selection[0].strand = parseInt(value)
@@ -240,7 +255,6 @@ Item {
 
             LabeledInput {
                 visible: canvas.selection.length == 1
-                id: input_fixture_address
                 key: "Offset"
                 value: canvas.selection.length == 1 ? canvas.selection[0].offset : ""
                 onChanged: canvas.selection[0].offset = parseInt(value)
@@ -248,30 +262,26 @@ Item {
 
             LabeledInput {
                 visible: canvas.selection.length == 1
-                id: input_fixture_pixels
                 key: "Pixel Count"
                 value: canvas.selection.length == 1 ? canvas.selection[0].count : ""
                 onChanged: canvas.selection[0].count = parseInt(value)
             }
 
-            Row {
+            ToolButton {
                 visible: ((canvas.selection.length == 1) &&
                           (canvas.selection[0].type == "linear"))
-                ToolButton {
-                    width: fixture_info_column.width
-                    text: "Flip Start/End"
-                    onClicked: canvas.selection[0].flip()
-                }
+                width: tool_palette.width
+                text: "Flip Start/End"
+                onClicked: canvas.selection[0].flip()
             }
 
-            Row {
-                ToolButton {
-                    width: fixture_info_column.width
-                    text: (canvas.selection.length == 1 ? "Delete Group"
-                                                        : "Delete Groups")
-                    textColor: "#f99"
-                    onClicked: canvas.controller.delete_selected_groups()
-                }
+            ToolButton {
+                visible: canvas.selection.length > 0
+                width: tool_palette.width
+                text: (canvas.selection.length == 1 ? "Delete Group"
+                                                    : "Delete Groups")
+                textColor: "#f99"
+                onClicked: canvas.controller.delete_selected_groups()
             }
         }
     }

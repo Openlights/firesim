@@ -8,7 +8,7 @@ from models.pixelgroup import *
 from models.canvas import Canvas
 
 from lib.dtypes import rgb888_color
-from lib.geometry import hit_test_rect, inflate_rect
+from lib.geometry import hit_test_rect, inflate_rect, vec2_sum
 
 
 class CanvasController(QObject):
@@ -19,6 +19,7 @@ class CanvasController(QObject):
         self.model = Canvas()
 
         self.mouse_down_pos = None
+        self.cursor_loc = (0, 0)
 
         self.selected = []
         self.selection_candidates = []
@@ -29,11 +30,29 @@ class CanvasController(QObject):
         self.drag_delta = None
         self.child_handling_drag = None
 
+        self.adding_type = None
+        self.ghost_item = None
+
     @pyqtSlot(dict)
     def on_new_frame(self, frame):
         for strand, data in frame.items():
             self.model.color_data[strand] =\
                 np.asarray(data).reshape((-1, 3))
+
+
+# Adding pixel groups should actually be a toggle-able mode, not a single click.
+# When in the mode, the mouse should ghost around a pixel group with default
+# properties.  When you click, it converts that to a real new pixel group and
+# stores it in the scene.  self.ghost_item can be temporary storage.  view should
+# be updated to draw ghost items in a special way (translucent, glowing border?)
+
+
+    @pyqtSlot(str)
+    def add_new_pixel_group(self, grouptype):
+        if grouptype == "linear":
+            self.ghost_item = LinearPixelGroup(start=self.cursor_loc,
+                                               end=(vec2_sum(self.cursor_loc,
+                                                             (50, 50))))
 
     def try_select_under_cursor(self, pos):
         """
@@ -97,7 +116,7 @@ class CanvasController(QObject):
         self.view.selection_changed.emit()
 
     def on_hover_move(self, event):
-        self.view.cursor_loc = event.pos()
+        self.cursor_loc = event.pos().x(), event.pos().y()
         if len(self.selected) > 0:
             return
 
@@ -118,7 +137,7 @@ class CanvasController(QObject):
         self.hovering.clear()
 
     def on_mouse_move(self, event):
-        self.view.cursor_loc = event.localPos()
+        self.cursor_loc = event.localPos().x(), event.localPos().y()
 
         if self.model.design_mode and len(self.selected) > 0:
 

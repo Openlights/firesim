@@ -22,8 +22,14 @@ import collections
 import json
 import os
 
+from PyQt5.QtCore import QObject
+from abc import ABCMeta
 
-class JSONDict(collections.MutableMapping):
+class JSONDictMeta(type(QObject), ABCMeta):
+    pass
+
+
+class JSONDict(collections.MutableMapping, QObject, metaclass=JSONDictMeta):
     """
     Represents a dictionary backed by a JSON file.  The dictionary must contain
     at least one entry, with the key 'file-type' and the value a string passed to __init__().
@@ -31,6 +37,8 @@ class JSONDict(collections.MutableMapping):
     """
 
     def __init__(self, filetype, filepath, create_new):
+        QObject.__init__(self)
+
         self.data = dict()
         self.filetype = filetype
         self.filepath = filepath

@@ -56,6 +56,7 @@ class FireSimGUI(QObject):
         self.context = self.view.rootContext()
         self.context.setContextProperty('main', self)
         self.context.setContextProperty('view', self.view)
+        self.context.setContextProperty('scene', self.scene)
 
         self.view.setSource(QUrl('ui/qml/FireSimGUI.qml'))
 
