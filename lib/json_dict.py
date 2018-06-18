@@ -101,9 +101,9 @@ class JSONDict(collections.MutableMapping, QObject, metaclass=JSONDictMeta):
                 try:
                     self.data = self._unicode_to_str(json.load(f))
                     if self.data.get('file-type', None) != self.filetype:
-                        raise ValueError("Error loading settings from %s: file-type mismatch." % self.filename)
-                except:
-                    raise ValueError("Parse error in JSON file.")
+                        raise ValueError("Error loading settings from %s: file-type mismatch." % self.filepath)
+                except json.JSONDecodeError as err:
+                    raise ValueError("Parse error in JSON file: %s at line %s" % (err.msg, err.lineno))
 
     def save(self):
         if self.filepath is None or self.filepath == "":

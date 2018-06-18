@@ -92,6 +92,7 @@ class Scene(JSONDict):
         self._pixel_groups = []
 
     def generate_new_data(self):
+        self.data['file-type'] = "scene"
         self.data['file-version'] = 2
         self.data['scene-name'] = "Untitled"
         self.data['bounding-box'] = [1000, 1000]
