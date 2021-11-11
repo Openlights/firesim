@@ -18,7 +18,7 @@
 from builtins import str
 from builtins import map
 from past.builtins import basestring
-import collections
+from collections.abc import Mapping, MutableMapping, Iterable
 import json
 import os
 
@@ -29,7 +29,7 @@ class JSONDictMeta(type(QObject), ABCMeta):
     pass
 
 
-class JSONDict(collections.MutableMapping, QObject, metaclass=JSONDictMeta):
+class JSONDict(MutableMapping, QObject, metaclass=JSONDictMeta):
     """
     Represents a dictionary backed by a JSON file.  The dictionary must contain
     at least one entry, with the key 'file-type' and the value a string passed to __init__().
@@ -116,9 +116,9 @@ class JSONDict(collections.MutableMapping, QObject, metaclass=JSONDictMeta):
     def _unicode_to_str(self, data):
         if isinstance(data, basestring):
             return str(data)
-        elif isinstance(data, collections.Mapping):
+        elif isinstance(data, Mapping):
             return dict(list(map(self._unicode_to_str, iter(data.items()))))
-        elif isinstance(data, collections.Iterable):
+        elif isinstance(data, Iterable):
             return type(data)(list(map(self._unicode_to_str, data)))
         else:
             return data

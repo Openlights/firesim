@@ -168,7 +168,7 @@ void main (void)
         scale_y = self.window().height() / canvas_height
         scale = min(scale_x, scale_y)
         # TODO: add offets to center the view when aspect ratio is wrong
-        scaled = (coord[0] * scale, coord[1] * scale)
+        scaled = (int(coord[0] * scale), int(coord[1] * scale))
         return scaled
 
     def canvas_to_scene(self, coord):
@@ -212,8 +212,8 @@ void main (void)
 
                 gl = self.gl
                 ratio = self.window().devicePixelRatio()
-                w = self.width() * ratio
-                h = self.height() * ratio
+                w = int(self.width() * ratio)
+                h = int(self.height() * ratio)
 
                 gl.glViewport(0, 0, w, h)
                 gl.glMatrixMode(gl.GL_PROJECTION)
